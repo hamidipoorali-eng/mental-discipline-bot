@@ -4,189 +4,291 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>باشگاه تمرکز و دیسپلین</title>
+    <!-- اتصال به API رسمی تلگرام برای تمام‌صفحه شدن -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            /* تم روشن پیش‌فرض */
-            --bg-color: #f4f4f9;
-            --text-color: #1a1a1a;
-            --card-bg: #ffffff;
-            --btn-bg: #e0e0e0;
-            --btn-active: #d0d0d0;
-            --accent: #2c3e50;
+            --bg-color: #f4f4f9; --text-color: #1a1a1a; --card-bg: #ffffff;
+            --btn-bg: #e0e0e0; --btn-active: #d0d0d0; --accent: #2c3e50; --error: #e74c3c;
         }
-
         [data-theme="dark"] {
-            /* تم تاریک */
-            --bg-color: #121212;
-            --text-color: #e0e0e0;
-            --card-bg: #1e1e1e;
-            --btn-bg: #2d2d2d;
-            --btn-active: #404040;
-            --accent: #4da6ff;
+            --bg-color: #121212; --text-color: #e0e0e0; --card-bg: #1e1e1e;
+            --btn-bg: #2d2d2d; --btn-active: #404040; --accent: #4da6ff; --error: #ff6b6b;
         }
-
         * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;}
         
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        /* هدر: کرونومتر و دکمه تم */
-        .header {
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            opacity: 0.7;
-        }
-
-        .theme-toggle {
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: var(--text-color);
-            font-size: 1.5rem;
-        }
-
-        /* مرکز: نمایش سوال */
-        .arena {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-
-        .question-box {
-            font-size: 4rem;
-            font-weight: 900;
-            letter-spacing: 5px;
-            margin-bottom: 20px;
-            direction: ltr; /* برای نمایش صحیح اعداد در کنار هم */
-        }
-
-        .answer-box {
-            font-size: 3rem;
-            min-height: 60px;
-            min-width: 150px;
-            text-align: center;
-            border-bottom: 3px solid var(--accent);
-            color: var(--accent);
-            font-weight: bold;
-        }
-
-        /* پایین: کیبورد اختصاصی */
-        .numpad {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            background-color: var(--card-bg);
-            border-top-left-radius: 30px;
-            border-top-right-radius: 30px;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-        }
-
-        .numpad button {
-            background-color: var(--btn-bg);
-            color: var(--text-color);
-            border: none;
-            padding: 20px;
-            font-size: 1.8rem;
-            font-weight: bold;
-            border-radius: 15px;
-            cursor: pointer;
-            user-select: none;
-        }
-
+        /* مدیریت صفحات */
+        .screen { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100%; width: 100%; padding: 20px; position: absolute; top: 0; left: 0; }
+        .screen.active { display: flex; }
+        
+        /* --- صفحه ورود (Onboarding) --- */
+        #onboardingScreen { text-align: center; z-index: 10; background-color: var(--bg-color); }
+        .logo-icon { font-size: 5rem; margin-bottom: 20px; }
+        .welcome-text { font-size: 1.2rem; line-height: 1.8; margin-bottom: 40px; text-align: justify; text-align-last: center; max-width: 400px;}
+        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 18px 40px; font-size: 1.4rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; max-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        
+        /* --- صفحه تمرین (رینگ اصلی) --- */
+        .header { width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; font-weight: bold; opacity: 0.7; position: absolute; top: 0; }
+        .theme-toggle { cursor: pointer; background: none; border: none; color: var(--text-color); font-size: 1.5rem; }
+        .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
+        .question-box { font-size: 4.5rem; font-weight: 900; letter-spacing: 5px; margin-bottom: 20px; direction: ltr; }
+        .answer-box { font-size: 3rem; min-height: 60px; min-width: 150px; text-align: center; border-bottom: 3px solid var(--accent); color: var(--accent); font-weight: bold; }
+        
+        .numpad { width: 100%; max-width: 400px; padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background-color: var(--card-bg); border-top-left-radius: 30px; border-top-right-radius: 30px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); margin-top: auto;}
+        .numpad button { background-color: var(--btn-bg); color: var(--text-color); border: none; padding: 20px; font-size: 1.8rem; font-weight: bold; border-radius: 15px; cursor: pointer; user-select: none; }
         .numpad button:active { background-color: var(--btn-active); transform: scale(0.95); }
         .btn-submit { grid-column: span 2; background-color: var(--accent) !important; color: white !important; }
-        
         [data-theme="dark"] .numpad { box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
+        
+        /* --- صفحه مرور خطاها و خلاصه --- */
+        #reviewScreen, #summaryScreen { text-align: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); color: white; z-index: 20;}
+        .error-list { margin: 20px 0; font-size: 1.5rem; direction: ltr; color: var(--error); font-weight: bold; letter-spacing: 2px;}
+        .coach-msg { font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; color: #ccc;}
+        
     </style>
 </head>
-<body data-theme="dark"> <!-- پیش‌فرض تم تاریک تنظیم شده است -->
+<body data-theme="dark">
 
-    <div class="header">
-        <button class="theme-toggle" id="themeBtn">☀️</button>
-        <div id="stopwatch">۰۰:۰۰</div>
-        <div id="progress">۱/۵</div>
+    <!-- ایستگاه ورود -->
+    <div id="onboardingScreen" class="screen active">
+        <div class="logo-icon">🧠</div>
+        <div class="welcome-text">
+            سلام.<br>من معلم ریاضی نیستم. من فقط یاد گرفتم چطور ذهنم را از اسارت ماشین‌حساب رها کنم. اینجا باشگاه تمرکز و دیسپلین روزانه من است. آماده‌ای؟
+        </div>
+        <button class="primary-btn" id="startBtn">بزن بریم</button>
     </div>
 
-    <div class="arena">
-        <div class="question-box" id="question">82 - 49 =</div>
-        <div class="answer-box" id="answer"></div>
+    <!-- رینگ تمرین -->
+    <div id="workoutScreen" class="screen">
+        <div class="header">
+            <button class="theme-toggle" id="themeBtn">☀️</button>
+            <div id="stopwatch">00:00</div>
+            <div id="progress" style="direction: ltr;">1/5</div>
+        </div>
+        <div class="arena">
+            <div class="question-box" id="question">--</div>
+            <div class="answer-box" id="answer"></div>
+        </div>
+        <div class="numpad" id="numpad">
+            <button data-val="1">۱</button>
+            <button data-val="2">۲</button>
+            <button data-val="3">۳</button>
+            <button data-val="4">۴</button>
+            <button data-val="5">۵</button>
+            <button data-val="6">۶</button>
+            <button data-val="7">۷</button>
+            <button data-val="8">۸</button>
+            <button data-val="9">۹</button>
+            <button class="btn-clear" id="clearBtn">⌫</button>
+            <button data-val="0">۰</button>
+            <button class="btn-submit" id="submitBtn">تأیید</button>
+        </div>
     </div>
 
-    <div class="numpad" id="numpad">
-        <button data-val="1">۱</button>
-        <button data-val="2">۲</button>
-        <button data-val="3">۳</button>
-        <button data-val="4">۴</button>
-        <button data-val="5">۵</button>
-        <button data-val="6">۶</button>
-        <button data-val="7">۷</button>
-        <button data-val="8">۸</button>
-        <button data-val="9">۹</button>
-        <button class="btn-clear" id="clearBtn">⌫</button>
-        <button data-val="0">۰</button>
-        <button class="btn-submit" id="submitBtn">تأیید</button>
+    <!-- توقف هوشمند (نمایش خطاها در انتها) -->
+    <div id="reviewScreen" class="screen">
+        <h2 style="color: var(--error);">اینجا گیر کردی!</h2>
+        <div id="errorQuestions" class="error-list"></div>
+        <div class="coach-msg" id="coachMessage">دیدی چه اتفاقی افتاد؟ خواستی با روش مدرسه‌ای حساب کنی. رند کن، بپر و جبرانش کن. حالا دقیقاً همینا رو دوباره ازت تست می‌گیرم.</div>
+        <button class="primary-btn" id="retestBtn">فهمیدم، بریم جبران</button>
+    </div>
+
+    <!-- صفحه پایان و دیسپلین -->
+    <div id="summaryScreen" class="screen">
+        <h2>پایان تمرین امروز</h2>
+        <p id="summaryMessage" style="font-size: 1.3rem; line-height: 2; margin: 30px 0;"></p>
+        <button class="primary-btn" id="closeAppBtn">بستن باشگاه</button>
     </div>
 
     <script>
-        // منطق تغییر تم
+        // اجبار تلگرام به باز شدن در حالت تمام‌صفحه
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.expand();
+        }
+
+        // --- افکت صوتی کلیک (Zero-Latency Web Audio API) ---
+        let audioCtx;
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        function playClick() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime); // فرکانس صدای تق‌تق
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        // تغییر تم
         const body = document.body;
-        const themeBtn = document.getElementById('themeBtn');
-        themeBtn.addEventListener('click', () => {
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.setAttribute('data-theme', 'light');
-                themeBtn.textContent = '🌙';
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeBtn.textContent = '☀️';
-            }
+        document.getElementById('themeBtn').addEventListener('click', () => {
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+            playClick();
         });
 
-        // منطق کیبورد اختصاصی
-        const answerBox = document.getElementById('answer');
-        const numButtons = document.querySelectorAll('.numpad button[data-val]');
-        const clearBtn = document.getElementById('clearBtn');
+        // --- موتور ریاضی ---
+        function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function generateRounding() {
+            let num1 = rand(40, 95);
+            let bases = [18, 19, 28, 29, 38, 39, 48, 49].filter(b => b < num1);
+            let num2 = bases[Math.floor(Math.random() * bases.length)];
+            return { q: `${num1} - ${num2}`, a: num1 - num2, tag: 'rounding' };
+        }
+        function generateJump() {
+            let n1_tens = rand(4, 9), n1_units = rand(1, 5);
+            let n2_tens = rand(1, n1_tens - 1), n2_units = rand(n1_units + 1, 9);
+            let num1 = (n1_tens * 10) + n1_units, num2 = (n2_tens * 10) + n2_units;
+            return { q: `${num1} - ${num2}`, a: num1 - num2, tag: 'jump' };
+        }
 
-        numButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                // تبدیل عدد به فرمت مناسب و نمایش در کادر
-                const val = e.target.getAttribute('data-val');
-                answerBox.textContent += val;
+        // --- متغیرهای استیت ---
+        let pack = [], failedQuestions = [], currentQ = 0, startTime, timerInterval;
+        let isRetestMode = false;
+        let activeTags = JSON.parse(localStorage.getItem('activeTags')) || [];
+        let streak = parseInt(localStorage.getItem('streak')) || 0;
+        let lastActive = localStorage.getItem('lastActive');
+
+        // جابجایی بین صفحات
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function buildPack() {
+            pack = [];
+            let useJump = activeTags.includes('jump');
+            let useRound = activeTags.includes('rounding');
+            for(let i=0; i<5; i++) {
+                if (useJump && !useRound) pack.push(generateJump());
+                else if (useRound && !useJump) pack.push(generateRounding());
+                else pack.push(Math.random() > 0.5 ? generateJump() : generateRounding());
+            }
+        }
+
+        function formatTime(sec) {
+            let m = Math.floor(sec / 60).toString().padStart(2, '0');
+            let s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        // شروع تمرین (کلیک روی بزن بریم)
+        document.getElementById('startBtn').addEventListener('click', () => {
+            initAudio(); playClick();
+            buildPack();
+            startSession(pack, false);
+        });
+
+        function startSession(questionList, isRetest) {
+            pack = questionList;
+            isRetestMode = isRetest;
+            currentQ = 0;
+            failedQuestions = [];
+            
+            showScreen('workoutScreen');
+            if(!isRetest) {
+                startTime = Date.now();
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    let elapsed = Math.floor((Date.now() - startTime) / 1000);
+                    document.getElementById('stopwatch').textContent = formatTime(elapsed);
+                }, 1000);
+            }
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            document.getElementById('question').textContent = pack[currentQ].q;
+            document.getElementById('answer').textContent = "";
+            document.getElementById('progress').textContent = `${currentQ + 1}/${pack.length}`;
+        }
+
+        function processSessionEnd() {
+            if (failedQuestions.length > 0) {
+                // نمایش خطاها و توقف هوشمند
+                document.getElementById('errorQuestions').innerHTML = failedQuestions.map(f => f.q).join('<br>');
+                let jumpErrors = failedQuestions.filter(f => f.tag === 'jump').length;
+                let roundErrors = failedQuestions.filter(f => f.tag === 'rounding').length;
+                
+                let msg = "";
+                if (jumpErrors > roundErrors) msg = "دیدی اینجا چه اتفاقی افتاد؟ خواستی از دهگان قرض بگیری. رند کن و بپر.";
+                else msg = "اینجا نیازی به محاسبه مدرسه‌ای نبود. عدد رو گرد کن، بعد اختلافش رو جبران کن.";
+                document.getElementById('coachMessage').textContent = msg + " حالا دقیقاً همینا رو دوباره ازت تست می‌گیرم.";
+                
+                showScreen('reviewScreen');
+            } else {
+                // پایان کامل و موفقیت‌آمیز
+                clearInterval(timerInterval);
+                let elapsed = Math.floor((Date.now() - startTime) / 1000);
+                
+                let today = new Date().toISOString().split('T')[0];
+                if (lastActive !== today) {
+                    let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+                    if (lastActive === yesterday.toISOString().split('T')[0]) streak++;
+                    else streak = 1;
+                    lastActive = today;
+                    localStorage.setItem('lastActive', today);
+                    localStorage.setItem('streak', streak);
+                }
+                
+                // ذخیره تگ‌ها برای فردا اگر در تست اصلی (نه ریتست) غلطی داشت
+                let newTags = [...new Set(failedQuestions.map(f => f.tag))];
+                if (!isRetestMode && newTags.length > 0) localStorage.setItem('activeTags', JSON.stringify(newTags));
+                
+                document.getElementById('summaryMessage').innerHTML = `
+                    زمان پردازش ذهنی: <b>${formatTime(elapsed)}</b><br>
+                    زنجیره تمرین شما: <b>${streak} روز</b>
+                `;
+                showScreen('summaryScreen');
+            }
+        }
+
+        // --- کلیدهای کیبورد ---
+        document.querySelectorAll('.numpad button[data-val]').forEach(btn => {
+            btn.addEventListener('click', (e) => { 
+                playClick();
+                document.getElementById('answer').textContent += e.target.getAttribute('data-val'); 
             });
         });
-
-        clearBtn.addEventListener('click', () => {
-            let currentStr = answerBox.textContent;
-            answerBox.textContent = currentStr.slice(0, -1);
+        
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            playClick();
+            let ansBox = document.getElementById('answer');
+            ansBox.textContent = ansBox.textContent.slice(0, -1);
         });
 
-        // اکشن دکمه تأیید (فعلاً فقط پاک می‌کند تا در فاز بک‌اند به دیتابیس وصل شود)
         document.getElementById('submitBtn').addEventListener('click', () => {
-            if(answerBox.textContent !== "") {
-                console.log("پاسخ ثبت شده:", answerBox.textContent);
-                answerBox.textContent = "";
-                // اینجا در فاز بعد، منطق بررسی درستی پاسخ و رفتن به سوال بعد اضافه می‌شود
+            playClick();
+            let ans = parseInt(document.getElementById('answer').textContent);
+            if (isNaN(ans)) return;
+
+            // بررسی درستی یا نادرستی و عبور بی‌سروصدا به سوال بعد
+            if (ans !== pack[currentQ].a) {
+                failedQuestions.push(pack[currentQ]);
             }
+            
+            currentQ++;
+            if (currentQ < pack.length) loadQuestion();
+            else processSessionEnd();
         });
+
+        // دکمه تست مجدد
+        document.getElementById('retestBtn').addEventListener('click', () => {
+            playClick();
+            startSession([...failedQuestions], true); // کپی کردن سوالات غلط برای تست مجدد
+        });
+
+        // دکمه بستن
+        document.getElementById('closeAppBtn').addEventListener('click', () => {
+            playClick();
+            if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close();
+        });
+
     </script>
 </body>
 </html>
