@@ -5,7 +5,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 TOKEN = "9240190897:AAEzafgrLuY6NFCT2XJ6u4c0Ho5-IvbIIoY"
 
 # لینک موقت مینی‌اپ (در مرحله بعد این لینک را با لینک واقعی جایگزین می‌کنیم)
-MINI_APP_URL = "https://google.com" 
+MINI_APP_URL = "https://hamidipoorali-eng.github.io/mental-discipline-bot/" 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
