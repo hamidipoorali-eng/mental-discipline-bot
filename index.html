@@ -18,13 +18,12 @@
         }
         * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0;}
         
-        /* استفاده از 100dvh برای جلوگیری از بریده شدن صفحه در موبایل */
         body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column;}
         
         .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; }
         .screen.active { display: flex; }
         
-        /* --- صفحه ورود و انتخاب سطح --- */
+        /* --- صفحه ورود --- */
         #onboardingScreen { justify-content: center; align-items: center; text-align: center; z-index: 10; padding: 20px;}
         .logo-icon { font-size: 4rem; margin-bottom: 10px; }
         .welcome-text { font-size: 1.1rem; line-height: 1.8; margin-bottom: 25px; text-align: justify; text-align-last: center; max-width: 400px;}
@@ -45,17 +44,12 @@
         .question-box { font-size: 4.8rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px; direction: ltr; }
         .answer-box { font-size: 3.5rem; min-height: 70px; min-width: 180px; text-align: center; border-bottom: 3px solid var(--accent); color: var(--accent); font-weight: bold; }
         
-        /* --- کیبورد اصلاح شده --- */
+        /* --- کیبورد --- */
         .numpad-container { padding: 15px; background-color: var(--card-bg); border-top-left-radius: 30px; border-top-right-radius: 30px; box-shadow: 0 -5px 25px rgba(0,0,0,0.08); z-index: 5;}
         .numpad { width: 100%; max-width: 400px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        
-        /* ارتفاع دکمه‌ها کمی متعادل‌تر شد تا در گوشی‌های کوچک بیرون نزند */
         .numpad button { background-color: var(--btn-bg); color: var(--text-color); border: none; padding: 18px 10px; font-size: 1.8rem; font-weight: bold; border-radius: 16px; cursor: pointer; user-select: none; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
         .numpad button:active { background-color: var(--btn-active); transform: scale(0.95); }
-        
-        /* باگ مخفی شدن برطرف شد (span 2 حذف شد) */
         .btn-submit { background-color: var(--accent) !important; color: white !important; font-size: 1.4rem !important;}
-        
         [data-theme="dark"] .numpad-container { box-shadow: 0 -5px 25px rgba(0,0,0,0.5); }
         
         /* --- پاپ‌آپ‌ها --- */
@@ -95,8 +89,6 @@
             <div class="question-box" id="question">--</div>
             <div class="answer-box" id="answer"></div>
         </div>
-        
-        <!-- کیبورد با چیدمان ۳ ستونه استاندارد -->
         <div class="numpad-container">
             <div class="numpad">
                 <button data-val="1">۱</button> <button data-val="2">۲</button> <button data-val="3">۳</button>
@@ -127,12 +119,34 @@
     </div>
 
     <script>
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.expand();
-            let user = window.Telegram.WebApp.initDataUnsafe?.user;
-            if (user && user.first_name) {
-                document.getElementById('userNameDisplay').textContent = user.first_name;
+        // --- متغیرهای ذخیره‌سازی ابری و دیسپلین ---
+        let streak = 0;
+        let lastActive = null;
+        let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+        // راه‌اندازی و خواندن اطلاعات از فضای ابری تلگرام
+        if (tg) {
+            tg.expand();
+            if (tg.initDataUnsafe?.user?.first_name) {
+                document.getElementById('userNameDisplay').textContent = tg.initDataUnsafe.user.first_name;
             }
+            
+            // فراخوانی داده‌ها از فضای ابری تلگرام
+            if (tg.CloudStorage) {
+                tg.CloudStorage.getItems(['streak', 'lastActive'], (err, values) => {
+                    if (!err && values) {
+                        if (values.streak) streak = parseInt(values.streak) || 0;
+                        if (values.lastActive) lastActive = values.lastActive;
+                    }
+                });
+            } else {
+                streak = parseInt(localStorage.getItem('streak')) || 0;
+                lastActive = localStorage.getItem('lastActive');
+            }
+        } else {
+            // حالت پشتیبان برای مرورگرهای خارج از تلگرام
+            streak = parseInt(localStorage.getItem('streak')) || 0;
+            lastActive = localStorage.getItem('lastActive');
         }
 
         let audioCtx;
@@ -197,8 +211,6 @@
 
         let currentPack = [], failedQuestions = [], currentQ = 0, startTime, timerInterval;
         let isPlacementTest = false, currentWorkoutLevel = 1, targetLevel = 1, isRetestMode = false;
-        let streak = parseInt(localStorage.getItem('streak')) || 0;
-        let lastActive = localStorage.getItem('lastActive');
 
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -287,12 +299,24 @@
             }
 
             clearInterval(timerInterval);
+            
+            // پردازش دیسپلین و ذخیره در فضای ابری تلگرام
             let today = new Date().toISOString().split('T')[0];
             if (lastActive !== today) {
                 let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-                if (lastActive === yesterday.toISOString().split('T')[0]) streak++;
-                else streak = 1;
+                if (lastActive === yesterday.toISOString().split('T')[0]) {
+                    streak++;
+                } else {
+                    streak = 1;
+                }
                 lastActive = today;
+                
+                // ذخیره ابری
+                if (tg && tg.CloudStorage) {
+                    tg.CloudStorage.setItem('lastActive', today);
+                    tg.CloudStorage.setItem('streak', streak.toString());
+                }
+                // پشتیبان‌گیری محلی
                 localStorage.setItem('lastActive', today);
                 localStorage.setItem('streak', streak);
             }
@@ -332,7 +356,7 @@
         });
 
         document.getElementById('closeAppBtn').addEventListener('click', () => {
-            playWoodClick(); if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close();
+            playWoodClick(); if (tg) tg.close();
         });
     </script>
 </body>
