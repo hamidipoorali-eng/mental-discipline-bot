@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>باشگاه تمرکز و دیسپلین</title>
-    <!-- اتصال به تلگرام و کتابخانه Chart.js -->
+    <!-- اتصال به تلگرام و کتابخانه Chart.js از سرور پایدار Cloudflare -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     
     <style>
         :root {
@@ -26,7 +26,6 @@
         .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; }
         .screen.active { display: flex; }
         
-        /* --- صفحه ورود --- */
         #onboardingScreen { justify-content: center; align-items: center; text-align: center; z-index: 10; padding: 20px;}
         .logo-icon { font-size: 4rem; margin-bottom: 10px; }
         .welcome-text { font-size: 1.1rem; line-height: 1.8; margin-bottom: 25px; text-align: justify; text-align-last: center; max-width: 400px;}
@@ -34,20 +33,16 @@
         .level-btn { background-color: var(--card-bg); color: var(--text-color); border: 2px solid var(--accent); padding: 18px 20px; font-size: 1.2rem; border-radius: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
         .level-btn:active { transform: scale(0.97); }
         
-        /* --- نوار ابزار بالا --- */
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--topbar-bg); backdrop-filter: blur(10px); z-index: 5; border-bottom: 1px solid rgba(128,128,128,0.1);}
         .top-bar button { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color); padding: 5px;}
         .level-badge { font-size: 1.1rem; font-weight: bold; color: var(--accent); background: rgba(128,128,128,0.1); padding: 5px 15px; border-radius: 20px; }
         
-        /* --- نوار آمار --- */
         .stats-bar { display: flex; justify-content: space-between; padding: 10px 25px; font-size: 1.1rem; font-weight: bold; opacity: 0.8; }
         
-        /* --- رینگ اصلی تمرین --- */
         .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding-bottom: 20px;}
         .question-box { font-size: 4.8rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px; direction: ltr; }
         .answer-box { font-size: 3.5rem; min-height: 70px; min-width: 180px; text-align: center; border-bottom: 3px solid var(--accent); color: var(--accent); font-weight: bold; }
         
-        /* --- کیبورد --- */
         .numpad-container { padding: 15px; background-color: var(--card-bg); border-top-left-radius: 30px; border-top-right-radius: 30px; box-shadow: 0 -5px 25px rgba(0,0,0,0.08); z-index: 5;}
         .numpad { width: 100%; max-width: 400px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
         .numpad button { background-color: var(--btn-bg); color: var(--text-color); border: none; padding: 18px 10px; font-size: 1.8rem; font-weight: bold; border-radius: 16px; cursor: pointer; user-select: none; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
@@ -55,15 +50,14 @@
         .btn-submit { background-color: var(--accent) !important; color: white !important; font-size: 1.4rem !important;}
         [data-theme="dark"] .numpad-container { box-shadow: 0 -5px 25px rgba(0,0,0,0.5); }
         
-        /* --- پاپ‌آپ‌ها --- */
         .popup-screen { flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(0,0,0,0.92); backdrop-filter: blur(5px); color: white; z-index: 20; padding: 20px;}
         .popup-title { font-size: 1.8rem; margin-bottom: 10px; color: var(--accent); }
         .popup-msg { font-size: 1.2rem; line-height: 1.8; margin-bottom: 20px; color: #eee; max-width: 350px;}
         .primary-btn { background-color: var(--accent); color: white; border: none; padding: 16px 30px; font-size: 1.2rem; border-radius: 16px; font-weight: bold; cursor: pointer; width: 100%; max-width: 300px; margin-top: 15px;}
         .error-list { margin: 20px 0; font-size: 1.5rem; direction: ltr; color: var(--error); font-weight: bold; letter-spacing: 2px;}
         
-        /* استایل مخصوص گراف پیشرفت */
-        .chart-container { width: 100%; max-width: 350px; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 10px; margin-bottom: 15px;}
+        /* استایل مخصوص گراف پیشرفت (تثبیت ارتفاع برای جلوگیری از غیب شدن کادر) */
+        .chart-container { width: 100%; max-width: 350px; height: 180px; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 10px; margin-bottom: 15px; position: relative;}
     </style>
 </head>
 <body data-theme="dark">
@@ -131,15 +125,13 @@
     </div>
 
     <script>
-        // --- متغیرهای ابری تلگرام ---
         let streak = 0;
         let lastActive = null;
-        let timeHistory = []; // آرایه برای نگهداری رکوردهای زمان
-        let chartInstance = null; // برای رفرش کردن گراف
+        let timeHistory = []; 
+        let chartInstance = null; 
 
         let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-        // فراخوانی داده‌ها در لحظه باز شدن
         if (tg) {
             tg.expand();
             if (tg.initDataUnsafe?.user?.first_name) {
@@ -151,7 +143,7 @@
                         if (values.streak) streak = parseInt(values.streak) || 0;
                         if (values.lastActive) lastActive = values.lastActive;
                         if (values.timeHistory) {
-                            try { timeHistory = JSON.parse(values.timeHistory); } catch(e){}
+                            try { timeHistory = JSON.parse(values.timeHistory); } catch(e){ timeHistory = []; }
                         }
                     }
                 });
@@ -167,19 +159,21 @@
         let audioCtx;
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playWoodClick() {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator(); 
-            const gain = audioCtx.createGain();
-            const filter = audioCtx.createBiquadFilter();
+            try {
+                if (!audioCtx) return;
+                const osc = audioCtx.createOscillator(); 
+                const gain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
 
-            osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-            
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(350, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
-            filter.type = 'lowpass'; filter.frequency.value = 800; 
-            gain.gain.setValueAtTime(0.6, audioCtx.currentTime); 
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); 
-            osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+                osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+                
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
+                filter.type = 'lowpass'; filter.frequency.value = 800; 
+                gain.gain.setValueAtTime(0.6, audioCtx.currentTime); 
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+            } catch(e) {} // محافظت در برابر خطای صوتی
         }
 
         document.getElementById('themeBtn').addEventListener('click', () => {
@@ -188,7 +182,7 @@
             body.setAttribute('data-theme', isDark ? 'light' : 'dark');
             document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
             playWoodClick();
-            if(chartInstance) drawChart(); // بروزرسانی رنگ چارت با تغییر تم
+            if(chartInstance) drawChart(); 
         });
 
         document.getElementById('backBtn').addEventListener('click', () => {
@@ -261,47 +255,62 @@
             document.getElementById('progress').textContent = `${currentQ + 1}/${currentPack.length}`;
         }
 
-        // رسم گراف پیشرفت با Chart.js
+        // رسم گراف پیشرفت (با محافظت ضدکِرَش)
         function drawChart() {
-            const ctx = document.getElementById('progressChart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-            
-            let isDark = document.body.getAttribute('data-theme') === 'dark';
-            let textColor = isDark ? '#e0e0e0' : '#1a1a1a';
-            let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+            try {
+                if (typeof Chart === 'undefined') {
+                    console.warn("کتابخانه رسم گراف هنوز لود نشده است.");
+                    return;
+                }
+                const ctx = document.getElementById('progressChart').getContext('2d');
+                if (chartInstance) chartInstance.destroy();
+                
+                let isDark = document.body.getAttribute('data-theme') === 'dark';
+                let textColor = isDark ? '#e0e0e0' : '#1a1a1a';
+                let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: timeHistory.map((_, index) => (index + 1).toString()),
-                    datasets: [{
-                        label: 'زمان پردازش (ثانیه)',
-                        data: timeHistory,
-                        borderColor: '#4da6ff',
-                        backgroundColor: 'rgba(77, 166, 255, 0.2)',
-                        borderWidth: 2,
-                        tension: 0.4, // انحنای نرم خطوط
-                        pointBackgroundColor: '#e74c3c',
-                        pointRadius: 4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } }, // مخفی کردن راهنما برای خلوتی چارت
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            title: { display: true, text: 'ثانیه', color: textColor, font: {family: 'system-ui'} },
-                            grid: { color: gridColor }, ticks: { color: textColor }
-                        },
-                        x: { 
-                            title: { display: true, text: 'تاریخچه تمرینات', color: textColor, font: {family: 'system-ui'} },
-                            grid: { display: false }, ticks: { color: textColor }
+                // اگر فقط یک رکورد ثبت شده، آن را تکرار می‌کنیم تا خط صاف دیده شود نه یک نقطه خالی
+                let displayData = [...timeHistory];
+                let displayLabels = timeHistory.map((_, index) => (index + 1).toString());
+                if (displayData.length === 1) {
+                    displayData.push(displayData[0]);
+                    displayLabels.push("-");
+                }
+
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: displayLabels,
+                        datasets: [{
+                            label: 'زمان (ثانیه)',
+                            data: displayData,
+                            borderColor: '#4da6ff',
+                            backgroundColor: 'rgba(77, 166, 255, 0.2)',
+                            borderWidth: 2,
+                            tension: 0.4, 
+                            pointBackgroundColor: '#e74c3c',
+                            pointRadius: 4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // اجازه می‌دهد کادر را به صورت دستی ارتفاع بدهیم
+                        plugins: { legend: { display: false } }, 
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                grid: { color: gridColor }, ticks: { color: textColor }
+                            },
+                            x: { 
+                                grid: { display: false }, ticks: { color: textColor }
+                            }
                         }
                     }
-                }
-            });
+                });
+            } catch(e) {
+                console.error("خطا در رسم نمودار: ", e);
+            }
         }
 
         function processSessionEnd() {
@@ -331,7 +340,6 @@
 
             clearInterval(timerInterval);
             
-            // پردازش دیسپلین
             let today = new Date().toISOString().split('T')[0];
             if (lastActive !== today) {
                 let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
@@ -339,15 +347,14 @@
                 lastActive = today;
             }
             
-            // ثبت رکورد زمان (فقط ۱۰ رکورد آخر)
             timeHistory.push(elapsed);
             if(timeHistory.length > 10) timeHistory.shift();
 
-            // ذخیره همزمان در ابری و محلی
+            // ثبت با Callback خالی برای جلوگیری از خطای همگام‌سازی تلگرام
             if (tg && tg.CloudStorage) {
-                tg.CloudStorage.setItem('lastActive', lastActive);
-                tg.CloudStorage.setItem('streak', streak.toString());
-                tg.CloudStorage.setItem('timeHistory', JSON.stringify(timeHistory));
+                tg.CloudStorage.setItem('lastActive', lastActive, function(){});
+                tg.CloudStorage.setItem('streak', streak.toString(), function(){});
+                tg.CloudStorage.setItem('timeHistory', JSON.stringify(timeHistory), function(){});
             }
             localStorage.setItem('lastActive', lastActive);
             localStorage.setItem('streak', streak);
@@ -358,7 +365,6 @@
                 زنجیره دیسپلین: <b style="color:var(--accent); font-size:1.4rem;">${streak} روز 🔥</b>
             `;
             
-            // رسم چارت
             showScreen('summaryScreen');
             drawChart();
         }
@@ -367,13 +373,24 @@
             btn.addEventListener('click', (e) => { playWoodClick(); document.getElementById('answer').textContent += e.target.getAttribute('data-val'); });
         });
         document.getElementById('clearBtn').addEventListener('click', () => { playWoodClick(); let ansBox = document.getElementById('answer'); ansBox.textContent = ansBox.textContent.slice(0, -1); });
+        
         document.getElementById('submitBtn').addEventListener('click', () => {
             playWoodClick(); let ans = parseInt(document.getElementById('answer').textContent); if (isNaN(ans)) return;
             if (ans !== currentPack[currentQ].a) failedQuestions.push(currentPack[currentQ]);
             currentQ++; if (currentQ < currentPack.length) loadQuestion(); else processSessionEnd();
         });
+        
         document.getElementById('retestBtn').addEventListener('click', () => { playWoodClick(); startSession([...failedQuestions], currentWorkoutLevel, false, true); });
-        document.getElementById('closeAppBtn').addEventListener('click', () => { playWoodClick(); if (tg) tg.close(); });
+        
+        // دکمه بستن ضدگلوله شد
+        document.getElementById('closeAppBtn').addEventListener('click', () => { 
+            playWoodClick(); 
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.close();
+            } else {
+                window.close(); // برای مرورگرهای خارج از تلگرام
+            }
+        });
     </script>
 </body>
 </html>
