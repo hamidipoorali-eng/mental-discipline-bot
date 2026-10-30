@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>باشگاه تمرکز و دیسپلین</title>
-    <!-- اتصال به API رسمی تلگرام برای تمام‌صفحه شدن -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -18,17 +17,18 @@
         * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s; }
         body { background-color: var(--bg-color); color: var(--text-color); margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;}
         
-        /* مدیریت صفحات */
         .screen { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100%; width: 100%; padding: 20px; position: absolute; top: 0; left: 0; }
         .screen.active { display: flex; }
         
-        /* --- صفحه ورود (Onboarding) --- */
+        /* --- صفحه ورود و انتخاب سطح --- */
         #onboardingScreen { text-align: center; z-index: 10; background-color: var(--bg-color); }
-        .logo-icon { font-size: 5rem; margin-bottom: 20px; }
-        .welcome-text { font-size: 1.2rem; line-height: 1.8; margin-bottom: 40px; text-align: justify; text-align-last: center; max-width: 400px;}
-        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 18px 40px; font-size: 1.4rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; max-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .logo-icon { font-size: 4rem; margin-bottom: 10px; }
+        .welcome-text { font-size: 1.1rem; line-height: 1.8; margin-bottom: 25px; text-align: justify; text-align-last: center; max-width: 400px;}
+        .level-btns { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 300px; }
+        .level-btn { background-color: var(--card-bg); color: var(--text-color); border: 2px solid var(--accent); padding: 15px; font-size: 1.2rem; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;}
+        .level-btn:active { transform: scale(0.97); }
         
-        /* --- صفحه تمرین (رینگ اصلی) --- */
+        /* --- صفحه رینگ اصلی --- */
         .header { width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; font-weight: bold; opacity: 0.7; position: absolute; top: 0; }
         .theme-toggle { cursor: pointer; background: none; border: none; color: var(--text-color); font-size: 1.5rem; }
         .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
@@ -39,13 +39,13 @@
         .numpad button { background-color: var(--btn-bg); color: var(--text-color); border: none; padding: 20px; font-size: 1.8rem; font-weight: bold; border-radius: 15px; cursor: pointer; user-select: none; }
         .numpad button:active { background-color: var(--btn-active); transform: scale(0.95); }
         .btn-submit { grid-column: span 2; background-color: var(--accent) !important; color: white !important; }
-        [data-theme="dark"] .numpad { box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
         
-        /* --- صفحه مرور خطاها و خلاصه --- */
-        #reviewScreen, #summaryScreen { text-align: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); color: white; z-index: 20;}
+        /* --- پاپ‌آپ‌های سیستم (دروازه‌بان، خطا، پایان) --- */
+        .popup-screen { text-align: center; background: rgba(0,0,0,0.92); backdrop-filter: blur(5px); color: white; z-index: 20;}
+        .popup-title { font-size: 1.8rem; margin-bottom: 15px; color: var(--accent); }
+        .popup-msg { font-size: 1.2rem; line-height: 1.8; margin-bottom: 30px; color: #eee; max-width: 350px;}
+        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 16px 30px; font-size: 1.2rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; max-width: 300px;}
         .error-list { margin: 20px 0; font-size: 1.5rem; direction: ltr; color: var(--error); font-weight: bold; letter-spacing: 2px;}
-        .coach-msg { font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; color: #ccc;}
-        
     </style>
 </head>
 <body data-theme="dark">
@@ -54,9 +54,14 @@
     <div id="onboardingScreen" class="screen active">
         <div class="logo-icon">🧠</div>
         <div class="welcome-text">
-            سلام.<br>من معلم ریاضی نیستم. من فقط یاد گرفتم چطور ذهنم را از اسارت ماشین‌حساب رها کنم. اینجا باشگاه تمرکز و دیسپلین روزانه من است. آماده‌ای؟
+            سلام <span id="userNameDisplay" style="color: var(--accent); font-weight: bold;">مبارز</span>.<br>
+            به باشگاه تمرکز و پردازش سریعِ ذهن خوش آمدی. ماشین‌حساب‌ها رو دور بریز و سطح وزنه امروزت رو انتخاب کن:
         </div>
-        <button class="primary-btn" id="startBtn">بزن بریم</button>
+        <div class="level-btns">
+            <button class="level-btn" onclick="selectLevel(1)"><span>سطح ۱ (گرم‌کردن)</span> <span style="font-size: 0.9rem; opacity: 0.7;">۲ رقمی</span></button>
+            <button class="level-btn" onclick="selectLevel(2)"><span>سطح ۲ (متوسط)</span> <span style="font-size: 0.9rem; opacity: 0.7;">۳ و ۲ رقمی</span></button>
+            <button class="level-btn" onclick="selectLevel(3)"><span>سطح ۳ (حرفه‌ای)</span> <span style="font-size: 0.9rem; opacity: 0.7;">۳ رقمی</span></button>
+        </div>
     </div>
 
     <!-- رینگ تمرین -->
@@ -70,105 +75,100 @@
             <div class="question-box" id="question">--</div>
             <div class="answer-box" id="answer"></div>
         </div>
-        <div class="numpad" id="numpad">
-            <button data-val="1">۱</button>
-            <button data-val="2">۲</button>
-            <button data-val="3">۳</button>
-            <button data-val="4">۴</button>
-            <button data-val="5">۵</button>
-            <button data-val="6">۶</button>
-            <button data-val="7">۷</button>
-            <button data-val="8">۸</button>
-            <button data-val="9">۹</button>
-            <button class="btn-clear" id="clearBtn">⌫</button>
-            <button data-val="0">۰</button>
-            <button class="btn-submit" id="submitBtn">تأیید</button>
+        <div class="numpad">
+            <button data-val="1">۱</button> <button data-val="2">۲</button> <button data-val="3">۳</button>
+            <button data-val="4">۴</button> <button data-val="5">۵</button> <button data-val="6">۶</button>
+            <button data-val="7">۷</button> <button data-val="8">۸</button> <button data-val="9">۹</button>
+            <button id="clearBtn">⌫</button> <button data-val="0">۰</button> <button class="btn-submit" id="submitBtn">تأیید</button>
         </div>
     </div>
 
-    <!-- توقف هوشمند (نمایش خطاها در انتها) -->
-    <div id="reviewScreen" class="screen">
+    <!-- پاپ‌آپ دروازه‌بان (Gatekeeper) -->
+    <div id="gatekeeperScreen" class="screen popup-screen">
+        <h2 class="popup-title" id="gkTitle">نتیجه آزمون ورودی</h2>
+        <div class="popup-msg" id="gkMessage">...</div>
+        <button class="primary-btn" id="gkBtn">شروع تمرین اصلی</button>
+    </div>
+
+    <!-- پاپ‌آپ توقف هوشمند (ریتست خطاها) -->
+    <div id="reviewScreen" class="screen popup-screen">
         <h2 style="color: var(--error);">اینجا گیر کردی!</h2>
         <div id="errorQuestions" class="error-list"></div>
-        <div class="coach-msg" id="coachMessage">دیدی چه اتفاقی افتاد؟ خواستی با روش مدرسه‌ای حساب کنی. رند کن، بپر و جبرانش کن. حالا دقیقاً همینا رو دوباره ازت تست می‌گیرم.</div>
+        <div class="popup-msg">دیدی چه اتفاقی افتاد؟ خواستی با روش مدرسه‌ای حساب کنی. رند کن و بپر. حالا دقیقاً همینا رو دوباره ازت تست می‌گیرم.</div>
         <button class="primary-btn" id="retestBtn">فهمیدم، بریم جبران</button>
     </div>
 
-    <!-- صفحه پایان و دیسپلین -->
-    <div id="summaryScreen" class="screen">
+    <!-- صفحه پایان -->
+    <div id="summaryScreen" class="screen popup-screen">
         <h2>پایان تمرین امروز</h2>
-        <p id="summaryMessage" style="font-size: 1.3rem; line-height: 2; margin: 30px 0;"></p>
+        <div class="popup-msg" id="summaryMessage" style="font-size: 1.3rem; margin: 30px 0;"></div>
         <button class="primary-btn" id="closeAppBtn">بستن باشگاه</button>
     </div>
 
     <script>
-        // اجبار تلگرام به باز شدن در حالت تمام‌صفحه
+        // --- راه‌اندازی بومی تلگرام ---
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.expand();
+            let user = window.Telegram.WebApp.initDataUnsafe?.user;
+            if (user && user.first_name) {
+                document.getElementById('userNameDisplay').textContent = user.first_name;
+            }
         }
 
-        // --- افکت صوتی کلیک (Zero-Latency Web Audio API) ---
+        // --- افکت صوتی ---
         let audioCtx;
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playClick() {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime); // فرکانس صدای تق‌تق
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
             osc.start(); osc.stop(audioCtx.currentTime + 0.05);
         }
 
-        // تغییر تم
-        const body = document.body;
+        // --- تغییر تم ---
         document.getElementById('themeBtn').addEventListener('click', () => {
+            const body = document.body;
             const isDark = body.getAttribute('data-theme') === 'dark';
             body.setAttribute('data-theme', isDark ? 'light' : 'dark');
             document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
             playClick();
         });
 
-        // --- موتور ریاضی ---
+        // --- موتور ریاضی ترکیبی ---
         function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-        function generateRounding() {
-            let num1 = rand(40, 95);
-            let bases = [18, 19, 28, 29, 38, 39, 48, 49].filter(b => b < num1);
-            let num2 = bases[Math.floor(Math.random() * bases.length)];
-            return { q: `${num1} - ${num2}`, a: num1 - num2, tag: 'rounding' };
+        
+        function generateQ(level) {
+            let num1, num2;
+            let isAdd = Math.random() > 0.5; // ترکیب ۵۰/۵۰ جمع و تفریق
+            
+            if (level === 1) { num1 = rand(20, 99); num2 = rand(15, 99); }
+            else if (level === 2) { num1 = rand(100, 999); num2 = rand(15, 99); }
+            else { num1 = rand(100, 999); num2 = rand(100, 999); }
+
+            if (!isAdd && num1 < num2) [num1, num2] = [num2, num1]; // جلوگیری از جواب منفی در تفریق
+
+            let ans = isAdd ? num1 + num2 : num1 - num2;
+            let op = isAdd ? '+' : '-';
+            return { q: `${num1} ${op} ${num2}`, a: ans };
         }
-        function generateJump() {
-            let n1_tens = rand(4, 9), n1_units = rand(1, 5);
-            let n2_tens = rand(1, n1_tens - 1), n2_units = rand(n1_units + 1, 9);
-            let num1 = (n1_tens * 10) + n1_units, num2 = (n2_tens * 10) + n2_units;
-            return { q: `${num1} - ${num2}`, a: num1 - num2, tag: 'jump' };
+
+        function buildPack(level) {
+            let pack = [];
+            for(let i=0; i<5; i++) pack.push(generateQ(level));
+            return pack;
         }
 
         // --- متغیرهای استیت ---
-        let pack = [], failedQuestions = [], currentQ = 0, startTime, timerInterval;
-        let isRetestMode = false;
-        let activeTags = JSON.parse(localStorage.getItem('activeTags')) || [];
+        let currentPack = [], failedQuestions = [], currentQ = 0, startTime, timerInterval;
+        let isPlacementTest = false, currentWorkoutLevel = 1, targetLevel = 1, isRetestMode = false;
         let streak = parseInt(localStorage.getItem('streak')) || 0;
         let lastActive = localStorage.getItem('lastActive');
 
-        // جابجایی بین صفحات
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
-        }
-
-        function buildPack() {
-            pack = [];
-            let useJump = activeTags.includes('jump');
-            let useRound = activeTags.includes('rounding');
-            for(let i=0; i<5; i++) {
-                if (useJump && !useRound) pack.push(generateJump());
-                else if (useRound && !useJump) pack.push(generateRounding());
-                else pack.push(Math.random() > 0.5 ? generateJump() : generateRounding());
-            }
         }
 
         function formatTime(sec) {
@@ -177,21 +177,31 @@
             return `${m}:${s}`;
         }
 
-        // شروع تمرین (کلیک روی بزن بریم)
-        document.getElementById('startBtn').addEventListener('click', () => {
+        // --- منطق دروازه‌بان (انتخاب سطح) ---
+        function selectLevel(level) {
             initAudio(); playClick();
-            buildPack();
-            startSession(pack, false);
-        });
+            targetLevel = level;
+            
+            if (level === 1) {
+                // ورود مستقیم به سطح ۱
+                startSession(buildPack(1), 1, false, false);
+            } else {
+                // اجرای آزمون مخفی از سطح پایین‌تر
+                startSession(buildPack(level - 1), level - 1, true, false);
+            }
+        }
 
-        function startSession(questionList, isRetest) {
-            pack = questionList;
+        function startSession(pack, level, isTest, isRetest) {
+            currentPack = pack;
+            currentWorkoutLevel = level;
+            isPlacementTest = isTest;
             isRetestMode = isRetest;
             currentQ = 0;
             failedQuestions = [];
             
             showScreen('workoutScreen');
-            if(!isRetest) {
+            
+            if(!isRetest) { // در تست مجدد، تایمر ریست نمی‌شود
                 startTime = Date.now();
                 clearInterval(timerInterval);
                 timerInterval = setInterval(() => {
@@ -203,63 +213,71 @@
         }
 
         function loadQuestion() {
-            document.getElementById('question').textContent = pack[currentQ].q;
+            document.getElementById('question').textContent = currentPack[currentQ].q;
             document.getElementById('answer').textContent = "";
-            document.getElementById('progress').textContent = `${currentQ + 1}/${pack.length}`;
+            document.getElementById('progress').textContent = `${currentQ + 1}/${currentPack.length}`;
         }
 
         function processSessionEnd() {
-            if (failedQuestions.length > 0) {
-                // نمایش خطاها و توقف هوشمند
-                document.getElementById('errorQuestions').innerHTML = failedQuestions.map(f => f.q).join('<br>');
-                let jumpErrors = failedQuestions.filter(f => f.tag === 'jump').length;
-                let roundErrors = failedQuestions.filter(f => f.tag === 'rounding').length;
-                
-                let msg = "";
-                if (jumpErrors > roundErrors) msg = "دیدی اینجا چه اتفاقی افتاد؟ خواستی از دهگان قرض بگیری. رند کن و بپر.";
-                else msg = "اینجا نیازی به محاسبه مدرسه‌ای نبود. عدد رو گرد کن، بعد اختلافش رو جبران کن.";
-                document.getElementById('coachMessage').textContent = msg + " حالا دقیقاً همینا رو دوباره ازت تست می‌گیرم.";
-                
-                showScreen('reviewScreen');
-            } else {
-                // پایان کامل و موفقیت‌آمیز
+            let elapsed = Math.floor((Date.now() - startTime) / 1000);
+            
+            // اگر در حالت آزمون ورودی (Gatekeeper) هستیم
+            if (isPlacementTest) {
                 clearInterval(timerInterval);
-                let elapsed = Math.floor((Date.now() - startTime) / 1000);
-                
-                let today = new Date().toISOString().split('T')[0];
-                if (lastActive !== today) {
-                    let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-                    if (lastActive === yesterday.toISOString().split('T')[0]) streak++;
-                    else streak = 1;
-                    lastActive = today;
-                    localStorage.setItem('lastActive', today);
-                    localStorage.setItem('streak', streak);
+                if (failedQuestions.length === 0 && elapsed <= 30) {
+                    // قبولی در آزمون ورودی
+                    document.getElementById('gkTitle').style.color = "#2ecc71"; // سبز
+                    document.getElementById('gkTitle').textContent = "صلاحیت تایید شد!";
+                    document.getElementById('gkMessage').textContent = `۵ سوال سطح قبل رو در ${elapsed} ثانیه بدون خطا زدی. آماده‌ای برای سطح ${targetLevel}؟`;
+                    document.getElementById('gkBtn').onclick = () => { playClick(); startSession(buildPack(targetLevel), targetLevel, false, false); };
+                } else {
+                    // رد شدن در آزمون ورودی (سقوط به سطح فعلی آزمون)
+                    let reason = failedQuestions.length > 0 ? "خطای محاسباتی داشتی" : "زمانت بیشتر از ۳۰ ثانیه شد";
+                    document.getElementById('gkTitle').style.color = "var(--error)";
+                    document.getElementById('gkTitle').textContent = "رد صلاحیت!";
+                    document.getElementById('gkMessage').textContent = `در آزمون ورودی ${reason}. دیسپلین یعنی پذیرش ضعف. از سطح ${currentWorkoutLevel} شروع می‌کنیم تا پایه‌ات قوی بشه.`;
+                    document.getElementById('gkBtn').onclick = () => { playClick(); startSession(buildPack(currentWorkoutLevel), currentWorkoutLevel, false, false); };
                 }
-                
-                // ذخیره تگ‌ها برای فردا اگر در تست اصلی (نه ریتست) غلطی داشت
-                let newTags = [...new Set(failedQuestions.map(f => f.tag))];
-                if (!isRetestMode && newTags.length > 0) localStorage.setItem('activeTags', JSON.stringify(newTags));
-                
-                document.getElementById('summaryMessage').innerHTML = `
-                    زمان پردازش ذهنی: <b>${formatTime(elapsed)}</b><br>
-                    زنجیره تمرین شما: <b>${streak} روز</b>
-                `;
-                showScreen('summaryScreen');
+                showScreen('gatekeeperScreen');
+                return;
             }
+
+            // اگر تمرین اصلی است و خطا داشته (ریتست هوشمند)
+            if (failedQuestions.length > 0) {
+                document.getElementById('errorQuestions').innerHTML = failedQuestions.map(f => f.q).join('<br>');
+                showScreen('reviewScreen');
+                return;
+            }
+
+            // پایان کامل تمرین روزانه
+            clearInterval(timerInterval);
+            let today = new Date().toISOString().split('T')[0];
+            if (lastActive !== today) {
+                let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+                if (lastActive === yesterday.toISOString().split('T')[0]) streak++;
+                else streak = 1;
+                lastActive = today;
+                localStorage.setItem('lastActive', today);
+                localStorage.setItem('streak', streak);
+            }
+            
+            document.getElementById('summaryMessage').innerHTML = `
+                سطح تمرین: <b>${currentWorkoutLevel}</b><br>
+                زمان کل: <b>${formatTime(elapsed)}</b><br><br>
+                زنجیره دیسپلین: <b style="color:var(--accent); font-size:1.6rem;">${streak} روز 🔥</b>
+            `;
+            showScreen('summaryScreen');
         }
 
         // --- کلیدهای کیبورد ---
         document.querySelectorAll('.numpad button[data-val]').forEach(btn => {
             btn.addEventListener('click', (e) => { 
-                playClick();
-                document.getElementById('answer').textContent += e.target.getAttribute('data-val'); 
+                playClick(); document.getElementById('answer').textContent += e.target.getAttribute('data-val'); 
             });
         });
         
         document.getElementById('clearBtn').addEventListener('click', () => {
-            playClick();
-            let ansBox = document.getElementById('answer');
-            ansBox.textContent = ansBox.textContent.slice(0, -1);
+            playClick(); let ansBox = document.getElementById('answer'); ansBox.textContent = ansBox.textContent.slice(0, -1);
         });
 
         document.getElementById('submitBtn').addEventListener('click', () => {
@@ -267,28 +285,22 @@
             let ans = parseInt(document.getElementById('answer').textContent);
             if (isNaN(ans)) return;
 
-            // بررسی درستی یا نادرستی و عبور بی‌سروصدا به سوال بعد
-            if (ans !== pack[currentQ].a) {
-                failedQuestions.push(pack[currentQ]);
-            }
+            if (ans !== currentPack[currentQ].a) failedQuestions.push(currentPack[currentQ]);
             
             currentQ++;
-            if (currentQ < pack.length) loadQuestion();
+            if (currentQ < currentPack.length) loadQuestion();
             else processSessionEnd();
         });
 
-        // دکمه تست مجدد
+        // دکمه تست مجدد خطاها
         document.getElementById('retestBtn').addEventListener('click', () => {
-            playClick();
-            startSession([...failedQuestions], true); // کپی کردن سوالات غلط برای تست مجدد
+            playClick(); startSession([...failedQuestions], currentWorkoutLevel, false, true);
         });
 
-        // دکمه بستن
+        // بستن اپلیکیشن
         document.getElementById('closeAppBtn').addEventListener('click', () => {
-            playClick();
-            if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close();
+            playClick(); if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close();
         });
-
     </script>
 </body>
 </html>
