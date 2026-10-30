@@ -3,91 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>باشگاه تمرکز و دیسپلین</title>
-    <!-- اتصال به تلگرام و کتابخانه Chart.js از سرور پایدار Cloudflare -->
+    <title>باشگاه دیسپلین ذهنی</title>
+    <!-- اتصال به فونت وزیرمتن، تلگرام و چارت -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     
     <style>
         :root {
             --bg-color: #f4f4f9; --text-color: #1a1a1a; --card-bg: #ffffff;
-            --btn-bg: #e8e8eb; --btn-active: #d1d1d6; --accent: #2c3e50; --error: #e74c3c;
+            --btn-bg: #e8e8eb; --btn-active: #d1d1d6; --accent: #2c3e50; --error: #e74c3c; --success: #2ecc71;
             --topbar-bg: rgba(255,255,255,0.8);
         }
         [data-theme="dark"] {
-            --bg-color: #121212; --text-color: #e0e0e0; --card-bg: #1e1e1e;
-            --btn-bg: #2c2c2e; --btn-active: #3a3a3c; --accent: #4da6ff; --error: #ff6b6b;
-            --topbar-bg: rgba(30,30,30,0.8);
+            --bg-color: #0f0f11; --text-color: #e0e0e0; --card-bg: #1c1c1e;
+            --btn-bg: #2c2c2e; --btn-active: #3a3a3c; --accent: #4da6ff; --error: #ff6b6b; --success: #2ecc71;
+            --topbar-bg: rgba(15,15,17,0.8);
         }
-        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0;}
-        
+        * { box-sizing: border-box; font-family: 'Vazirmatn', system-ui, sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0;}
         body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column;}
         
         .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; }
         .screen.active { display: flex; }
         
+        /* --- داشبورد اصلی --- */
         #onboardingScreen { justify-content: center; align-items: center; text-align: center; z-index: 10; padding: 20px;}
-        .logo-icon { font-size: 4rem; margin-bottom: 10px; }
-        .welcome-text { font-size: 1.1rem; line-height: 1.8; margin-bottom: 25px; text-align: justify; text-align-last: center; max-width: 400px;}
-        .level-btns { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
-        .level-btn { background-color: var(--card-bg); color: var(--text-color); border: 2px solid var(--accent); padding: 18px 20px; font-size: 1.2rem; border-radius: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
-        .level-btn:active { transform: scale(0.97); }
+        .app-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 5px; color: var(--accent); }
+        .user-greeting { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.8; }
+        .dashboard-card { background: var(--card-bg); padding: 25px; border-radius: 20px; width: 100%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 20px;}
+        .status-badge { display: inline-block; background: rgba(77, 166, 255, 0.1); color: var(--accent); padding: 5px 15px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; font-size: 1.1rem;}
+        .progress-text { font-size: 1.1rem; line-height: 1.8; margin-bottom: 20px; }
         
+        .diff-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; display: none;}
+        .diff-btn { background: var(--bg-color); border: 1px solid var(--btn-bg); color: var(--text-color); padding: 8px 15px; border-radius: 10px; cursor: pointer; }
+        .diff-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(77, 166, 255, 0.1);}
+
+        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 16px 30px; font-size: 1.2rem; border-radius: 16px; font-weight: bold; cursor: pointer; width: 100%;}
+        .primary-btn:active { transform: scale(0.97); }
+        [data-theme="dark"] .dashboard-card { box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* --- رینگ تمرین --- */
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--topbar-bg); backdrop-filter: blur(10px); z-index: 5; border-bottom: 1px solid rgba(128,128,128,0.1);}
         .top-bar button { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color); padding: 5px;}
-        .level-badge { font-size: 1.1rem; font-weight: bold; color: var(--accent); background: rgba(128,128,128,0.1); padding: 5px 15px; border-radius: 20px; }
+        .level-badge { font-size: 1rem; font-weight: bold; color: var(--text-color); opacity: 0.8;}
         
-        .stats-bar { display: flex; justify-content: space-between; padding: 10px 25px; font-size: 1.1rem; font-weight: bold; opacity: 0.8; }
+        .stats-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 25px; font-size: 1.1rem; font-weight: bold; opacity: 0.8; }
+        .hint-btn { background: rgba(77, 166, 255, 0.15); color: var(--accent); border: none; padding: 5px 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-weight: bold; display: none;}
         
-        .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding-bottom: 20px;}
-        .question-box { font-size: 4.8rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px; direction: ltr; }
+        .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px;}
+        .question-box { font-size: 4.8rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 20px; direction: ltr; }
         .answer-box { font-size: 3.5rem; min-height: 70px; min-width: 180px; text-align: center; border-bottom: 3px solid var(--accent); color: var(--accent); font-weight: bold; }
+        .hint-text { margin-top: 20px; font-size: 1.1rem; color: var(--text-color); opacity: 0.9; background: var(--card-bg); padding: 15px; border-radius: 12px; border-right: 4px solid var(--accent); max-width: 300px; text-align: right; display: none;}
         
+        /* --- کیبورد --- */
         .numpad-container { padding: 15px; background-color: var(--card-bg); border-top-left-radius: 30px; border-top-right-radius: 30px; box-shadow: 0 -5px 25px rgba(0,0,0,0.08); z-index: 5;}
         .numpad { width: 100%; max-width: 400px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .numpad button { background-color: var(--btn-bg); color: var(--text-color); border: none; padding: 18px 10px; font-size: 1.8rem; font-weight: bold; border-radius: 16px; cursor: pointer; user-select: none; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
+        .numpad button { background-color: var(--btn-bg); color: var(--text-color); border: none; padding: 18px 10px; font-size: 1.8rem; font-weight: bold; border-radius: 16px; cursor: pointer; user-select: none;}
         .numpad button:active { background-color: var(--btn-active); transform: scale(0.95); }
         .btn-submit { background-color: var(--accent) !important; color: white !important; font-size: 1.4rem !important;}
         [data-theme="dark"] .numpad-container { box-shadow: 0 -5px 25px rgba(0,0,0,0.5); }
         
-        .popup-screen { flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(0,0,0,0.92); backdrop-filter: blur(5px); color: white; z-index: 20; padding: 20px;}
-        .popup-title { font-size: 1.8rem; margin-bottom: 10px; color: var(--accent); }
-        .popup-msg { font-size: 1.2rem; line-height: 1.8; margin-bottom: 20px; color: #eee; max-width: 350px;}
-        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 16px 30px; font-size: 1.2rem; border-radius: 16px; font-weight: bold; cursor: pointer; width: 100%; max-width: 300px; margin-top: 15px;}
-        .error-list { margin: 20px 0; font-size: 1.5rem; direction: ltr; color: var(--error); font-weight: bold; letter-spacing: 2px;}
-        
-        /* استایل مخصوص گراف پیشرفت (تثبیت ارتفاع برای جلوگیری از غیب شدن کادر) */
-        .chart-container { width: 100%; max-width: 350px; height: 180px; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 10px; margin-bottom: 15px; position: relative;}
+        /* --- پاپ‌آپ‌ها و گراف --- */
+        .popup-screen { flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); color: white; z-index: 20; padding: 20px;}
+        .popup-title { font-size: 1.8rem; margin-bottom: 15px; color: var(--accent); font-weight: 900;}
+        .popup-msg { font-size: 1.2rem; line-height: 1.8; margin-bottom: 25px; color: #eee; max-width: 350px;}
+        .chart-container { width: 100%; max-width: 350px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 10px; margin-bottom: 20px; position: relative;}
     </style>
 </head>
 <body data-theme="dark">
 
+    <!-- داشبورد اصلی -->
     <div id="onboardingScreen" class="screen active">
-        <div class="logo-icon">🧠</div>
-        <div class="welcome-text">
-            سلام <span id="userNameDisplay" style="color: var(--accent); font-weight: bold;">مبارز</span>.<br>
-            به باشگاه تمرکز و پردازش سریعِ ذهن خوش آمدی. ماشین‌حساب‌ها رو دور بریز و سطح وزنه امروزت رو انتخاب کن:
+        <div class="app-title">باشگاه دیسپلین</div>
+        <div class="user-greeting">سلام <span id="userNameDisplay" style="color: var(--accent); font-weight: bold;">مبارز</span></div>
+        
+        <div class="dashboard-card">
+            <div class="status-badge" id="dashLevelBadge">سطح ۱</div>
+            <div class="progress-text" id="dashProgressText">روز ۱ از ۵۰<br>تمرکز روی آموزش تکنیک‌ها</div>
+            
+            <div class="diff-selector" id="diffSelector">
+                <button class="diff-btn active" data-diff="easy">راحت</button>
+                <button class="diff-btn" data-diff="hard">سخت</button>
+                <button class="diff-btn" data-diff="vhard">خیلی سخت</button>
+            </div>
+            
+            <button class="primary-btn" id="startBtn">شروع تمرین امروز</button>
         </div>
-        <div class="level-btns">
-            <button class="level-btn" onclick="selectLevel(1, 'سطح ۱ (گرم‌کردن)')"><span>سطح ۱ (گرم‌کردن)</span> <span style="font-size: 0.9rem; opacity: 0.7;">۲ رقمی</span></button>
-            <button class="level-btn" onclick="selectLevel(2, 'سطح ۲ (متوسط)')"><span>سطح ۲ (متوسط)</span> <span style="font-size: 0.9rem; opacity: 0.7;">۳ و ۲ رقمی</span></button>
-            <button class="level-btn" onclick="selectLevel(3, 'سطح ۳ (حرفه‌ای)')"><span>سطح ۳ (حرفه‌ای)</span> <span style="font-size: 0.9rem; opacity: 0.7;">۳ رقمی</span></button>
-        </div>
+        <div style="font-size: 0.9rem; opacity: 0.5;" id="streakDisplay">زنجیره: 0 روز</div>
     </div>
 
+    <!-- رینگ تمرین -->
     <div id="workoutScreen" class="screen">
         <div class="top-bar">
             <button id="backBtn">🔙</button>
-            <div class="level-badge" id="currentLevelDisplay">سطح ۱</div>
+            <div class="level-badge" id="arenaStatusBadge">سطح ۱ - روز ۱</div>
             <button class="theme-toggle" id="themeBtn">☀️</button>
         </div>
         <div class="stats-bar">
             <div id="progress" style="direction: ltr;">1/5</div>
+            <button class="hint-btn" id="hintBtn">راهنمای تکنیک</button>
             <div id="stopwatch">00:00</div>
         </div>
         <div class="arena">
             <div class="question-box" id="question">--</div>
             <div class="answer-box" id="answer"></div>
+            <div class="hint-text" id="hintBox"></div>
         </div>
         <div class="numpad-container">
             <div class="numpad">
@@ -99,36 +119,35 @@
         </div>
     </div>
 
-    <div id="gatekeeperScreen" class="screen popup-screen">
-        <h2 class="popup-title" id="gkTitle">نتیجه آزمون ورودی</h2>
-        <div class="popup-msg" id="gkMessage">...</div>
-        <button class="primary-btn" id="gkBtn">شروع تمرین اصلی</button>
-    </div>
-
-    <div id="reviewScreen" class="screen popup-screen">
-        <h2 style="color: var(--error);">اینجا گیر کردی!</h2>
-        <div id="errorQuestions" class="error-list"></div>
-        <div class="popup-msg">دیدی چه اتفاقی افتاد؟ خواستی با روش مدرسه‌ای حساب کنی. رند کن و بپر. حالا دقیقاً همینا رو دوباره ازت تست می‌گیرم.</div>
-        <button class="primary-btn" id="retestBtn">فهمیدم، بریم جبران</button>
+    <!-- پاپ‌آپ‌ها -->
+    <div id="alertScreen" class="screen popup-screen">
+        <h2 class="popup-title" id="alertTitle">توجه</h2>
+        <div class="popup-msg" id="alertMsg">...</div>
+        <button class="primary-btn" id="alertBtn" style="max-width: 250px;">فهمیدم</button>
     </div>
 
     <div id="summaryScreen" class="screen popup-screen">
-        <h2>پایان تمرین امروز</h2>
-        <div class="popup-msg" id="summaryMessage" style="font-size: 1.1rem; margin: 15px 0;"></div>
+        <h2 class="popup-title" style="color: white;">پایان تمرین</h2>
+        <div class="popup-msg" id="summaryMessage" style="margin-bottom: 15px;"></div>
         
-        <!-- بوم گراف پیشرفت -->
         <div class="chart-container">
             <canvas id="progressChart"></canvas>
         </div>
-
-        <button class="primary-btn" id="closeAppBtn">بستن باشگاه</button>
+        <button class="primary-btn" id="closeAppBtn" style="max-width: 250px;">بستن باشگاه</button>
     </div>
 
     <script>
-        let streak = 0;
-        let lastActive = null;
-        let timeHistory = []; 
-        let chartInstance = null; 
+        // --- دیتابیس ابری ---
+        let db = {
+            level: 1,
+            dayL1: 1,
+            progressL2: 0, // از 200
+            historyAccuracy: [], // ذخیره 10 رکورد آخر دقت (برای سطح 1 و 2)
+            historyTime: [],     // ذخیره 10 رکورد آخر زمان (برای سطح 3)
+            streak: 0,
+            lastActive: null,
+            difficulty: 'easy'
+        };
 
         let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
@@ -138,258 +157,305 @@
                 document.getElementById('userNameDisplay').textContent = tg.initDataUnsafe.user.first_name;
             }
             if (tg.CloudStorage) {
-                tg.CloudStorage.getItems(['streak', 'lastActive', 'timeHistory'], (err, values) => {
-                    if (!err && values) {
-                        if (values.streak) streak = parseInt(values.streak) || 0;
-                        if (values.lastActive) lastActive = values.lastActive;
-                        if (values.timeHistory) {
-                            try { timeHistory = JSON.parse(values.timeHistory); } catch(e){ timeHistory = []; }
-                        }
-                    }
+                tg.CloudStorage.getKeys((err, keys) => {
+                    if (!err && keys.length > 0) {
+                        tg.CloudStorage.getItems(keys, (err, values) => {
+                            if (!err) {
+                                if(values.level) db.level = parseInt(values.level);
+                                if(values.dayL1) db.dayL1 = parseInt(values.dayL1);
+                                if(values.progressL2) db.progressL2 = parseInt(values.progressL2);
+                                if(values.streak) db.streak = parseInt(values.streak);
+                                if(values.lastActive) db.lastActive = values.lastActive;
+                                if(values.difficulty) db.difficulty = values.difficulty;
+                                try { if(values.historyAccuracy) db.historyAccuracy = JSON.parse(values.historyAccuracy); } catch(e){}
+                                try { if(values.historyTime) db.historyTime = JSON.parse(values.historyTime); } catch(e){}
+                                updateDashboard();
+                            }
+                        });
+                    } else { updateDashboard(); }
                 });
-            } else { loadLocalData(); }
-        } else { loadLocalData(); }
+            } else { loadLocal(); updateDashboard(); }
+        } else { loadLocal(); updateDashboard(); }
 
-        function loadLocalData() {
-            streak = parseInt(localStorage.getItem('streak')) || 0;
-            lastActive = localStorage.getItem('lastActive');
-            try { timeHistory = JSON.parse(localStorage.getItem('timeHistory')) || []; } catch(e){ timeHistory = []; }
+        function loadLocal() {
+            let localData = localStorage.getItem('db');
+            if(localData) { try { Object.assign(db, JSON.parse(localData)); } catch(e){} }
+        }
+        function saveDb() {
+            if (tg && tg.CloudStorage) {
+                Object.keys(db).forEach(k => tg.CloudStorage.setItem(k, typeof db[k] === 'object' ? JSON.stringify(db[k]) : db[k].toString(), function(){}));
+            }
+            localStorage.setItem('db', JSON.stringify(db));
         }
 
+        // --- سینث‌سایزر صدای چرتکه ---
         let audioCtx;
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playWoodClick() {
             try {
                 if (!audioCtx) return;
-                const osc = audioCtx.createOscillator(); 
-                const gain = audioCtx.createGain();
-                const filter = audioCtx.createBiquadFilter();
-
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); const filter = audioCtx.createBiquadFilter();
                 osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-                
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(350, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(350, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
                 filter.type = 'lowpass'; filter.frequency.value = 800; 
-                gain.gain.setValueAtTime(0.6, audioCtx.currentTime); 
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); 
+                gain.gain.setValueAtTime(0.6, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); 
                 osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-            } catch(e) {} // محافظت در برابر خطای صوتی
+            } catch(e) {}
         }
 
+        // --- مدیریت UI ---
         document.getElementById('themeBtn').addEventListener('click', () => {
-            const body = document.body;
-            const isDark = body.getAttribute('data-theme') === 'dark';
-            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
             document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
-            playWoodClick();
-            if(chartInstance) drawChart(); 
+            playWoodClick(); if(chartInstance) drawChart(lastChartType); 
         });
 
         document.getElementById('backBtn').addEventListener('click', () => {
-            playWoodClick(); clearInterval(timerInterval); showScreen('onboardingScreen');
+            playWoodClick(); clearInterval(timerInterval); showScreen('onboardingScreen'); updateDashboard();
         });
 
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                playWoodClick(); document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active'); db.difficulty = e.target.getAttribute('data-diff'); saveDb();
+            });
+        });
+
+        function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function showAlert(title, msg, btnText, callback) {
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMsg').innerHTML = msg;
+            document.getElementById('alertBtn').textContent = btnText;
+            document.getElementById('alertBtn').onclick = () => { playWoodClick(); callback(); };
+            showScreen('alertScreen');
+        }
+
+        // --- بروزرسانی داشبورد ---
+        let currentSessionMode = ''; // 'dailyL1', 'examL1', 'pracL2', 'examL2', 'pracL3'
+        
+        function updateDashboard() {
+            document.getElementById('streakDisplay').textContent = `زنجیره: ${db.streak} روز`;
+            let badge = document.getElementById('dashLevelBadge');
+            let text = document.getElementById('dashProgressText');
+            let btn = document.getElementById('startBtn');
+            let diffSel = document.getElementById('diffSelector');
+            
+            diffSel.style.display = 'none';
+
+            if (db.level === 1) {
+                badge.textContent = 'سطح ۱ (فونداسیون)';
+                if (db.dayL1 <= 50) {
+                    text.innerHTML = `روز <b>${db.dayL1}</b> از ۵۰<br>تمرکز روی یادگیری تکنیک‌ها`;
+                    btn.textContent = 'شروع تمرین ۵ سؤالی';
+                    currentSessionMode = 'dailyL1';
+                } else {
+                    text.innerHTML = `تبریک! ۵۰ روز تکمیل شد.<br>آماده‌ای برای آزمون ورودی سطح ۲؟`;
+                    btn.textContent = 'آغاز آزمون (۱۵ سؤال)';
+                    currentSessionMode = 'examL1';
+                }
+            } 
+            else if (db.level === 2) {
+                badge.textContent = 'سطح ۲ (پردازش کور)';
+                diffSel.style.display = 'flex';
+                document.querySelector(`.diff-btn[data-diff="${db.difficulty}"]`).classList.add('active');
+                
+                if (db.progressL2 < 200) {
+                    let block = db.progressL2 < 100 ? 'بلوک ۱ (حذف تکیه‌گاه چشمی)' : 'بلوک ۲ (افزایش سرعت)';
+                    text.innerHTML = `${block}<br>پیشرفت: <b>${db.progressL2}</b> از ۲۰۰`;
+                    btn.textContent = 'شروع تمرین (۱۰ سؤال)';
+                    currentSessionMode = 'pracL2';
+                } else {
+                    text.innerHTML = `بلوک‌های سطح ۲ تکمیل شد.<br>آماده‌ای برای سخت‌ترین آزمون؟`;
+                    btn.textContent = 'آزمون ورودی سطح ۳ (۲۵ سؤال)';
+                    currentSessionMode = 'examL2';
+                }
+            }
+            else if (db.level === 3) {
+                badge.textContent = 'سطح ۳ (سرعت خالص)';
+                diffSel.style.display = 'flex';
+                document.querySelector(`.diff-btn[data-diff="${db.difficulty}"]`).classList.add('active');
+                text.innerHTML = `محدودیت‌ها برداشته شد.<br>اکنون فقط زمان مهم است.`;
+                btn.textContent = 'شروع رکوردگیری (۱۰ سؤال)';
+                currentSessionMode = 'pracL3';
+            }
+        }
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            initAudio(); playWoodClick();
+            if (currentSessionMode === 'pracL2') {
+                showAlert("قانون سطح ۲", "تکنیک را به یاد بیاور:<br><br><b>صورت سؤال را بلند بخوان، چشم‌هایت را ببند و در ذهن حل کن.</b><br>اجازه نگاه کردن مجدد نداری.", "چشم‌بسته شروع کن", () => startSession());
+            } else { startSession(); }
+        });
+
+        // --- موتور ریاضی و تولید راهنما ---
         function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
         
-        function generateQ(level) {
-            let num1, num2, isAdd = Math.random() > 0.5; 
-            if (level === 1) { num1 = rand(20, 99); num2 = rand(15, 99); }
-            else if (level === 2) { num1 = rand(100, 999); num2 = rand(15, 99); }
-            else { num1 = rand(100, 999); num2 = rand(100, 999); }
+        function generateQ(level, diff) {
+            let n1, n2, isAdd = Math.random() > 0.5;
+            
+            if (level === 1) { n1 = rand(20, 99); n2 = rand(15, 99); }
+            else {
+                if(diff === 'easy') { n1 = rand(20, 99); n2 = rand(15, 99); }
+                else if (diff === 'hard') { n1 = rand(100, 999); n2 = rand(15, 99); }
+                else { n1 = rand(100, 999); n2 = rand(100, 999); }
+            }
 
-            if (!isAdd && num1 < num2) [num1, num2] = [num2, num1]; 
-            let ans = isAdd ? num1 + num2 : num1 - num2;
+            if (!isAdd && n1 < n2) [n1, n2] = [n2, n1];
+            let ans = isAdd ? n1 + n2 : n1 - n2;
             let op = isAdd ? '+' : '-';
-            return { q: `${num1} ${op} ${num2}`, a: ans };
-        }
-
-        function buildPack(level) {
-            let pack = []; for(let i=0; i<5; i++) pack.push(generateQ(level)); return pack;
-        }
-
-        let currentPack = [], failedQuestions = [], currentQ = 0, startTime, timerInterval;
-        let isPlacementTest = false, currentWorkoutLevel = 1, targetLevel = 1, isRetestMode = false;
-
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function formatTime(sec) {
-            let m = Math.floor(sec / 60).toString().padStart(2, '0');
-            let s = (sec % 60).toString().padStart(2, '0');
-            return `${m}:${s}`;
-        }
-
-        function selectLevel(level, levelName) {
-            initAudio(); playWoodClick();
-            targetLevel = level;
             
+            // تولید راهنمای هوشمند (فقط سطح 1)
+            let hint = "";
             if (level === 1) {
-                document.getElementById('currentLevelDisplay').textContent = levelName;
-                startSession(buildPack(1), 1, false, false);
-            } else {
-                document.getElementById('currentLevelDisplay').textContent = "آزمون ورودی سطح " + level;
-                startSession(buildPack(level - 1), level - 1, true, false);
+                if (!isAdd) {
+                    let n1_tens = Math.floor(n1/10)*10;
+                    if (n1 - n2 < n1_tens && n1 - n2 > n1_tens - 10) {
+                        let nearestTen = Math.ceil(n2/10)*10;
+                        let diffToTen = nearestTen - n2;
+                        hint = `تکنیک رند کردن: ${n2} نزدیک ${nearestTen} است. ${n1} منهای ${nearestTen} می‌شود ${n1 - nearestTen}. حالا ${diffToTen} واحد جبران کن: جواب ${ans}.`;
+                    } else { hint = `تکنیک پرش: از ${n2} تا دهگان بعدی بشمار، بعد تا ${n1} پرش کن.`; }
+                } else { hint = `تکنیک جمع: دهگان‌ها را با هم (${Math.floor(n1/10)*10} و ${Math.floor(n2/10)*10}) و یکان‌ها را جدا جمع کن.`; }
             }
+            return { q: `${n1} ${op} ${n2}`, a: ans, h: hint };
         }
 
-        function startSession(pack, level, isTest, isRetest) {
-            currentPack = pack; currentWorkoutLevel = level; isPlacementTest = isTest; isRetestMode = isRetest;
-            currentQ = 0; failedQuestions = [];
-            showScreen('workoutScreen');
+        // --- منطق تمرین ---
+        let currentPack = [], currentQ = 0, errors = 0, startTime, timerInterval;
+        let chartInstance = null, lastChartType = 'accuracy';
+
+        function startSession() {
+            let qCount = 5;
+            document.getElementById('hintBtn').style.display = 'none';
+            document.getElementById('hintBox').style.display = 'none';
             
-            if(!isRetest) { 
-                startTime = Date.now(); clearInterval(timerInterval);
-                timerInterval = setInterval(() => {
-                    let elapsed = Math.floor((Date.now() - startTime) / 1000);
-                    document.getElementById('stopwatch').textContent = formatTime(elapsed);
-                }, 1000);
-            }
+            if (currentSessionMode === 'dailyL1') { qCount = 5; document.getElementById('hintBtn').style.display = 'block'; document.getElementById('arenaStatusBadge').textContent = `سطح ۱ - روز ${db.dayL1}`; }
+            else if (currentSessionMode === 'examL1') { qCount = 15; document.getElementById('arenaStatusBadge').textContent = `آزمون ورودی سطح ۲`; }
+            else if (currentSessionMode === 'pracL2') { qCount = 10; document.getElementById('arenaStatusBadge').textContent = `سطح ۲ - تمرین`; }
+            else if (currentSessionMode === 'examL2') { qCount = 25; document.getElementById('arenaStatusBadge').textContent = `آزمون ورودی سطح ۳`; }
+            else if (currentSessionMode === 'pracL3') { qCount = 10; document.getElementById('arenaStatusBadge').textContent = `سطح ۳ - سرعت`; }
+
+            currentPack = []; for(let i=0; i<qCount; i++) currentPack.push(generateQ(db.level, db.difficulty));
+            currentQ = 0; errors = 0;
+            
+            showScreen('workoutScreen');
+            startTime = Date.now(); clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                let elapsed = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('stopwatch').textContent = formatTime(elapsed);
+            }, 1000);
             loadQuestion();
         }
+
+        function formatTime(sec) { let m = Math.floor(sec/60).toString().padStart(2,'0'); let s = (sec%60).toString().padStart(2,'0'); return `${m}:${s}`; }
 
         function loadQuestion() {
             document.getElementById('question').textContent = currentPack[currentQ].q;
             document.getElementById('answer').textContent = "";
             document.getElementById('progress').textContent = `${currentQ + 1}/${currentPack.length}`;
+            document.getElementById('hintBox').style.display = 'none';
+            document.getElementById('hintBox').textContent = currentPack[currentQ].h;
         }
 
-        // رسم گراف پیشرفت (با محافظت ضدکِرَش)
-        function drawChart() {
+        document.getElementById('hintBtn').addEventListener('click', () => { 
+            playWoodClick(); document.getElementById('hintBox').style.display = 'block'; 
+        });
+
+        function processEnd() {
+            clearInterval(timerInterval);
+            let elapsed = Math.floor((Date.now() - startTime) / 1000);
+            let accuracy = Math.round(((currentPack.length - errors) / currentPack.length) * 100);
+            
+            // مدیریت دیسپلین
+            let today = new Date().toISOString().split('T')[0];
+            if (db.lastActive !== today) {
+                let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+                if (db.lastActive === yesterday.toISOString().split('T')[0]) db.streak++; else db.streak = 1;
+                db.lastActive = today;
+            }
+
+            let title = "پایان تمرین";
+            let msg = `زمان: <b>${formatTime(elapsed)}</b> | خطا: <b>${errors}</b><br>زنجیره: <b style="color:var(--accent);">${db.streak} روز 🔥</b>`;
+            let isFail = false;
+
+            // ارزیابی بر اساس حالت
+            if (currentSessionMode === 'dailyL1') {
+                db.dayL1++; db.historyAccuracy.push(accuracy);
+                if(db.historyAccuracy.length > 10) db.historyAccuracy.shift();
+                lastChartType = 'accuracy';
+            } 
+            else if (currentSessionMode === 'examL1') {
+                if (errors <= 1) { db.level = 2; title = "صعود به سطح ۲!"; msg = "آزمون را با موفقیت گذراندی. آماده فشارِ بدون نگاه باش."; }
+                else { title = "رد صلاحیت در آزمون"; msg = "خطاها بیشتر از ۱ بود. فردا دوباره تلاش کن."; isFail = true; }
+            }
+            else if (currentSessionMode === 'pracL2') {
+                db.progressL2 += 10; db.historyAccuracy.push(accuracy);
+                if(db.historyAccuracy.length > 10) db.historyAccuracy.shift();
+                lastChartType = 'accuracy';
+            }
+            else if (currentSessionMode === 'examL2') {
+                if (errors <= 1 && elapsed <= 250) { // شرط زمانی برای 25 سوال سطح سخت
+                    db.level = 3; title = "صعود به سطح نهایی!"; msg = "حافظه و تمرکزت تأیید شد. به سطح ۳ خوش آمدی.";
+                } else { title = "رد صلاحیت در آزمون"; msg = "یا خطاهایت زیاد بود یا سرعتت کم. دوباره تمرین کن."; isFail = true; }
+            }
+            else if (currentSessionMode === 'pracL3') {
+                db.historyTime.push(elapsed);
+                if(db.historyTime.length > 10) db.historyTime.shift();
+                lastChartType = 'time';
+            }
+
+            saveDb();
+            document.getElementById('summaryMessage').innerHTML = msg;
+            showScreen('summaryScreen');
+            if(!isFail && (currentSessionMode.includes('prac') || currentSessionMode.includes('daily'))) { drawChart(lastChartType); }
+            else { if(chartInstance) chartInstance.destroy(); }
+        }
+
+        // --- گرافیک Chart.js ---
+        function drawChart(type) {
             try {
-                if (typeof Chart === 'undefined') {
-                    console.warn("کتابخانه رسم گراف هنوز لود نشده است.");
-                    return;
-                }
+                if (typeof Chart === 'undefined') return;
                 const ctx = document.getElementById('progressChart').getContext('2d');
                 if (chartInstance) chartInstance.destroy();
                 
                 let isDark = document.body.getAttribute('data-theme') === 'dark';
-                let textColor = isDark ? '#e0e0e0' : '#1a1a1a';
-                let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                let txtC = isDark ? '#e0e0e0' : '#1a1a1a'; let grC = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                
+                let dData = type === 'accuracy' ? [...db.historyAccuracy] : [...db.historyTime];
+                let dLabels = dData.map((_, i) => (i+1).toString());
+                if (dData.length === 1) { dData.push(dData[0]); dLabels.push("-"); }
 
-                // اگر فقط یک رکورد ثبت شده، آن را تکرار می‌کنیم تا خط صاف دیده شود نه یک نقطه خالی
-                let displayData = [...timeHistory];
-                let displayLabels = timeHistory.map((_, index) => (index + 1).toString());
-                if (displayData.length === 1) {
-                    displayData.push(displayData[0]);
-                    displayLabels.push("-");
-                }
+                let labelTitle = type === 'accuracy' ? 'دقت پردازش (%)' : 'زمان رکورد (ثانیه)';
+                let colorLine = type === 'accuracy' ? '#2ecc71' : '#4da6ff';
+                let colorBg = type === 'accuracy' ? 'rgba(46, 204, 113, 0.2)' : 'rgba(77, 166, 255, 0.2)';
 
                 chartInstance = new Chart(ctx, {
                     type: 'line',
-                    data: {
-                        labels: displayLabels,
-                        datasets: [{
-                            label: 'زمان (ثانیه)',
-                            data: displayData,
-                            borderColor: '#4da6ff',
-                            backgroundColor: 'rgba(77, 166, 255, 0.2)',
-                            borderWidth: 2,
-                            tension: 0.4, 
-                            pointBackgroundColor: '#e74c3c',
-                            pointRadius: 4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false, // اجازه می‌دهد کادر را به صورت دستی ارتفاع بدهیم
-                        plugins: { legend: { display: false } }, 
-                        scales: {
-                            y: { 
-                                beginAtZero: true, 
-                                grid: { color: gridColor }, ticks: { color: textColor }
-                            },
-                            x: { 
-                                grid: { display: false }, ticks: { color: textColor }
-                            }
-                        }
-                    }
+                    data: { labels: dLabels, datasets: [{ label: labelTitle, data: dData, borderColor: colorLine, backgroundColor: colorBg, borderWidth: 2, tension: 0.3, pointBackgroundColor: '#e74c3c', pointRadius: 3, fill: true }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: type==='accuracy', max: type==='accuracy'?100:null, grid: { color: grC }, ticks: { color: txtC, font:{family:'Vazirmatn'} } }, x: { grid: { display: false }, ticks: { color: txtC, font:{family:'Vazirmatn'} } } } }
                 });
-            } catch(e) {
-                console.error("خطا در رسم نمودار: ", e);
-            }
+            } catch(e) {}
         }
 
-        function processSessionEnd() {
-            let elapsed = Math.floor((Date.now() - startTime) / 1000);
-            
-            if (isPlacementTest) {
-                clearInterval(timerInterval);
-                if (failedQuestions.length === 0 && elapsed <= 30) {
-                    document.getElementById('gkTitle').style.color = "#2ecc71"; 
-                    document.getElementById('gkTitle').textContent = "صلاحیت تایید شد!";
-                    document.getElementById('gkMessage').textContent = `در ${elapsed} ثانیه بدون خطا زدی. آماده‌ای برای سطح ${targetLevel}؟`;
-                    document.getElementById('gkBtn').onclick = () => { playWoodClick(); document.getElementById('currentLevelDisplay').textContent = "سطح " + targetLevel; startSession(buildPack(targetLevel), targetLevel, false, false); };
-                } else {
-                    let reason = failedQuestions.length > 0 ? "خطای محاسباتی داشتی" : "زمانت بیشتر از ۳۰ ثانیه شد";
-                    document.getElementById('gkTitle').style.color = "var(--error)";
-                    document.getElementById('gkTitle').textContent = "رد صلاحیت!";
-                    document.getElementById('gkMessage').textContent = `در آزمون ورودی ${reason}. از سطح ${currentWorkoutLevel} شروع می‌کنیم تا پایه‌ات قوی بشه.`;
-                    document.getElementById('gkBtn').onclick = () => { playWoodClick(); document.getElementById('currentLevelDisplay').textContent = "سطح " + currentWorkoutLevel; startSession(buildPack(currentWorkoutLevel), currentWorkoutLevel, false, false); };
-                }
-                showScreen('gatekeeperScreen'); return;
-            }
-
-            if (failedQuestions.length > 0) {
-                document.getElementById('errorQuestions').innerHTML = failedQuestions.map(f => f.q).join('<br>');
-                showScreen('reviewScreen'); return;
-            }
-
-            clearInterval(timerInterval);
-            
-            let today = new Date().toISOString().split('T')[0];
-            if (lastActive !== today) {
-                let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-                if (lastActive === yesterday.toISOString().split('T')[0]) streak++; else streak = 1;
-                lastActive = today;
-            }
-            
-            timeHistory.push(elapsed);
-            if(timeHistory.length > 10) timeHistory.shift();
-
-            // ثبت با Callback خالی برای جلوگیری از خطای همگام‌سازی تلگرام
-            if (tg && tg.CloudStorage) {
-                tg.CloudStorage.setItem('lastActive', lastActive, function(){});
-                tg.CloudStorage.setItem('streak', streak.toString(), function(){});
-                tg.CloudStorage.setItem('timeHistory', JSON.stringify(timeHistory), function(){});
-            }
-            localStorage.setItem('lastActive', lastActive);
-            localStorage.setItem('streak', streak);
-            localStorage.setItem('timeHistory', JSON.stringify(timeHistory));
-            
-            document.getElementById('summaryMessage').innerHTML = `
-                سطح <b>${currentWorkoutLevel}</b> | زمان: <b>${formatTime(elapsed)}</b><br>
-                زنجیره دیسپلین: <b style="color:var(--accent); font-size:1.4rem;">${streak} روز 🔥</b>
-            `;
-            
-            showScreen('summaryScreen');
-            drawChart();
-        }
-
+        // کیبورد
         document.querySelectorAll('.numpad button[data-val]').forEach(btn => {
             btn.addEventListener('click', (e) => { playWoodClick(); document.getElementById('answer').textContent += e.target.getAttribute('data-val'); });
         });
-        document.getElementById('clearBtn').addEventListener('click', () => { playWoodClick(); let ansBox = document.getElementById('answer'); ansBox.textContent = ansBox.textContent.slice(0, -1); });
+        document.getElementById('clearBtn').addEventListener('click', () => { playWoodClick(); let ans = document.getElementById('answer'); ans.textContent = ans.textContent.slice(0, -1); });
         
         document.getElementById('submitBtn').addEventListener('click', () => {
             playWoodClick(); let ans = parseInt(document.getElementById('answer').textContent); if (isNaN(ans)) return;
-            if (ans !== currentPack[currentQ].a) failedQuestions.push(currentPack[currentQ]);
-            currentQ++; if (currentQ < currentPack.length) loadQuestion(); else processSessionEnd();
-        });
-        
-        document.getElementById('retestBtn').addEventListener('click', () => { playWoodClick(); startSession([...failedQuestions], currentWorkoutLevel, false, true); });
-        
-        // دکمه بستن ضدگلوله شد
-        document.getElementById('closeAppBtn').addEventListener('click', () => { 
-            playWoodClick(); 
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.close();
-            } else {
-                window.close(); // برای مرورگرهای خارج از تلگرام
+            if (ans !== currentPack[currentQ].a) {
+                errors++;
+                let ansBox = document.getElementById('answer');
+                ansBox.style.color = 'var(--error)'; ansBox.style.borderColor = 'var(--error)';
+                setTimeout(() => { ansBox.style.color = ''; ansBox.style.borderColor = ''; }, 300);
             }
+            currentQ++; if (currentQ < currentPack.length) loadQuestion(); else processEnd();
+        });
+
+        document.getElementById('closeAppBtn').addEventListener('click', () => { 
+            playWoodClick(); if (tg) tg.close(); else window.close(); 
         });
     </script>
 </body>
