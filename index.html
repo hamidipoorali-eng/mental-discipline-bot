@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>باشگاه تمرکز و دیسپلین</title>
+    <!-- اتصال به تلگرام و کتابخانه Chart.js -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root {
             --bg-color: #f4f4f9; --text-color: #1a1a1a; --card-bg: #ffffff;
@@ -54,10 +57,13 @@
         
         /* --- پاپ‌آپ‌ها --- */
         .popup-screen { flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(0,0,0,0.92); backdrop-filter: blur(5px); color: white; z-index: 20; padding: 20px;}
-        .popup-title { font-size: 1.8rem; margin-bottom: 15px; color: var(--accent); }
-        .popup-msg { font-size: 1.2rem; line-height: 1.8; margin-bottom: 30px; color: #eee; max-width: 350px;}
-        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 16px 30px; font-size: 1.2rem; border-radius: 16px; font-weight: bold; cursor: pointer; width: 100%; max-width: 300px;}
+        .popup-title { font-size: 1.8rem; margin-bottom: 10px; color: var(--accent); }
+        .popup-msg { font-size: 1.2rem; line-height: 1.8; margin-bottom: 20px; color: #eee; max-width: 350px;}
+        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 16px 30px; font-size: 1.2rem; border-radius: 16px; font-weight: bold; cursor: pointer; width: 100%; max-width: 300px; margin-top: 15px;}
         .error-list { margin: 20px 0; font-size: 1.5rem; direction: ltr; color: var(--error); font-weight: bold; letter-spacing: 2px;}
+        
+        /* استایل مخصوص گراف پیشرفت */
+        .chart-container { width: 100%; max-width: 350px; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 10px; margin-bottom: 15px;}
     </style>
 </head>
 <body data-theme="dark">
@@ -114,39 +120,48 @@
 
     <div id="summaryScreen" class="screen popup-screen">
         <h2>پایان تمرین امروز</h2>
-        <div class="popup-msg" id="summaryMessage" style="font-size: 1.3rem; margin: 30px 0;"></div>
+        <div class="popup-msg" id="summaryMessage" style="font-size: 1.1rem; margin: 15px 0;"></div>
+        
+        <!-- بوم گراف پیشرفت -->
+        <div class="chart-container">
+            <canvas id="progressChart"></canvas>
+        </div>
+
         <button class="primary-btn" id="closeAppBtn">بستن باشگاه</button>
     </div>
 
     <script>
-        // --- متغیرهای ذخیره‌سازی ابری و دیسپلین ---
+        // --- متغیرهای ابری تلگرام ---
         let streak = 0;
         let lastActive = null;
+        let timeHistory = []; // آرایه برای نگهداری رکوردهای زمان
+        let chartInstance = null; // برای رفرش کردن گراف
+
         let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-        // راه‌اندازی و خواندن اطلاعات از فضای ابری تلگرام
+        // فراخوانی داده‌ها در لحظه باز شدن
         if (tg) {
             tg.expand();
             if (tg.initDataUnsafe?.user?.first_name) {
                 document.getElementById('userNameDisplay').textContent = tg.initDataUnsafe.user.first_name;
             }
-            
-            // فراخوانی داده‌ها از فضای ابری تلگرام
             if (tg.CloudStorage) {
-                tg.CloudStorage.getItems(['streak', 'lastActive'], (err, values) => {
+                tg.CloudStorage.getItems(['streak', 'lastActive', 'timeHistory'], (err, values) => {
                     if (!err && values) {
                         if (values.streak) streak = parseInt(values.streak) || 0;
                         if (values.lastActive) lastActive = values.lastActive;
+                        if (values.timeHistory) {
+                            try { timeHistory = JSON.parse(values.timeHistory); } catch(e){}
+                        }
                     }
                 });
-            } else {
-                streak = parseInt(localStorage.getItem('streak')) || 0;
-                lastActive = localStorage.getItem('lastActive');
-            }
-        } else {
-            // حالت پشتیبان برای مرورگرهای خارج از تلگرام
+            } else { loadLocalData(); }
+        } else { loadLocalData(); }
+
+        function loadLocalData() {
             streak = parseInt(localStorage.getItem('streak')) || 0;
             lastActive = localStorage.getItem('lastActive');
+            try { timeHistory = JSON.parse(localStorage.getItem('timeHistory')) || []; } catch(e){ timeHistory = []; }
         }
 
         let audioCtx;
@@ -159,16 +174,11 @@
 
             osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
             
-            osc.type = 'triangle'; 
-            osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(350, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
-
-            filter.type = 'lowpass';
-            filter.frequency.value = 800; 
-
+            filter.type = 'lowpass'; filter.frequency.value = 800; 
             gain.gain.setValueAtTime(0.6, audioCtx.currentTime); 
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); 
-
             osc.start(); osc.stop(audioCtx.currentTime + 0.05);
         }
 
@@ -178,35 +188,29 @@
             body.setAttribute('data-theme', isDark ? 'light' : 'dark');
             document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
             playWoodClick();
+            if(chartInstance) drawChart(); // بروزرسانی رنگ چارت با تغییر تم
         });
 
         document.getElementById('backBtn').addEventListener('click', () => {
-            playWoodClick();
-            clearInterval(timerInterval); 
-            showScreen('onboardingScreen');
+            playWoodClick(); clearInterval(timerInterval); showScreen('onboardingScreen');
         });
 
         function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
         
         function generateQ(level) {
-            let num1, num2;
-            let isAdd = Math.random() > 0.5; 
-            
+            let num1, num2, isAdd = Math.random() > 0.5; 
             if (level === 1) { num1 = rand(20, 99); num2 = rand(15, 99); }
             else if (level === 2) { num1 = rand(100, 999); num2 = rand(15, 99); }
             else { num1 = rand(100, 999); num2 = rand(100, 999); }
 
             if (!isAdd && num1 < num2) [num1, num2] = [num2, num1]; 
-
             let ans = isAdd ? num1 + num2 : num1 - num2;
             let op = isAdd ? '+' : '-';
             return { q: `${num1} ${op} ${num2}`, a: ans };
         }
 
         function buildPack(level) {
-            let pack = [];
-            for(let i=0; i<5; i++) pack.push(generateQ(level));
-            return pack;
+            let pack = []; for(let i=0; i<5; i++) pack.push(generateQ(level)); return pack;
         }
 
         let currentPack = [], failedQuestions = [], currentQ = 0, startTime, timerInterval;
@@ -237,18 +241,12 @@
         }
 
         function startSession(pack, level, isTest, isRetest) {
-            currentPack = pack;
-            currentWorkoutLevel = level;
-            isPlacementTest = isTest;
-            isRetestMode = isRetest;
-            currentQ = 0;
-            failedQuestions = [];
-            
+            currentPack = pack; currentWorkoutLevel = level; isPlacementTest = isTest; isRetestMode = isRetest;
+            currentQ = 0; failedQuestions = [];
             showScreen('workoutScreen');
             
             if(!isRetest) { 
-                startTime = Date.now();
-                clearInterval(timerInterval);
+                startTime = Date.now(); clearInterval(timerInterval);
                 timerInterval = setInterval(() => {
                     let elapsed = Math.floor((Date.now() - startTime) / 1000);
                     document.getElementById('stopwatch').textContent = formatTime(elapsed);
@@ -263,6 +261,49 @@
             document.getElementById('progress').textContent = `${currentQ + 1}/${currentPack.length}`;
         }
 
+        // رسم گراف پیشرفت با Chart.js
+        function drawChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            
+            let isDark = document.body.getAttribute('data-theme') === 'dark';
+            let textColor = isDark ? '#e0e0e0' : '#1a1a1a';
+            let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeHistory.map((_, index) => (index + 1).toString()),
+                    datasets: [{
+                        label: 'زمان پردازش (ثانیه)',
+                        data: timeHistory,
+                        borderColor: '#4da6ff',
+                        backgroundColor: 'rgba(77, 166, 255, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.4, // انحنای نرم خطوط
+                        pointBackgroundColor: '#e74c3c',
+                        pointRadius: 4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } }, // مخفی کردن راهنما برای خلوتی چارت
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            title: { display: true, text: 'ثانیه', color: textColor, font: {family: 'system-ui'} },
+                            grid: { color: gridColor }, ticks: { color: textColor }
+                        },
+                        x: { 
+                            title: { display: true, text: 'تاریخچه تمرینات', color: textColor, font: {family: 'system-ui'} },
+                            grid: { display: false }, ticks: { color: textColor }
+                        }
+                    }
+                }
+            });
+        }
+
         function processSessionEnd() {
             let elapsed = Math.floor((Date.now() - startTime) / 1000);
             
@@ -271,93 +312,68 @@
                 if (failedQuestions.length === 0 && elapsed <= 30) {
                     document.getElementById('gkTitle').style.color = "#2ecc71"; 
                     document.getElementById('gkTitle').textContent = "صلاحیت تایید شد!";
-                    document.getElementById('gkMessage').textContent = `۵ سوال سطح قبل رو در ${elapsed} ثانیه بدون خطا زدی. آماده‌ای برای سطح ${targetLevel}؟`;
-                    document.getElementById('gkBtn').onclick = () => { 
-                        playWoodClick(); 
-                        document.getElementById('currentLevelDisplay').textContent = "سطح " + targetLevel;
-                        startSession(buildPack(targetLevel), targetLevel, false, false); 
-                    };
+                    document.getElementById('gkMessage').textContent = `در ${elapsed} ثانیه بدون خطا زدی. آماده‌ای برای سطح ${targetLevel}؟`;
+                    document.getElementById('gkBtn').onclick = () => { playWoodClick(); document.getElementById('currentLevelDisplay').textContent = "سطح " + targetLevel; startSession(buildPack(targetLevel), targetLevel, false, false); };
                 } else {
                     let reason = failedQuestions.length > 0 ? "خطای محاسباتی داشتی" : "زمانت بیشتر از ۳۰ ثانیه شد";
                     document.getElementById('gkTitle').style.color = "var(--error)";
                     document.getElementById('gkTitle').textContent = "رد صلاحیت!";
-                    document.getElementById('gkMessage').textContent = `در آزمون ورودی ${reason}. دیسپلین یعنی پذیرش ضعف. از سطح ${currentWorkoutLevel} شروع می‌کنیم تا پایه‌ات قوی بشه.`;
-                    document.getElementById('gkBtn').onclick = () => { 
-                        playWoodClick(); 
-                        document.getElementById('currentLevelDisplay').textContent = "سطح " + currentWorkoutLevel;
-                        startSession(buildPack(currentWorkoutLevel), currentWorkoutLevel, false, false); 
-                    };
+                    document.getElementById('gkMessage').textContent = `در آزمون ورودی ${reason}. از سطح ${currentWorkoutLevel} شروع می‌کنیم تا پایه‌ات قوی بشه.`;
+                    document.getElementById('gkBtn').onclick = () => { playWoodClick(); document.getElementById('currentLevelDisplay').textContent = "سطح " + currentWorkoutLevel; startSession(buildPack(currentWorkoutLevel), currentWorkoutLevel, false, false); };
                 }
-                showScreen('gatekeeperScreen');
-                return;
+                showScreen('gatekeeperScreen'); return;
             }
 
             if (failedQuestions.length > 0) {
                 document.getElementById('errorQuestions').innerHTML = failedQuestions.map(f => f.q).join('<br>');
-                showScreen('reviewScreen');
-                return;
+                showScreen('reviewScreen'); return;
             }
 
             clearInterval(timerInterval);
             
-            // پردازش دیسپلین و ذخیره در فضای ابری تلگرام
+            // پردازش دیسپلین
             let today = new Date().toISOString().split('T')[0];
             if (lastActive !== today) {
                 let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-                if (lastActive === yesterday.toISOString().split('T')[0]) {
-                    streak++;
-                } else {
-                    streak = 1;
-                }
+                if (lastActive === yesterday.toISOString().split('T')[0]) streak++; else streak = 1;
                 lastActive = today;
-                
-                // ذخیره ابری
-                if (tg && tg.CloudStorage) {
-                    tg.CloudStorage.setItem('lastActive', today);
-                    tg.CloudStorage.setItem('streak', streak.toString());
-                }
-                // پشتیبان‌گیری محلی
-                localStorage.setItem('lastActive', today);
-                localStorage.setItem('streak', streak);
             }
             
+            // ثبت رکورد زمان (فقط ۱۰ رکورد آخر)
+            timeHistory.push(elapsed);
+            if(timeHistory.length > 10) timeHistory.shift();
+
+            // ذخیره همزمان در ابری و محلی
+            if (tg && tg.CloudStorage) {
+                tg.CloudStorage.setItem('lastActive', lastActive);
+                tg.CloudStorage.setItem('streak', streak.toString());
+                tg.CloudStorage.setItem('timeHistory', JSON.stringify(timeHistory));
+            }
+            localStorage.setItem('lastActive', lastActive);
+            localStorage.setItem('streak', streak);
+            localStorage.setItem('timeHistory', JSON.stringify(timeHistory));
+            
             document.getElementById('summaryMessage').innerHTML = `
-                سطح تمرین: <b>${currentWorkoutLevel}</b><br>
-                زمان کل: <b>${formatTime(elapsed)}</b><br><br>
-                زنجیره دیسپلین: <b style="color:var(--accent); font-size:1.6rem;">${streak} روز 🔥</b>
+                سطح <b>${currentWorkoutLevel}</b> | زمان: <b>${formatTime(elapsed)}</b><br>
+                زنجیره دیسپلین: <b style="color:var(--accent); font-size:1.4rem;">${streak} روز 🔥</b>
             `;
+            
+            // رسم چارت
             showScreen('summaryScreen');
+            drawChart();
         }
 
         document.querySelectorAll('.numpad button[data-val]').forEach(btn => {
-            btn.addEventListener('click', (e) => { 
-                playWoodClick(); document.getElementById('answer').textContent += e.target.getAttribute('data-val'); 
-            });
+            btn.addEventListener('click', (e) => { playWoodClick(); document.getElementById('answer').textContent += e.target.getAttribute('data-val'); });
         });
-        
-        document.getElementById('clearBtn').addEventListener('click', () => {
-            playWoodClick(); let ansBox = document.getElementById('answer'); ansBox.textContent = ansBox.textContent.slice(0, -1);
-        });
-
+        document.getElementById('clearBtn').addEventListener('click', () => { playWoodClick(); let ansBox = document.getElementById('answer'); ansBox.textContent = ansBox.textContent.slice(0, -1); });
         document.getElementById('submitBtn').addEventListener('click', () => {
-            playWoodClick();
-            let ans = parseInt(document.getElementById('answer').textContent);
-            if (isNaN(ans)) return;
-
+            playWoodClick(); let ans = parseInt(document.getElementById('answer').textContent); if (isNaN(ans)) return;
             if (ans !== currentPack[currentQ].a) failedQuestions.push(currentPack[currentQ]);
-            
-            currentQ++;
-            if (currentQ < currentPack.length) loadQuestion();
-            else processSessionEnd();
+            currentQ++; if (currentQ < currentPack.length) loadQuestion(); else processSessionEnd();
         });
-
-        document.getElementById('retestBtn').addEventListener('click', () => {
-            playWoodClick(); startSession([...failedQuestions], currentWorkoutLevel, false, true);
-        });
-
-        document.getElementById('closeAppBtn').addEventListener('click', () => {
-            playWoodClick(); if (tg) tg.close();
-        });
+        document.getElementById('retestBtn').addEventListener('click', () => { playWoodClick(); startSession([...failedQuestions], currentWorkoutLevel, false, true); });
+        document.getElementById('closeAppBtn').addEventListener('click', () => { playWoodClick(); if (tg) tg.close(); });
     </script>
 </body>
 </html>
