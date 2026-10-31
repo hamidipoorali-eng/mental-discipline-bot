@@ -38,12 +38,21 @@
         .module-icon { font-size: 1.5rem; }
         
         .phase-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: right;}
-        .phase-card.locked { opacity: 0.5; pointer-events: none;}
+        .locked-content { opacity: 0.4; pointer-events: none; }
         .phase-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
         .phase-title { font-weight: bold; font-size: 1.2rem; color: var(--accent);}
         .phase-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;}
+        
         .primary-btn { background-color: var(--accent); color: white; border: none; padding: 12px 20px; font-size: 1.1rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;}
         .outline-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 12px 20px; font-size: 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
+
+        /* --- نقشه راه (Saga Map) --- */
+        .saga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 400px; direction: rtl; }
+        .day-btn { aspect-ratio: 1; border-radius: 12px; font-size: 1.2rem; font-weight: bold; border: none; cursor: pointer; display:flex; justify-content:center; align-items:center; }
+        .day-btn.locked { background: var(--btn-bg); color: var(--text-color); opacity: 0.3; cursor: not-allowed; }
+        .day-btn.current { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(77, 166, 255, 0.3); border: 2px solid var(--bg-color); }
+        .day-btn.passed { background: var(--success); color: white; opacity: 0.8; }
+        .exam-btn { grid-column: span 4; aspect-ratio: auto; padding: 15px; border-radius: 12px; font-size: 1.1rem; }
 
         /* --- رینگ تمرین --- */
         .stats-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; font-weight: bold; opacity: 0.8; }
@@ -59,20 +68,16 @@
         .numpad button:active { background-color: var(--btn-active); transform: scale(0.95); }
         .btn-submit { background-color: var(--accent) !important; color: white !important;}
 
-        /* --- کارنامه و تحلیل --- */
+        /* --- کارنامه و پاپ‌آپ‌ها --- */
         .summary-card { background: var(--card-bg); padding: 20px; border-radius: 16px; width: 100%; max-width: 400px; margin-bottom: 15px; border: 1px solid var(--border);}
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; text-align: center;}
         .metric-item { background: var(--bg-color); padding: 15px; border-radius: 12px;}
         .metric-val { font-size: 1.5rem; font-weight: bold; color: var(--accent);}
         .metric-label { font-size: 0.85rem; opacity: 0.7;}
-        
         .ai-feedback { background: rgba(77, 166, 255, 0.1); border-right: 4px solid var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.6;}
-        .error-log { font-size: 0.9rem; margin-top: 15px; direction: ltr; text-align: left;}
-        .error-item { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border);}
-        .chart-container { width: 100%; height: 150px; position: relative;}
         
         .popup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 50; padding: 20px; text-align: center;}
-        .popup-content { background: var(--card-bg); padding: 25px; border-radius: 16px; max-width: 350px; width: 100%;}
+        .popup-content { background: var(--card-bg); padding: 25px; border-radius: 16px; max-width: 380px; width: 100%; max-height: 85vh; overflow-y: auto;}
     </style>
 </head>
 <body data-theme="dark">
@@ -86,17 +91,14 @@
         </div>
         <div class="container">
             <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 10px;">ماژول تمرینی خود را انتخاب کنید</div>
-            
-            <div class="module-card" onclick="openModule('addsub')">
+            <div class="module-card" onclick="navToPhases('addsub')">
                 <div class="module-title">جمع و تفریق</div>
                 <div class="module-icon">➔</div>
             </div>
-            
             <div class="module-card locked">
                 <div class="module-title">ضرب و تقسیم</div>
                 <div class="module-icon">🔒</div>
             </div>
-            
             <div class="module-card locked">
                 <div class="module-title">محاسبه درصد</div>
                 <div class="module-icon">🔒</div>
@@ -104,15 +106,25 @@
         </div>
     </div>
 
-    <!-- صفحه فازها (نقشه راه) -->
+    <!-- صفحه فازها -->
     <div id="screen-phases" class="screen">
         <div class="header">
             <button onclick="nav('screen-modules')">➔</button>
             <div class="header-title">جمع و تفریق</div>
             <div style="width:24px"></div>
         </div>
-        <div class="container" id="phasesContainer">
-            <!-- محتوای فازها توسط جاوااسکریپت تولید می‌شود -->
+        <div class="container" id="phasesContainer"></div>
+    </div>
+
+    <!-- صفحه نقشه راه (Saga Map) -->
+    <div id="screen-path" class="screen">
+        <div class="header">
+            <button onclick="nav('screen-phases')">➔</button>
+            <div class="header-title" id="pathTitle">مسیر فاز ۱</div>
+            <div style="width:24px"></div>
+        </div>
+        <div class="container">
+            <div class="saga-grid" id="sagaGrid"></div>
         </div>
     </div>
 
@@ -133,13 +145,20 @@
             <div class="answer-box" id="answerBox"></div>
             <div class="hint-text" id="hintBox"></div>
         </div>
-        <div class="numpad-container">
+        
+        <!-- کیبورد (برای تمرین عادی) -->
+        <div class="numpad-container" id="numpadWrapper">
             <div class="numpad">
                 <button data-val="1">۱</button> <button data-val="2">۲</button> <button data-val="3">۳</button>
                 <button data-val="4">۴</button> <button data-val="5">۵</button> <button data-val="6">۶</button>
                 <button data-val="7">۷</button> <button data-val="8">۸</button> <button data-val="9">۹</button>
                 <button onclick="clearAnswer()">⌫</button> <button data-val="0">۰</button> <button class="btn-submit" onclick="submitAnswer()">تأیید</button>
             </div>
+        </div>
+        
+        <!-- کنترل‌های حالت آموزشی (فقط خواندن) -->
+        <div id="tutorialControls" style="display:none; padding:20px; width:100%; max-width:400px; margin: 0 auto;">
+            <button class="primary-btn" onclick="submitTutorial()">متوجه شدم ➔</button>
         </div>
     </div>
 
@@ -152,36 +171,15 @@
         </div>
         <div class="container">
             <div class="summary-card">
-                <div class="ai-feedback" id="aiFeedback">در حال تحلیل عملکرد...</div>
-                
+                <div class="ai-feedback" id="aiFeedback"></div>
                 <div class="metrics-grid">
-                    <div class="metric-item">
-                        <div class="metric-val" id="sumCorrect" style="color:var(--success)">0</div>
-                        <div class="metric-label">درست</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-val" id="sumError" style="color:var(--error)">0</div>
-                        <div class="metric-label">خطا</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-val" id="sumTime">0s</div>
-                        <div class="metric-label">زمان کل</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-val" id="sumAvgTime">0s</div>
-                        <div class="metric-label">میانگین هر سؤال</div>
-                    </div>
-                </div>
-
-                <div style="font-weight:bold; margin-bottom:10px;">روند پیشرفت</div>
-                <div class="chart-container"><canvas id="progressChart"></canvas></div>
-                
-                <div id="errorLogContainer" style="display:none; margin-top:20px;">
-                    <div style="font-weight:bold; border-bottom:2px solid var(--border); padding-bottom:5px;">کالبدشکافی خطاها</div>
-                    <div class="error-log" id="errorLog"></div>
+                    <div class="metric-item"><div class="metric-val" id="sumCorrect" style="color:var(--success)">0</div><div class="metric-label">درست</div></div>
+                    <div class="metric-item"><div class="metric-val" id="sumError" style="color:var(--error)">0</div><div class="metric-label">خطا</div></div>
+                    <div class="metric-item"><div class="metric-val" id="sumTime">0s</div><div class="metric-label">زمان کل</div></div>
+                    <div class="metric-item"><div class="metric-val" id="sumAvgTime">0s</div><div class="metric-label">میانگین</div></div>
                 </div>
             </div>
-            <button class="primary-btn" onclick="nav('screen-phases')">بازگشت به نقشه راه</button>
+            <button class="primary-btn" onclick="nav('screen-phases')">بازگشت به منو</button>
         </div>
     </div>
 
@@ -189,13 +187,25 @@
     <div id="popupOverlay" class="popup">
         <div class="popup-content">
             <h3 id="popupTitle" style="margin-bottom:15px; color:var(--accent);">توجه</h3>
-            <p id="popupMsg" style="margin-bottom:20px; line-height:1.6; font-size:1rem;"></p>
+            <p id="popupMsg" style="margin-bottom:20px; line-height:1.6;"></p>
             <button class="primary-btn" onclick="closePopup()">فهمیدم</button>
         </div>
     </div>
 
+    <!-- پاپ‌آپ مرور روزهای گذشته -->
+    <div id="reviewModal" class="popup">
+        <div class="popup-content" style="text-align:right;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <h3 id="reviewTitle" style="color:var(--accent);">مرور</h3>
+                <button onclick="closeReview()" style="background:none; border:none; font-size:1.2rem; color:var(--text-color); cursor:pointer;">✕</button>
+            </div>
+            <div id="reviewBody" style="margin-bottom:20px;"></div>
+            <button class="primary-btn" id="btnReplayDay">تکرار این روز (بدون ثبت)</button>
+        </div>
+    </div>
+
     <script>
-        // --- مدیریت تم و صدا ---
+        // مدیریت تم و صدا
         let audioCtx;
         function playClick() {
             try {
@@ -215,127 +225,176 @@
             playClick();
         });
 
-        // --- دیتابیس هوشمند (JSON) ---
+        // دیتابیس هوشمند پیشرفت
         let db = {
             addsub: {
-                unlockedPhases: [1], // 1, 2, 3
-                phase1Day: 1, // از 1 تا 10
-                phase2Day: 1, // از 1 تا 20
-                phase3Day: 1, // از 1 تا 30
-                history: [] // رکوردهای چارت
+                unlockedPhases: [1], 
+                phase1Day: 1, 
+                phase2Day: 1, 
+                phase3Day: 1
             }
         };
 
-        // دیتابیس محتوایی (نمونه دقیق روز 1 و 2 فرستاده شده توسط شما)
+        // دیتابیس محتوایی (شامل ۲ روز اول برای تست حالت آموزشی)
         const contentDB = {
             p1_d1: [
                 {q: "56 + 38", a: 94, h: "شکستن: ابتدا ۵۶+۳۰=۸۶، سپس ۸۶+۸=۹۴."},
                 {q: "74 + 49", a: 123, h: "رند کردن: ۴۹ نزدیک ۵۰ است. ۷۴+۵۰=۱۲۴. یکی کم کن → ۱۲۳."},
                 {q: "87 + 65", a: 152, h: "دهگان‌ها: ۸۰+۶۰=۱۴۰. یکان‌ها: ۷+۵=۱۲. مجموع → ۱۵۲."},
                 {q: "63 - 27", a: 36, h: "پرش به جلو: از ۲۷ تا ۳۰ (۳ تا). از ۳۰ تا ۶۳ (۳۳ تا). جمع: ۳۳+۳=۳۶."},
-                {q: "92 - 48", a: 44, h: "رند کردن: ۹۲-۵۰=۴۲. چون ۲ تا اضافه کم کردی، طلبکاری و پس می‌گیری → ۴۴."}
+                {q: "92 - 48", a: 44, h: "رند کردن: ۹۲-۵۰=۴۲. چون ۲ تا اضافه کم کردی، پس می‌گیری → ۴۴."}
             ],
             p1_d2: [
                 {q: "48 + 37", a: 85, h: "جمع روان از چپ به راست."},
                 {q: "85 + 58", a: 143, h: "شکستن: ۸۵+۵۰=۱۳۵. سپس ۱۳۵+۸=۱۴۳."},
                 {q: "54 - 28", a: 26, h: "رند کردن: ۵۴-۳۰=۲۴. دو تا طلبکاری → ۲۶."},
-                {q: "81 - 39", a: 42, h: "پرش به جلو: از ۳۹ تا ۴۰ (۱). از ۴۰ تا ۸۱ (۴۱). جمع → ۴۲."}
+                {q: "81 - 39", a: 42, h: "پرش به جلو: از ۳۹ تا ۴۰ (۱ تا). از ۴۰ تا ۸۱ (۴۱ تا). جمع → ۴۲."}
             ]
         };
 
-        // --- نویگیشن ---
+        // نویگیشن
         function nav(screenId) {
             playClick();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
 
-        function openModule(mod) {
-            if (mod === 'addsub') { renderPhases(); nav('screen-phases'); }
-        }
+        function navToPhases(mod) { if (mod === 'addsub') { renderPhases(); nav('screen-phases'); } }
 
         function renderPhases() {
-            const c = document.getElementById('phasesContainer');
-            c.innerHTML = '';
+            const c = document.getElementById('phasesContainer'); c.innerHTML = '';
             
             // فاز 1
             c.innerHTML += `
                 <div class="phase-card">
                     <div class="phase-header"><span class="phase-title">فاز ۱: فونداسیون</span> ${db.addsub.phase1Day > 10 ? '✅' : ''}</div>
                     <div class="phase-desc">تثبیت تکنیک‌ها با راهنما. روز ${Math.min(db.addsub.phase1Day, 10)} از ۱۰</div>
-                    ${db.addsub.phase1Day <= 10 
-                        ? `<button class="primary-btn" onclick="startSession(1, false)">شروع تمرین روز ${db.addsub.phase1Day}</button>`
-                        : `<button class="primary-btn" onclick="startSession(1, true)">آزمون خروج (ورود به فاز ۲)</button>`}
+                    <div style="display:flex; gap:10px;">
+                        <button class="primary-btn" style="flex:2;" onclick="${db.addsub.phase1Day <= 10 ? `startSession(1, false, ${db.addsub.phase1Day})` : `startSession(1, true, 11)`}">${db.addsub.phase1Day <= 10 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۲'}</button>
+                        <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(1)">نقشه راه</button>
+                    </div>
                 </div>`;
             
             // فاز 2
             let p2Locked = !db.addsub.unlockedPhases.includes(2);
             c.innerHTML += `
-                <div class="phase-card ${p2Locked ? 'locked' : ''}">
-                    <div class="phase-header"><span class="phase-title">فاز ۲: حافظه کاری</span> ${p2Locked ? '🔒' : ''}</div>
-                    <div class="phase-desc">حذف تکیه‌گاه چشمی (چشم بسته). روز ${Math.min(db.addsub.phase2Day, 20)} از ۲۰</div>
-                    ${!p2Locked ? (db.addsub.phase2Day <= 20 
-                        ? `<button class="primary-btn" onclick="startSession(2, false)">شروع تمرین روز ${db.addsub.phase2Day}</button>`
-                        : `<button class="primary-btn" onclick="startSession(2, true)">آزمون خروج (ورود به فاز ۳)</button>`) : ''}
-                    ${p2Locked ? `<button class="outline-btn" onclick="startSession(1, true)">میان‌بر: شرکت در آزمون فاز ۱</button>` : ''}
+                <div class="phase-card">
+                    <div class="${p2Locked ? 'locked-content' : ''}">
+                        <div class="phase-header"><span class="phase-title">فاز ۲: حافظه کاری</span> ${p2Locked ? '🔒' : ''}</div>
+                        <div class="phase-desc">حذف تکیه‌گاه چشمی (چشم بسته). روز ${Math.min(db.addsub.phase2Day, 20)} از ۲۰</div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="primary-btn" style="flex:2;" onclick="${db.addsub.phase2Day <= 20 ? `startSession(2, false, ${db.addsub.phase2Day})` : `startSession(2, true, 21)`}">${db.addsub.phase2Day <= 20 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۳'}</button>
+                            <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(2)">نقشه راه</button>
+                        </div>
+                    </div>
+                    ${p2Locked ? `<button class="outline-btn" style="margin-top:15px;" onclick="startSession(1, true, 11)">میان‌بر: شرکت در آزمون فاز ۱</button>` : ''}
                 </div>`;
 
             // فاز 3
             let p3Locked = !db.addsub.unlockedPhases.includes(3);
             c.innerHTML += `
-                <div class="phase-card ${p3Locked ? 'locked' : ''}">
-                    <div class="phase-header"><span class="phase-title">فاز ۳: غرقیگی</span> ${p3Locked ? '🔒' : ''}</div>
-                    <div class="phase-desc">فشار زمانی و سرعت خالص. روز ${Math.min(db.addsub.phase3Day, 30)} از ۳۰</div>
-                    ${!p3Locked ? `<button class="primary-btn" onclick="startSession(3, false)">شروع تمرین روز ${db.addsub.phase3Day}</button>` : ''}
+                <div class="phase-card">
+                    <div class="${p3Locked ? 'locked-content' : ''}">
+                        <div class="phase-header"><span class="phase-title">فاز ۳: غرقیگی</span> ${p3Locked ? '🔒' : ''}</div>
+                        <div class="phase-desc">فشار زمانی و سرعت خالص. روز ${Math.min(db.addsub.phase3Day, 30)} از ۳۰</div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="primary-btn" style="flex:2;" onclick="startSession(3, false, ${db.addsub.phase3Day})">ادامه مسیر</button>
+                            <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(3)">نقشه راه</button>
+                        </div>
+                    </div>
+                    ${p3Locked ? `<button class="outline-btn" style="margin-top:15px;" onclick="startSession(2, true, 21)">میان‌بر: شرکت در آزمون فاز ۲</button>` : ''}
                 </div>`;
         }
 
-        // --- موتور تمرین ---
-        let currentSession = { phase: 1, isExam: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: 0, timerObj: null };
+        // نقشه راه (Saga Map)
+        function openPath(phase) {
+            document.getElementById('pathTitle').textContent = `مسیر فاز ${phase}`;
+            let grid = document.getElementById('sagaGrid'); grid.innerHTML = '';
+            
+            let totalDays = phase === 1 ? 10 : (phase === 2 ? 20 : 30);
+            let currentDay = db.addsub[`phase${phase}Day`];
+            
+            for(let i=1; i<=totalDays; i++) {
+                let status = 'locked';
+                if(i < currentDay) status = 'passed'; else if(i === currentDay) status = 'current';
+                grid.innerHTML += `<button class="day-btn ${status}" onclick="handleDayClick(${phase}, ${i}, '${status}')">${i}</button>`;
+            }
+            
+            let examStatus = currentDay > totalDays ? 'current' : 'locked';
+            if (db.addsub.unlockedPhases.includes(phase + 1)) examStatus = 'passed';
+            grid.innerHTML += `<button class="day-btn exam-btn ${examStatus}" onclick="handleExamClick(${phase}, '${examStatus}')">آزمون دروازه‌بان</button>`;
+            nav('screen-path');
+        }
+
+        function handleDayClick(phase, day, status) {
+            playClick();
+            if (status === 'locked') return;
+            if (status === 'current') startSession(phase, false, day);
+            if (status === 'passed') showDayReview(phase, day);
+        }
+        function handleExamClick(phase, status) {
+            playClick();
+            if (status === 'locked') return;
+            let examDay = phase === 1 ? 11 : 21;
+            if (status === 'current') startSession(phase, true, examDay);
+            if (status === 'passed') showPopup("آزمون پاس شده", "شما قبلاً این آزمون را با موفقیت پشت سر گذاشته‌اید و نیازی به تکرار آن نیست.", closePopup);
+        }
+
+        function showDayReview(phase, day) {
+            let key = `p${phase}_d${day}`;
+            let qList = contentDB[key];
+            let html = '';
+            if (qList) {
+                qList.forEach(item => {
+                    html += `<div style="background:rgba(128,128,128,0.1); padding:12px; border-radius:10px; margin-bottom:10px;">
+                        <div style="direction:ltr; font-weight:bold; font-size:1.4rem; margin-bottom:5px; color:var(--text-color);">${item.q} = ${item.a}</div>
+                        <div style="color:var(--accent); font-size:0.95rem; line-height:1.5;">${item.h}</div>
+                    </div>`;
+                });
+            } else { html = `<div style="text-align:center; opacity:0.6; padding:20px;">این روز با اعداد تصادفی تمرین شده است.</div>`; }
+            
+            document.getElementById('reviewBody').innerHTML = html;
+            document.getElementById('reviewTitle').textContent = `مرور فاز ${phase} - روز ${day}`;
+            document.getElementById('reviewModal').style.display = 'flex';
+            document.getElementById('btnReplayDay').onclick = () => { closeReview(); startSession(phase, false, day, true); };
+        }
+        function closeReview() { playClick(); document.getElementById('reviewModal').style.display = 'none'; }
+
+        // موتور تمرین
+        let currentSession = { phase: 1, isExam: false, day: 1, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: 0, timerObj: null };
         
         function showPopup(title, msg, callback) {
             document.getElementById('popupTitle').textContent = title;
             document.getElementById('popupMsg').innerHTML = msg;
             document.getElementById('popupOverlay').style.display = 'flex';
-            document.getElementById('popupOverlay').onclick = callback;
+            document.getElementById('popupOverlay').onclick = () => { playClick(); callback(); };
         }
-        function closePopup() { playClick(); document.getElementById('popupOverlay').style.display = 'none'; document.getElementById('popupOverlay').onclick = null; }
+        function closePopup() { document.getElementById('popupOverlay').style.display = 'none'; document.getElementById('popupOverlay').onclick = null; }
 
-        function generateFallbackQuestion(phase) {
-            let n1 = Math.floor(Math.random() * 80) + 20;
-            let n2 = Math.floor(Math.random() * 50) + 15;
-            let isAdd = Math.random() > 0.5;
-            if(!isAdd && n1 < n2) [n1, n2] = [n2, n1];
-            return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2, h: "بدون راهنما (تولید خودکار)"};
+        function generateQ(phase) {
+            let n1 = Math.floor(Math.random() * 80) + 20; let n2 = Math.floor(Math.random() * 50) + 15;
+            let isAdd = Math.random() > 0.5; if(!isAdd && n1 < n2) [n1, n2] = [n2, n1];
+            return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2, h: "الگوی تولید خودکار"};
         }
 
-        function startSession(phase, isExam) {
-            currentSession = { phase, isExam, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now() };
+        function startSession(phase, isExam, day, isReplay = false) {
+            // حالت آموزشی: فقط فاز ۱، روزهای ۱ و ۲، نه در آزمون و نه در بازپخش
+            let isTutorial = (phase === 1 && day <= 2 && !isExam); 
+            currentSession = { phase, isExam, day, isReplay, isTutorial, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now() };
             
-            let qCount = isExam ? (phase === 1 ? 15 : 25) : 5; // 5 سوال برای تمرین، 15 و 25 برای آزمون
-            
-            // واکشی سوالات (اگر در دیتابیس محتوایی بود استفاده کن، وگرنه تولید کن)
-            let dayKey = `p${phase}_d${db.addsub[`phase${phase}Day`]}`;
-            if (!isExam && contentDB[dayKey]) {
-                currentSession.questions = [...contentDB[dayKey]];
-            } else {
-                for(let i=0; i<qCount; i++) currentSession.questions.push(generateFallbackQuestion(phase));
-            }
+            let qCount = isExam ? (phase === 1 ? 15 : 25) : 5;
+            let dayKey = `p${phase}_d${day}`;
+            if (!isExam && contentDB[dayKey]) { currentSession.questions = [...contentDB[dayKey]]; } 
+            else { for(let i=0; i<qCount; i++) currentSession.questions.push(generateQ(phase)); }
 
-            document.getElementById('trainingTitle').textContent = isExam ? `آزمون دروازه‌بان فاز ${phase}` : `فاز ${phase} - روز ${db.addsub[`phase${phase}Day`]}`;
+            document.getElementById('trainingTitle').textContent = isExam ? `آزمون فاز ${phase}` : (isReplay ? `تکرار روز ${day}` : `فاز ${phase} - روز ${day}`);
             document.getElementById('heartsContainer').textContent = isExam ? '❤️❤️' : '';
             
-            if (phase === 2 && !isExam) {
-                showPopup("پروتکل حافظه کاری", "صورت سؤال را فقط ۱.۵ ثانیه می‌بینی.<br>آن را در ذهن تکرار کن، چشم‌ها را ببند و روی تخته‌سیاه ذهنت حل کن.", () => {
-                    closePopup(); initArena();
-                });
-            } else if (phase === 3) {
-                showPopup("ورود به غرقیگی", "فشار زمانی به حداکثر می‌رسد.<br>بدون فکر کردنِ اضافه، فقط پاسخ بده.", () => {
-                    closePopup(); initArena();
-                });
-            } else {
-                initArena();
-            }
+            if (phase === 2 && !isExam && !isReplay) {
+                showPopup("پروتکل حافظه کاری", "سوال را فقط ۱.۵ ثانیه می‌بینی.<br>آن را تکرار کن و چشم‌ها را ببند.", () => { closePopup(); initArena(); });
+            } else if (phase === 3 && !isReplay) {
+                showPopup("ورود به غرقیگی", "بدون فکر کردنِ اضافه، فقط پاسخ بده.", () => { closePopup(); initArena(); });
+            } else { initArena(); }
         }
 
         function initArena() {
@@ -353,20 +412,41 @@
             let qData = currentSession.questions[currentSession.qIndex];
             document.getElementById('questionBox').textContent = qData.q;
             document.getElementById('questionBox').style.opacity = '1';
-            document.getElementById('answerBox').textContent = "";
             document.getElementById('progressText').textContent = `${currentSession.qIndex + 1}/${currentSession.questions.length}`;
             
             let hb = document.getElementById('hintBox');
-            if (currentSession.phase === 1 && !currentSession.isExam) { hb.style.display = 'block'; hb.textContent = qData.h; } 
-            else { hb.style.display = 'none'; }
+            let nb = document.getElementById('numpadWrapper');
+            let tb = document.getElementById('tutorialControls');
+            let ab = document.getElementById('answerBox');
+            
+            // پیاده‌سازی حالت آموزشی
+            if (currentSession.isTutorial) {
+                ab.textContent = qData.a; // نمایش جواب
+                nb.style.display = 'none'; // مخفی کردن کیبورد
+                tb.style.display = 'block'; // نمایش دکمه "متوجه شدم"
+                hb.style.display = 'block'; hb.textContent = qData.h;
+            } else {
+                ab.textContent = "";
+                nb.style.display = 'block';
+                tb.style.display = 'none';
+                if (currentSession.phase === 1 && !currentSession.isExam) { hb.style.display = 'block'; hb.textContent = qData.h; } 
+                else { hb.style.display = 'none'; }
+            }
 
-            // پروتکل محو شدن برای فاز 2
-            if (currentSession.phase === 2) {
+            if (currentSession.phase === 2 && !currentSession.isTutorial) {
                 setTimeout(() => { if(document.getElementById('screen-training').classList.contains('active')) document.getElementById('questionBox').style.opacity = '0.05'; }, 1500);
             }
         }
 
-        // کیبورد
+        // عملکرد دکمه‌های آموزشی
+        function submitTutorial() {
+            playClick();
+            currentSession.qIndex++;
+            if (currentSession.qIndex < currentSession.questions.length) loadQ();
+            else endSession(false);
+        }
+
+        // عملکرد کیبورد (عادی)
         document.querySelectorAll('.numpad button[data-val]').forEach(b => {
             b.addEventListener('click', (e) => { playClick(); document.getElementById('answerBox').textContent += e.target.getAttribute('data-val'); });
         });
@@ -376,13 +456,11 @@
             playClick();
             let userAns = parseInt(document.getElementById('answerBox').textContent);
             if (isNaN(userAns)) return;
-
             let qData = currentSession.questions[currentSession.qIndex];
-            let isCorrect = (userAns === qData.a);
-
-            if (!isCorrect) {
+            
+            if (userAns !== qData.a) {
                 currentSession.errors++;
-                currentSession.errorDetails.push({ q: qData.q, correct: qData.a, user: userAns, qIndex: currentSession.qIndex });
+                currentSession.errorDetails.push({ q: qData.q, correct: qData.a, user: userAns });
                 document.getElementById('answerBox').style.color = 'var(--error)';
                 document.getElementById('answerBox').style.borderColor = 'var(--error)';
                 setTimeout(() => { document.getElementById('answerBox').style.color = ''; document.getElementById('answerBox').style.borderColor = ''; }, 300);
@@ -393,107 +471,39 @@
                     if (currentSession.errors > 1) { endSession(true); return; } // Failed exam
                 }
             }
-
             currentSession.qIndex++;
-            if (currentSession.qIndex < currentSession.questions.length) loadQ();
-            else endSession(false);
+            if (currentSession.qIndex < currentSession.questions.length) loadQ(); else endSession(false);
         }
 
         function abortTraining() { clearInterval(currentSession.timerObj); nav('screen-phases'); }
-
-        // --- تحلیل‌گر هوش مصنوعی (Rule-Based) ---
-        function analyzePerformance(totalTime, avgTime, errors, totalQ, errorDetails, phase) {
-            if (errors > 1 && currentSession.isExam) return "خطاها از حد مجاز گذشت. آزمون دروازه‌بان را از دست دادی. به تمرین بیشتر نیاز داری.";
-            if (errors === 0) return "🔥 تسلط کامل! سیناپس‌های جدید دقیقاً در حال شکل‌گیری‌اند. بدون هیچ خطایی این بخش را تمام کردی.";
-            
-            // تشخیص الگوی فدای دقت
-            if (avgTime < 3 && errors >= 2) return "⚠️ داری سرعت را فدای دقت می‌کنی. در محاسبات، ابتدا باید تکنیک را درست پیاده کنی، سرعت خودش بعداً به وجود می‌آید. کمی ترمز کن!";
-            
-            // تشخیص خطای تکنیک جبران (اختلاف 1 یا 10 واحدی)
-            let compError = errorDetails.some(e => Math.abs(e.correct - e.user) === 1 || Math.abs(e.correct - e.user) === 10);
-            if (compError) return "💡 الگوی خطای تو در یکان یا دهگان است (اختلاف ۱ یا ۱۰ واحدی). به نظر می‌رسد در تکنیک «رند کردن»، قانونِ «طلبکارم پس می‌گیرم» را برعکس انجام می‌دهی یا فراموش می‌کنی.";
-
-            // تشخیص خستگی ذهنی
-            let lateErrors = errorDetails.every(e => e.qIndex >= Math.floor(totalQ / 2));
-            if (lateErrors && errors > 1) return "📉 افت تمرکز! سوالات اول را خوب پیش رفتی اما در انتهای تمرین خطا داشتی. مغزت دچار خستگی تصمیم‌گیری (Decay) شده. استقامتت را بالا ببر.";
-
-            return "خوب بود، اما هنوز جای کار داری. به لیست خطاهایت در پایین دقت کن تا فردا تکرار نشوند.";
-        }
 
         function endSession(isFailedExam) {
             clearInterval(currentSession.timerObj);
             let totalTime = Math.floor((Date.now() - currentSession.startTime)/1000);
             let avgTime = totalTime / currentSession.questions.length;
             
-            // آپدیت UI کارنامه
-            document.getElementById('sumCorrect').textContent = currentSession.qIndex - currentSession.errorDetails.length + (isFailedExam ? 0 : 1); // rough calc for display
-            if(isFailedExam) document.getElementById('sumCorrect').textContent = currentSession.questions.length - currentSession.errors;
+            document.getElementById('sumCorrect').textContent = currentSession.questions.length - currentSession.errors;
             document.getElementById('sumError').textContent = currentSession.errors;
             document.getElementById('sumTime').textContent = totalTime + 's';
-            document.getElementById('sumAvgTime').textContent = avgTime.toFixed(1) + 's';
+            document.getElementById('sumAvgTime').textContent = currentSession.isTutorial ? '-' : avgTime.toFixed(1) + 's';
             
-            // تولید بازخورد
-            document.getElementById('aiFeedback').innerHTML = analyzePerformance(totalTime, avgTime, currentSession.errors, currentSession.questions.length, currentSession.errorDetails, currentSession.phase);
+            let fb = "خوب بود. آماده‌ای برای فردا؟";
+            if (currentSession.isTutorial) fb = "عالی! ذهن شما در حال آشنایی با مسیرهای عصبیِ جدید است.";
+            else if (isFailedExam) fb = "آزمون ناموفق بود. خطاهایت بیشتر از حد مجاز است. دوباره تلاش کن.";
+            else if (currentSession.errors === 0) fb = "🔥 بی‌نظیر! تسلط کامل به وضوح دیده می‌شود.";
+            
+            document.getElementById('aiFeedback').textContent = fb;
 
-            // لاگ خطاها
-            let elc = document.getElementById('errorLogContainer');
-            let el = document.getElementById('errorLog');
-            el.innerHTML = '';
-            if (currentSession.errors > 0) {
-                elc.style.display = 'block';
-                currentSession.errorDetails.forEach(e => {
-                    el.innerHTML += `<div class="error-item">سؤال: <b>${e.q}</b> <br> پاسخ شما: <span style="color:var(--error)">${e.user}</span> | صحیح: <span style="color:var(--success)">${e.correct}</span></div>`;
-                });
-            } else { elc.style.display = 'none'; }
-
-            // مدیریت دیسپلین و قفل‌ها در دیتابیس
-            if (!isFailedExam) {
+            // فقط در صورتی که بازپخش نباشد و آزمون را رد نشده باشد، روز را جلو می‌بریم
+            if (!isFailedExam && !currentSession.isReplay) {
                 if (currentSession.isExam) {
-                    // قبولی در آزمون
                     if (currentSession.phase === 1 && !db.addsub.unlockedPhases.includes(2)) db.addsub.unlockedPhases.push(2);
                     if (currentSession.phase === 2 && !db.addsub.unlockedPhases.includes(3)) db.addsub.unlockedPhases.push(3);
                 } else {
-                    // پیشروی در روزها
                     db.addsub[`phase${currentSession.phase}Day`]++;
                 }
-                
-                // ثبت گراف
-                let accuracy = Math.round(((currentSession.questions.length - currentSession.errors) / currentSession.questions.length) * 100);
-                db.addsub.history.push({ p: currentSession.phase, a: accuracy, t: avgTime });
-                if(db.addsub.history.length > 10) db.addsub.history.shift();
             }
-
-            drawChart();
             nav('screen-summary');
-        }
-
-        // --- چارت تحلیلی ---
-        let chartInstance = null;
-        function drawChart() {
-            if (typeof Chart === 'undefined') return;
-            const ctx = document.getElementById('progressChart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-            
-            let isDark = document.body.getAttribute('data-theme') === 'dark';
-            let txtC = isDark ? '#e0e0e0' : '#1a1a1a';
-            
-            let labels = db.addsub.history.map((_, i) => (i+1).toString());
-            let dataAcc = db.addsub.history.map(h => h.a); // دقت
-            let dataTime = db.addsub.history.map(h => h.t); // زمان
-            
-            // اگر در فاز 3 هستیم، زمان را رسم کن، وگرنه دقت
-            let isPhase3 = currentSession.phase === 3;
-            let finalData = isPhase3 ? dataTime : dataAcc;
-            let labelText = isPhase3 ? 'میانگین زمان (ثانیه)' : 'دقت پردازش (%)';
-            let color = isPhase3 ? '#4da6ff' : '#2ecc71';
-
-            if(finalData.length === 1) { finalData.push(finalData[0]); labels.push("-"); }
-
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: { labels: labels, datasets: [{ label: labelText, data: finalData, borderColor: color, backgroundColor: color+'33', borderWidth: 2, tension: 0.3, pointRadius: 3, fill: true }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: !isPhase3, max: !isPhase3?100:null, ticks: { color: txtC, font:{family:'Vazirmatn'} } }, x: { ticks: { color: txtC, font:{family:'Vazirmatn'} } } } }
-            });
         }
     </script>
 </body>
