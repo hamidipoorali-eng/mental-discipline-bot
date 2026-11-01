@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>باشگاه دیسپلین ذهنی</title>
     
-    <!-- تزریق فونت یکان‌بخ (اولویت اول) و وزیرمتن (پشتیبان) -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
         @font-face {
@@ -27,7 +26,6 @@
     
     <style>
         :root {
-            /* تنظیم رنگ‌ها مشابه عکس ارسالی (تم روشن و مدرن) */
             --bg-color: #f7f8fa; --text-color: #1a1b22; --card-bg: #ffffff;
             --btn-bg: #e8ebf0; --btn-active: #d1d5db; --accent: #2c3e50; --error: #e74c3c; --success: #2ecc71;
             --border: rgba(0,0,0,0.06);
@@ -45,12 +43,10 @@
         .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; overflow-y: auto;}
         .screen.active { display: flex; }
         
-        /* --- هدر مشترک --- */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); z-index: 10; background: var(--card-bg);}
         .header button { background: var(--btn-bg); border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-color); border-radius: 50%; width: 35px; height: 35px; display:flex; justify-content:center; align-items:center;}
         .header-title { font-weight: bold; font-size: 1.1rem; }
 
-        /* --- منوها و کارت‌ها --- */
         .container { padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
         .module-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 25px 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
         .module-card.locked { opacity: 0.5; cursor: not-allowed; }
@@ -66,7 +62,6 @@
         .primary-btn { background-color: var(--accent); color: white; border: none; padding: 12px 20px; font-size: 1.05rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;}
         .outline-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 12px 20px; font-size: 0.95rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
 
-        /* --- نقشه راه (Saga Map) --- */
         .saga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 400px; direction: rtl; }
         .day-btn { aspect-ratio: 1; border-radius: 12px; font-size: 1.2rem; font-weight: bold; border: none; cursor: pointer; display:flex; justify-content:center; align-items:center; }
         .day-btn.locked { background: var(--btn-bg); color: var(--text-color); opacity: 0.3; cursor: not-allowed; }
@@ -74,7 +69,6 @@
         .day-btn.passed { background: var(--success); color: white; opacity: 0.8; }
         .exam-btn { grid-column: span 4; aspect-ratio: auto; padding: 15px; border-radius: 12px; font-size: 1.1rem; }
 
-        /* --- رینگ تمرین --- */
         .stats-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; font-weight: bold; opacity: 0.8; }
         .hearts { color: var(--error); font-size: 1.2rem; letter-spacing: 5px;}
         .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px;}
@@ -88,7 +82,6 @@
         .numpad button:active { background-color: var(--btn-active); transform: scale(0.95); }
         .btn-submit { background-color: var(--accent) !important; color: white !important;}
 
-        /* --- کارنامه و پاپ‌آپ‌ها --- */
         .summary-card { background: var(--card-bg); padding: 20px; border-radius: 16px; width: 100%; max-width: 400px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: var(--shadow);}
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; text-align: center;}
         .metric-item { background: var(--bg-color); padding: 15px; border-radius: 12px;}
@@ -102,7 +95,7 @@
 </head>
 <body data-theme="light">
 
-    <!-- صفحه انتخاب ماژول (Main Menu) -->
+    <!-- صفحه انتخاب ماژول -->
     <div id="screen-modules" class="screen active">
         <div class="header">
             <button id="themeToggleBtn">🌙</button>
@@ -136,7 +129,7 @@
         <div class="container" id="phasesContainer"></div>
     </div>
 
-    <!-- صفحه نقشه راه (Saga Map) -->
+    <!-- صفحه نقشه راه -->
     <div id="screen-path" class="screen">
         <div class="header">
             <button onclick="nav('screen-phases')">➔</button>
@@ -166,7 +159,6 @@
             <div class="hint-text" id="hintBox"></div>
         </div>
         
-        <!-- کیبورد -->
         <div class="numpad-container" id="numpadWrapper">
             <div class="numpad">
                 <button data-val="1">۱</button> <button data-val="2">۲</button> <button data-val="3">۳</button>
@@ -176,7 +168,6 @@
             </div>
         </div>
         
-        <!-- کنترل‌های حالت آموزشی -->
         <div id="tutorialControls" style="display:none; padding:20px; width:100%; max-width:400px; margin: 0 auto;">
             <button class="primary-btn" onclick="submitTutorial()">متوجه شدم ➔</button>
         </div>
@@ -212,7 +203,6 @@
         </div>
     </div>
 
-    <!-- پاپ‌آپ مرور روزهای گذشته (با کارنامه) -->
     <div id="reviewModal" class="popup">
         <div class="popup-content" style="text-align:right;">
             <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
@@ -228,14 +218,13 @@
     <script>
         let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-        // دیتابیس هوشمند پیشرفت
         let db = {
             addsub: {
                 unlockedPhases: [1], 
                 phase1Day: 1, 
                 phase2Day: 1, 
                 phase3Day: 1,
-                records: {} // بایگانی کارنامه‌های روزانه
+                records: {}
             }
         };
 
@@ -255,7 +244,6 @@
             ]
         };
 
-        // --- توابع ذخیره‌سازی ابری و محلی ---
         function saveDb() {
             let dataStr = JSON.stringify(db);
             localStorage.setItem('mentalmath_db', dataStr);
@@ -265,11 +253,9 @@
         }
 
         function loadDb() {
-            // لود سریع از لوکال
             let local = localStorage.getItem('mentalmath_db');
             if (local) { try { Object.assign(db, JSON.parse(local)); } catch(e){} }
             
-            // همگام‌سازی با کلود
             if (tg && tg.CloudStorage) {
                 tg.CloudStorage.getItem('mentalmath_db', (err, value) => {
                     if (!err && value) {
@@ -279,13 +265,11 @@
             }
         }
 
-        // راه‌اندازی اولیه
         window.onload = () => {
             if (tg) tg.ready();
             loadDb();
         };
 
-        // مدیریت تم و صدا
         let audioCtx;
         function playClick() {
             try {
@@ -305,7 +289,6 @@
             playClick();
         });
 
-        // نویگیشن
         function nav(screenId) {
             playClick();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -315,14 +298,13 @@
         function navToPhases(mod) { if (mod === 'addsub') { renderPhases(); nav('screen-phases'); } }
 
         function backFromSummary() {
-            renderPhases(); // رفع باگ: بازسازی رابط کاربری برای شکستن قفل‌ها
+            renderPhases(); 
             nav('screen-phases');
         }
 
         function renderPhases() {
             const c = document.getElementById('phasesContainer'); c.innerHTML = '';
             
-            // فاز 1
             c.innerHTML += `
                 <div class="phase-card">
                     <div class="phase-header"><span class="phase-title">فاز ۱: فونداسیون</span> ${db.addsub.phase1Day > 10 ? '✅' : ''}</div>
@@ -333,7 +315,6 @@
                     </div>
                 </div>`;
             
-            // فاز 2
             let p2Locked = !db.addsub.unlockedPhases.includes(2);
             c.innerHTML += `
                 <div class="phase-card">
@@ -348,13 +329,12 @@
                     ${p2Locked ? `<button class="outline-btn" style="margin-top:15px;" onclick="startSession(1, true, 11)">میان‌بر: شرکت در آزمون فاز ۱</button>` : ''}
                 </div>`;
 
-            // فاز 3
             let p3Locked = !db.addsub.unlockedPhases.includes(3);
             c.innerHTML += `
                 <div class="phase-card">
                     <div class="${p3Locked ? 'locked-content' : ''}">
                         <div class="phase-header"><span class="phase-title">فاز ۳: غرقیگی</span> ${p3Locked ? '🔒' : ''}</div>
-                        <div class="phase-desc">فشار زمانی و سرعت خالص. روز ${Math.min(db.addsub.phase3Day, 30)} از ۳۰</div>
+                        <div class="phase-desc">فشار زمانی و سرعت خالص. روز ${Math.min(db.addsub.phase3Day, 30)} از ۳0</div>
                         <div style="display:flex; gap:10px;">
                             <button class="primary-btn" style="flex:2;" onclick="startSession(3, false, ${db.addsub.phase3Day})">ادامه مسیر</button>
                             <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(3)">نقشه راه</button>
@@ -364,7 +344,6 @@
                 </div>`;
         }
 
-        // نقشه راه (Saga Map)
         function openPath(phase) {
             document.getElementById('pathTitle').textContent = `مسیر فاز ${phase}`;
             let grid = document.getElementById('sagaGrid'); grid.innerHTML = '';
@@ -402,9 +381,8 @@
         function showDayReview(phase, day) {
             let key = `p${phase}_d${day}`;
             let qList = contentDB[key];
-            let record = db.addsub.records[key]; // رفع باگ: استخراج رکورد اختصاصی روز
+            let record = db.addsub.records[key]; 
 
-            // نمایش آمار روز (اگر رکورد وجود داشت)
             let statsHtml = '';
             if (record) {
                 statsHtml = `
@@ -419,7 +397,6 @@
             }
             document.getElementById('reviewStats').innerHTML = statsHtml;
 
-            // نمایش سوالات و تکنیک‌ها
             let html = '';
             if (qList) {
                 qList.forEach(item => {
@@ -437,7 +414,6 @@
         }
         function closeReview() { playClick(); document.getElementById('reviewModal').style.display = 'none'; }
 
-        // موتور تمرین
         let currentSession = { phase: 1, isExam: false, day: 1, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, startTime: 0, timerObj: null };
         
         function showPopup(title, msg, callback) {
@@ -567,20 +543,23 @@
             else if (currentSession.errors === 0) fb = "🔥 بی‌نظیر! تسلط کامل به وضوح دیده می‌شود.";
             document.getElementById('aiFeedback').textContent = fb;
 
-            // مدیریت دیسپلین و ذخیره‌سازی
-            if (!isFailedExam && !currentSession.isReplay && !currentSession.isTutorial) {
+            // رفع باگ اصلی: پیشروی و ذخیره اطلاعات 
+            if (!isFailedExam && !currentSession.isReplay) {
                 
-                // رفع باگ: ذخیره رکورد در بایگانی
-                let dayKey = `p${currentSession.phase}_d${currentSession.day}`;
-                if (!db.addsub.records) db.addsub.records = {};
-                db.addsub.records[dayKey] = {
-                    correct: corrects,
-                    errors: currentSession.errors,
-                    time: totalTime,
-                    avgTime: avgTime.toFixed(1)
-                };
+                // بایگانی کارنامه (فقط برای روزهای غیرآموزشی)
+                if (!currentSession.isTutorial) {
+                    let dayKey = `p${currentSession.phase}_d${currentSession.day}`;
+                    if (!db.addsub.records) db.addsub.records = {};
+                    db.addsub.records[dayKey] = {
+                        correct: corrects,
+                        errors: currentSession.errors,
+                        time: totalTime,
+                        avgTime: avgTime.toFixed(1)
+                    };
+                }
 
-                // پیشروی روز و باز کردن قفل‌ها
+                // پیشروی روز و باز کردن قفل‌ها 
+                // این بخش اکنون برای روزهای آموزشی هم با موفقیت اجرا می‌شود
                 if (currentSession.isExam) {
                     if (currentSession.phase === 1 && !db.addsub.unlockedPhases.includes(2)) db.addsub.unlockedPhases.push(2);
                     if (currentSession.phase === 2 && !db.addsub.unlockedPhases.includes(3)) db.addsub.unlockedPhases.push(3);
@@ -588,7 +567,7 @@
                     db.addsub[`phase${currentSession.phase}Day`]++;
                 }
                 
-                // ذخیره نهایی
+                // ثبت تغییرات در دیتابیس لوکال و ابری
                 saveDb();
             }
             nav('screen-summary');
