@@ -4,47 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>باشگاه دیسپلین ذهنی</title>
+    
+    <!-- تزریق فونت یکان‌بخ (اولویت اول) و وزیرمتن (پشتیبان) -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        @font-face {
+            font-family: 'Yekan Bakh';
+            src: url('https://cdn.jsdelivr.net/gh/Dimaaweb/yekan-bakh-font@master/fonts/woff2/YekanBakh-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Yekan Bakh';
+            src: url('https://cdn.jsdelivr.net/gh/Dimaaweb/yekan-bakh-font@master/fonts/woff2/YekanBakh-Bold.woff2') format('woff2');
+            font-weight: bold;
+            font-style: normal;
+        }
+    </style>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     
     <style>
         :root {
-            --bg-color: #f4f4f9; --text-color: #1a1a1a; --card-bg: #ffffff;
-            --btn-bg: #e8e8eb; --btn-active: #d1d1d6; --accent: #2c3e50; --error: #e74c3c; --success: #2ecc71;
-            --border: rgba(0,0,0,0.1);
+            /* تنظیم رنگ‌ها مشابه عکس ارسالی (تم روشن و مدرن) */
+            --bg-color: #f7f8fa; --text-color: #1a1b22; --card-bg: #ffffff;
+            --btn-bg: #e8ebf0; --btn-active: #d1d5db; --accent: #2c3e50; --error: #e74c3c; --success: #2ecc71;
+            --border: rgba(0,0,0,0.06);
+            --shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
         [data-theme="dark"] {
             --bg-color: #0f0f11; --text-color: #e0e0e0; --card-bg: #1c1c1e;
             --btn-bg: #2c2c2e; --btn-active: #3a3a3c; --accent: #4da6ff; --error: #ff6b6b; --success: #2ecc71;
             --border: rgba(255,255,255,0.1);
+            --shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        * { box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0;}
+        * { box-sizing: border-box; font-family: 'Yekan Bakh', 'IRANYekan', 'Vazirmatn', sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0;}
         body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column;}
         
         .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; overflow-y: auto;}
         .screen.active { display: flex; }
         
         /* --- هدر مشترک --- */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); z-index: 10;}
-        .header button { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color);}
-        .header-title { font-weight: bold; font-size: 1.2rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); z-index: 10; background: var(--card-bg);}
+        .header button { background: var(--btn-bg); border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-color); border-radius: 50%; width: 35px; height: 35px; display:flex; justify-content:center; align-items:center;}
+        .header-title { font-weight: bold; font-size: 1.1rem; }
 
         /* --- منوها و کارت‌ها --- */
         .container { padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
-        .module-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 25px 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
+        .module-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 25px 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
         .module-card.locked { opacity: 0.5; cursor: not-allowed; }
-        .module-title { font-size: 1.3rem; font-weight: bold;}
-        .module-icon { font-size: 1.5rem; }
+        .module-title { font-size: 1.2rem; font-weight: bold;}
+        .module-icon { font-size: 1.2rem; }
         
-        .phase-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: right;}
+        .phase-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); text-align: right;}
         .locked-content { opacity: 0.4; pointer-events: none; }
         .phase-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
-        .phase-title { font-weight: bold; font-size: 1.2rem; color: var(--accent);}
+        .phase-title { font-weight: bold; font-size: 1.15rem; color: var(--accent);}
         .phase-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;}
         
-        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 12px 20px; font-size: 1.1rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;}
-        .outline-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 12px 20px; font-size: 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
+        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 12px 20px; font-size: 1.05rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;}
+        .outline-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 12px 20px; font-size: 0.95rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
 
         /* --- نقشه راه (Saga Map) --- */
         .saga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 400px; direction: rtl; }
@@ -60,34 +80,34 @@
         .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px;}
         .question-box { font-size: 4rem; font-weight: 900; margin-bottom: 20px; direction: ltr; transition: opacity 0.2s;}
         .answer-box { font-size: 3rem; min-height: 60px; min-width: 150px; text-align: center; border-bottom: 3px solid var(--accent); color: var(--accent); font-weight: bold; direction: ltr;}
-        .hint-text { margin-top: 20px; font-size: 1rem; background: var(--card-bg); padding: 15px; border-radius: 12px; border-right: 4px solid var(--accent); max-width: 320px; text-align: right; display: none;}
+        .hint-text { margin-top: 20px; font-size: 0.95rem; background: var(--card-bg); padding: 15px; border-radius: 12px; border-right: 4px solid var(--accent); max-width: 320px; text-align: right; display: none; box-shadow: var(--shadow);}
         
-        .numpad-container { padding: 15px; background-color: var(--card-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; border-top: 1px solid var(--border);}
+        .numpad-container { padding: 15px; background-color: var(--card-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; border-top: 1px solid var(--border); box-shadow: 0 -4px 15px rgba(0,0,0,0.02);}
         .numpad { width: 100%; max-width: 400px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .numpad button { background-color: var(--btn-bg); color: var(--text-color); border: none; padding: 15px 10px; font-size: 1.5rem; font-weight: bold; border-radius: 12px; user-select: none;}
         .numpad button:active { background-color: var(--btn-active); transform: scale(0.95); }
         .btn-submit { background-color: var(--accent) !important; color: white !important;}
 
         /* --- کارنامه و پاپ‌آپ‌ها --- */
-        .summary-card { background: var(--card-bg); padding: 20px; border-radius: 16px; width: 100%; max-width: 400px; margin-bottom: 15px; border: 1px solid var(--border);}
+        .summary-card { background: var(--card-bg); padding: 20px; border-radius: 16px; width: 100%; max-width: 400px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: var(--shadow);}
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; text-align: center;}
         .metric-item { background: var(--bg-color); padding: 15px; border-radius: 12px;}
         .metric-val { font-size: 1.5rem; font-weight: bold; color: var(--accent);}
         .metric-label { font-size: 0.85rem; opacity: 0.7;}
         .ai-feedback { background: rgba(77, 166, 255, 0.1); border-right: 4px solid var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.6;}
         
-        .popup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 50; padding: 20px; text-align: center;}
-        .popup-content { background: var(--card-bg); padding: 25px; border-radius: 16px; max-width: 380px; width: 100%; max-height: 85vh; overflow-y: auto;}
+        .popup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 50; padding: 20px; text-align: center; backdrop-filter: blur(5px);}
+        .popup-content { background: var(--card-bg); padding: 25px; border-radius: 16px; max-width: 380px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2);}
     </style>
 </head>
-<body data-theme="dark">
+<body data-theme="light">
 
     <!-- صفحه انتخاب ماژول (Main Menu) -->
     <div id="screen-modules" class="screen active">
         <div class="header">
-            <button id="themeToggleBtn">☀️</button>
+            <button id="themeToggleBtn">🌙</button>
             <div class="header-title">باشگاه دیسپلین ذهنی</div>
-            <div style="width:24px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="container">
             <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 10px;">ماژول تمرینی خود را انتخاب کنید</div>
@@ -111,7 +131,7 @@
         <div class="header">
             <button onclick="nav('screen-modules')">➔</button>
             <div class="header-title">جمع و تفریق</div>
-            <div style="width:24px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="container" id="phasesContainer"></div>
     </div>
@@ -121,7 +141,7 @@
         <div class="header">
             <button onclick="nav('screen-phases')">➔</button>
             <div class="header-title" id="pathTitle">مسیر فاز ۱</div>
-            <div style="width:24px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="container">
             <div class="saga-grid" id="sagaGrid"></div>
@@ -131,9 +151,9 @@
     <!-- رینگ تمرین -->
     <div id="screen-training" class="screen">
         <div class="header">
-            <button onclick="abortTraining()">➔</button>
+            <button onclick="abortTraining()">✕</button>
             <div class="header-title" id="trainingTitle">فاز ۱ - روز ۱</div>
-            <div style="width:24px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="stats-bar">
             <div id="progressText">۱/۵</div>
@@ -146,7 +166,7 @@
             <div class="hint-text" id="hintBox"></div>
         </div>
         
-        <!-- کیبورد (برای تمرین عادی) -->
+        <!-- کیبورد -->
         <div class="numpad-container" id="numpadWrapper">
             <div class="numpad">
                 <button data-val="1">۱</button> <button data-val="2">۲</button> <button data-val="3">۳</button>
@@ -156,7 +176,7 @@
             </div>
         </div>
         
-        <!-- کنترل‌های حالت آموزشی (فقط خواندن) -->
+        <!-- کنترل‌های حالت آموزشی -->
         <div id="tutorialControls" style="display:none; padding:20px; width:100%; max-width:400px; margin: 0 auto;">
             <button class="primary-btn" onclick="submitTutorial()">متوجه شدم ➔</button>
         </div>
@@ -165,9 +185,9 @@
     <!-- کارنامه تحلیلی -->
     <div id="screen-summary" class="screen">
         <div class="header">
-            <button onclick="nav('screen-phases')">➔</button>
+            <button onclick="backFromSummary()">➔</button>
             <div class="header-title">کارنامه تحلیلی</div>
-            <div style="width:24px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="container">
             <div class="summary-card">
@@ -179,11 +199,11 @@
                     <div class="metric-item"><div class="metric-val" id="sumAvgTime">0s</div><div class="metric-label">میانگین</div></div>
                 </div>
             </div>
-            <button class="primary-btn" onclick="nav('screen-phases')">بازگشت به منو</button>
+            <button class="primary-btn" onclick="backFromSummary()">بازگشت به منو</button>
         </div>
     </div>
 
-    <!-- پاپ‌آپ‌های اطلاع‌رسانی -->
+    <!-- پاپ‌آپ‌ها -->
     <div id="popupOverlay" class="popup">
         <div class="popup-content">
             <h3 id="popupTitle" style="margin-bottom:15px; color:var(--accent);">توجه</h3>
@@ -192,19 +212,79 @@
         </div>
     </div>
 
-    <!-- پاپ‌آپ مرور روزهای گذشته -->
+    <!-- پاپ‌آپ مرور روزهای گذشته (با کارنامه) -->
     <div id="reviewModal" class="popup">
         <div class="popup-content" style="text-align:right;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <h3 id="reviewTitle" style="color:var(--accent);">مرور</h3>
-                <button onclick="closeReview()" style="background:none; border:none; font-size:1.2rem; color:var(--text-color); cursor:pointer;">✕</button>
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+                <h3 id="reviewTitle" style="color:var(--accent); font-size:1.1rem;">مرور</h3>
+                <button onclick="closeReview()" style="background:var(--btn-bg); border:none; font-size:1rem; width:30px; height:30px; border-radius:50%; color:var(--text-color); cursor:pointer; display:flex; justify-content:center; align-items:center;">✕</button>
             </div>
-            <div id="reviewBody" style="margin-bottom:20px;"></div>
+            <div id="reviewStats" style="margin-bottom:15px;"></div>
+            <div id="reviewBody" style="margin-bottom:20px; max-height:40vh; overflow-y:auto; padding-right:5px;"></div>
             <button class="primary-btn" id="btnReplayDay">تکرار این روز (بدون ثبت)</button>
         </div>
     </div>
 
     <script>
+        let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+        // دیتابیس هوشمند پیشرفت
+        let db = {
+            addsub: {
+                unlockedPhases: [1], 
+                phase1Day: 1, 
+                phase2Day: 1, 
+                phase3Day: 1,
+                records: {} // بایگانی کارنامه‌های روزانه
+            }
+        };
+
+        const contentDB = {
+            p1_d1: [
+                {q: "56 + 38", a: 94, h: "شکستن: ابتدا ۵۶+۳۰=۸۶، سپس ۸۶+۸=۹۴."},
+                {q: "74 + 49", a: 123, h: "رند کردن: ۴۹ نزدیک ۵۰ است. ۷۴+۵۰=۱۲۴. یکی کم کن → ۱۲۳."},
+                {q: "87 + 65", a: 152, h: "دهگان‌ها: ۸۰+۶۰=۱۴۰. یکان‌ها: ۷+۵=۱۲. مجموع → ۱۵۲."},
+                {q: "63 - 27", a: 36, h: "پرش به جلو: از ۲۷ تا ۳۰ (۳ تا). از ۳۰ تا ۶۳ (۳۳ تا). جمع: ۳۳+۳=۳۶."},
+                {q: "92 - 48", a: 44, h: "رند کردن: ۹۲-۵۰=۴۲. چون ۲ تا اضافه کم کردی، پس می‌گیری → ۴۴."}
+            ],
+            p1_d2: [
+                {q: "48 + 37", a: 85, h: "جمع روان از چپ به راست."},
+                {q: "85 + 58", a: 143, h: "شکستن: ۸۵+۵۰=۱۳۵. سپس ۱۳۵+۸=۱۴۳."},
+                {q: "54 - 28", a: 26, h: "رند کردن: ۵۴-۳۰=۲۴. دو تا طلبکاری → ۲۶."},
+                {q: "81 - 39", a: 42, h: "پرش به جلو: از ۳۹ تا ۴۰ (۱ تا). از ۴۰ تا ۸۱ (۴۱ تا). جمع → ۴۲."}
+            ]
+        };
+
+        // --- توابع ذخیره‌سازی ابری و محلی ---
+        function saveDb() {
+            let dataStr = JSON.stringify(db);
+            localStorage.setItem('mentalmath_db', dataStr);
+            if (tg && tg.CloudStorage) {
+                tg.CloudStorage.setItem('mentalmath_db', dataStr, (err, ok) => {});
+            }
+        }
+
+        function loadDb() {
+            // لود سریع از لوکال
+            let local = localStorage.getItem('mentalmath_db');
+            if (local) { try { Object.assign(db, JSON.parse(local)); } catch(e){} }
+            
+            // همگام‌سازی با کلود
+            if (tg && tg.CloudStorage) {
+                tg.CloudStorage.getItem('mentalmath_db', (err, value) => {
+                    if (!err && value) {
+                        try { Object.assign(db, JSON.parse(value)); } catch(e){}
+                    }
+                });
+            }
+        }
+
+        // راه‌اندازی اولیه
+        window.onload = () => {
+            if (tg) tg.ready();
+            loadDb();
+        };
+
         // مدیریت تم و صدا
         let audioCtx;
         function playClick() {
@@ -225,33 +305,6 @@
             playClick();
         });
 
-        // دیتابیس هوشمند پیشرفت
-        let db = {
-            addsub: {
-                unlockedPhases: [1], 
-                phase1Day: 1, 
-                phase2Day: 1, 
-                phase3Day: 1
-            }
-        };
-
-        // دیتابیس محتوایی (شامل ۲ روز اول برای تست حالت آموزشی)
-        const contentDB = {
-            p1_d1: [
-                {q: "56 + 38", a: 94, h: "شکستن: ابتدا ۵۶+۳۰=۸۶، سپس ۸۶+۸=۹۴."},
-                {q: "74 + 49", a: 123, h: "رند کردن: ۴۹ نزدیک ۵۰ است. ۷۴+۵۰=۱۲۴. یکی کم کن → ۱۲۳."},
-                {q: "87 + 65", a: 152, h: "دهگان‌ها: ۸۰+۶۰=۱۴۰. یکان‌ها: ۷+۵=۱۲. مجموع → ۱۵۲."},
-                {q: "63 - 27", a: 36, h: "پرش به جلو: از ۲۷ تا ۳۰ (۳ تا). از ۳۰ تا ۶۳ (۳۳ تا). جمع: ۳۳+۳=۳۶."},
-                {q: "92 - 48", a: 44, h: "رند کردن: ۹۲-۵۰=۴۲. چون ۲ تا اضافه کم کردی، پس می‌گیری → ۴۴."}
-            ],
-            p1_d2: [
-                {q: "48 + 37", a: 85, h: "جمع روان از چپ به راست."},
-                {q: "85 + 58", a: 143, h: "شکستن: ۸۵+۵۰=۱۳۵. سپس ۱۳۵+۸=۱۴۳."},
-                {q: "54 - 28", a: 26, h: "رند کردن: ۵۴-۳۰=۲۴. دو تا طلبکاری → ۲۶."},
-                {q: "81 - 39", a: 42, h: "پرش به جلو: از ۳۹ تا ۴۰ (۱ تا). از ۴۰ تا ۸۱ (۴۱ تا). جمع → ۴۲."}
-            ]
-        };
-
         // نویگیشن
         function nav(screenId) {
             playClick();
@@ -260,6 +313,11 @@
         }
 
         function navToPhases(mod) { if (mod === 'addsub') { renderPhases(); nav('screen-phases'); } }
+
+        function backFromSummary() {
+            renderPhases(); // رفع باگ: بازسازی رابط کاربری برای شکستن قفل‌ها
+            nav('screen-phases');
+        }
 
         function renderPhases() {
             const c = document.getElementById('phasesContainer'); c.innerHTML = '';
@@ -332,6 +390,7 @@
             if (status === 'current') startSession(phase, false, day);
             if (status === 'passed') showDayReview(phase, day);
         }
+        
         function handleExamClick(phase, status) {
             playClick();
             if (status === 'locked') return;
@@ -343,10 +402,28 @@
         function showDayReview(phase, day) {
             let key = `p${phase}_d${day}`;
             let qList = contentDB[key];
+            let record = db.addsub.records[key]; // رفع باگ: استخراج رکورد اختصاصی روز
+
+            // نمایش آمار روز (اگر رکورد وجود داشت)
+            let statsHtml = '';
+            if (record) {
+                statsHtml = `
+                <div class="metrics-grid" style="margin-bottom:10px; font-size:0.9rem;">
+                    <div class="metric-item" style="padding:10px;"><div class="metric-val" style="color:var(--success); font-size:1.2rem;">${record.correct}</div>درست</div>
+                    <div class="metric-item" style="padding:10px;"><div class="metric-val" style="color:var(--error); font-size:1.2rem;">${record.errors}</div>خطا</div>
+                    <div class="metric-item" style="padding:10px;"><div class="metric-val" style="font-size:1.2rem;">${record.time}s</div>زمان</div>
+                    <div class="metric-item" style="padding:10px;"><div class="metric-val" style="font-size:1.2rem;">${record.avgTime}s</div>میانگین</div>
+                </div>`;
+            } else {
+                statsHtml = `<div style="text-align:center; opacity:0.6; font-size:0.85rem; margin-bottom:15px;">رکوردی برای این روز در بایگانی یافت نشد.</div>`;
+            }
+            document.getElementById('reviewStats').innerHTML = statsHtml;
+
+            // نمایش سوالات و تکنیک‌ها
             let html = '';
             if (qList) {
                 qList.forEach(item => {
-                    html += `<div style="background:rgba(128,128,128,0.1); padding:12px; border-radius:10px; margin-bottom:10px;">
+                    html += `<div style="background:var(--bg-color); padding:12px; border-radius:10px; margin-bottom:10px; border:1px solid var(--border);">
                         <div style="direction:ltr; font-weight:bold; font-size:1.4rem; margin-bottom:5px; color:var(--text-color);">${item.q} = ${item.a}</div>
                         <div style="color:var(--accent); font-size:0.95rem; line-height:1.5;">${item.h}</div>
                     </div>`;
@@ -361,7 +438,7 @@
         function closeReview() { playClick(); document.getElementById('reviewModal').style.display = 'none'; }
 
         // موتور تمرین
-        let currentSession = { phase: 1, isExam: false, day: 1, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: 0, timerObj: null };
+        let currentSession = { phase: 1, isExam: false, day: 1, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, startTime: 0, timerObj: null };
         
         function showPopup(title, msg, callback) {
             document.getElementById('popupTitle').textContent = title;
@@ -378,9 +455,8 @@
         }
 
         function startSession(phase, isExam, day, isReplay = false) {
-            // حالت آموزشی: فقط فاز ۱، روزهای ۱ و ۲، نه در آزمون و نه در بازپخش
             let isTutorial = (phase === 1 && day <= 2 && !isExam); 
-            currentSession = { phase, isExam, day, isReplay, isTutorial, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now() };
+            currentSession = { phase, isExam, day, isReplay, isTutorial, questions: [], qIndex: 0, errors: 0, startTime: Date.now() };
             
             let qCount = isExam ? (phase === 1 ? 15 : 25) : 5;
             let dayKey = `p${phase}_d${day}`;
@@ -419,11 +495,10 @@
             let tb = document.getElementById('tutorialControls');
             let ab = document.getElementById('answerBox');
             
-            // پیاده‌سازی حالت آموزشی
             if (currentSession.isTutorial) {
-                ab.textContent = qData.a; // نمایش جواب
-                nb.style.display = 'none'; // مخفی کردن کیبورد
-                tb.style.display = 'block'; // نمایش دکمه "متوجه شدم"
+                ab.textContent = qData.a;
+                nb.style.display = 'none';
+                tb.style.display = 'block';
                 hb.style.display = 'block'; hb.textContent = qData.h;
             } else {
                 ab.textContent = "";
@@ -438,7 +513,6 @@
             }
         }
 
-        // عملکرد دکمه‌های آموزشی
         function submitTutorial() {
             playClick();
             currentSession.qIndex++;
@@ -446,10 +520,10 @@
             else endSession(false);
         }
 
-        // عملکرد کیبورد (عادی)
         document.querySelectorAll('.numpad button[data-val]').forEach(b => {
             b.addEventListener('click', (e) => { playClick(); document.getElementById('answerBox').textContent += e.target.getAttribute('data-val'); });
         });
+        
         function clearAnswer() { playClick(); let a = document.getElementById('answerBox'); a.textContent = a.textContent.slice(0,-1); }
 
         function submitAnswer() {
@@ -460,15 +534,14 @@
             
             if (userAns !== qData.a) {
                 currentSession.errors++;
-                currentSession.errorDetails.push({ q: qData.q, correct: qData.a, user: userAns });
                 document.getElementById('answerBox').style.color = 'var(--error)';
-                document.getElementById('answerBox').style.borderColor = 'var(--error)';
-                setTimeout(() => { document.getElementById('answerBox').style.color = ''; document.getElementById('answerBox').style.borderColor = ''; }, 300);
+                document.getElementById('answerBox').style.borderBottomColor = 'var(--error)';
+                setTimeout(() => { document.getElementById('answerBox').style.color = 'var(--accent)'; document.getElementById('answerBox').style.borderBottomColor = 'var(--accent)'; }, 300);
                 
                 if (currentSession.isExam) {
                     let hStr = ""; for(let i=0; i<2-currentSession.errors; i++) hStr+="❤️";
                     document.getElementById('heartsContainer').textContent = hStr;
-                    if (currentSession.errors > 1) { endSession(true); return; } // Failed exam
+                    if (currentSession.errors > 1) { endSession(true); return; }
                 }
             }
             currentSession.qIndex++;
@@ -481,8 +554,9 @@
             clearInterval(currentSession.timerObj);
             let totalTime = Math.floor((Date.now() - currentSession.startTime)/1000);
             let avgTime = totalTime / currentSession.questions.length;
+            let corrects = currentSession.questions.length - currentSession.errors;
             
-            document.getElementById('sumCorrect').textContent = currentSession.questions.length - currentSession.errors;
+            document.getElementById('sumCorrect').textContent = corrects;
             document.getElementById('sumError').textContent = currentSession.errors;
             document.getElementById('sumTime').textContent = totalTime + 's';
             document.getElementById('sumAvgTime').textContent = currentSession.isTutorial ? '-' : avgTime.toFixed(1) + 's';
@@ -491,17 +565,31 @@
             if (currentSession.isTutorial) fb = "عالی! ذهن شما در حال آشنایی با مسیرهای عصبیِ جدید است.";
             else if (isFailedExam) fb = "آزمون ناموفق بود. خطاهایت بیشتر از حد مجاز است. دوباره تلاش کن.";
             else if (currentSession.errors === 0) fb = "🔥 بی‌نظیر! تسلط کامل به وضوح دیده می‌شود.";
-            
             document.getElementById('aiFeedback').textContent = fb;
 
-            // فقط در صورتی که بازپخش نباشد و آزمون را رد نشده باشد، روز را جلو می‌بریم
-            if (!isFailedExam && !currentSession.isReplay) {
+            // مدیریت دیسپلین و ذخیره‌سازی
+            if (!isFailedExam && !currentSession.isReplay && !currentSession.isTutorial) {
+                
+                // رفع باگ: ذخیره رکورد در بایگانی
+                let dayKey = `p${currentSession.phase}_d${currentSession.day}`;
+                if (!db.addsub.records) db.addsub.records = {};
+                db.addsub.records[dayKey] = {
+                    correct: corrects,
+                    errors: currentSession.errors,
+                    time: totalTime,
+                    avgTime: avgTime.toFixed(1)
+                };
+
+                // پیشروی روز و باز کردن قفل‌ها
                 if (currentSession.isExam) {
                     if (currentSession.phase === 1 && !db.addsub.unlockedPhases.includes(2)) db.addsub.unlockedPhases.push(2);
                     if (currentSession.phase === 2 && !db.addsub.unlockedPhases.includes(3)) db.addsub.unlockedPhases.push(3);
                 } else {
                     db.addsub[`phase${currentSession.phase}Day`]++;
                 }
+                
+                // ذخیره نهایی
+                saveDb();
             }
             nav('screen-summary');
         }
