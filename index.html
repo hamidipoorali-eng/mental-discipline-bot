@@ -80,14 +80,12 @@
         .popup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 50; padding: 20px; text-align: center; backdrop-filter: blur(5px);}
         .popup-content { background: var(--card-bg); padding: 25px; border-radius: 16px; max-width: 380px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2);}
         
-        /* انیمیشن تایمر معکوس فاز ۳ */
         @keyframes pulseRed { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
         .timer-danger { color: var(--error) !important; animation: pulseRed 1s infinite; }
     </style>
 </head>
 <body data-theme="dark">
 
-    <!-- صفحه انتخاب ماژول -->
     <div id="screen-modules" class="screen active">
         <div class="header">
             <button id="themeToggleBtn">☀️</button>
@@ -111,7 +109,6 @@
         </div>
     </div>
 
-    <!-- صفحه فازها -->
     <div id="screen-phases" class="screen">
         <div class="header">
             <button onclick="nav('screen-modules')">➔</button>
@@ -121,7 +118,6 @@
         <div class="container" id="phasesContainer"></div>
     </div>
 
-    <!-- صفحه نقشه راه -->
     <div id="screen-path" class="screen">
         <div class="header">
             <button onclick="nav('screen-phases')">➔</button>
@@ -133,7 +129,6 @@
         </div>
     </div>
 
-    <!-- رینگ تمرین -->
     <div id="screen-training" class="screen">
         <div class="header">
             <button onclick="abortTraining()">✕</button>
@@ -166,7 +161,6 @@
         </div>
     </div>
 
-    <!-- کارنامه تحلیلی -->
     <div id="screen-summary" class="screen">
         <div class="header">
             <button onclick="backFromSummary()">➔</button>
@@ -182,12 +176,16 @@
                     <div class="metric-item"><div class="metric-val" id="sumTime">0s</div><div class="metric-label">زمان کل</div></div>
                     <div class="metric-item"><div class="metric-val" id="sumAvgTime">0s</div><div class="metric-label">میانگین</div></div>
                 </div>
+                <!-- بخش جدید: کالبدشکافی خطاها -->
+                <div id="errorLogContainer" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:15px;">
+                    <div style="font-weight:bold; margin-bottom:15px; color:var(--accent);">کالبدشکافی خطاها:</div>
+                    <div id="errorLog" style="font-size:0.95rem;"></div>
+                </div>
             </div>
             <button class="primary-btn" onclick="backFromSummary()">بازگشت به منو</button>
         </div>
     </div>
 
-    <!-- پاپ‌آپ‌ها -->
     <div id="popupOverlay" class="popup">
         <div class="popup-content">
             <h3 id="popupTitle" style="margin-bottom:15px; color:var(--accent);">توجه</h3>
@@ -296,7 +294,7 @@
                 {q: "1% of 400", a: 4, h: "دو صفر حذف → ۴"},
                 {q: "5% of 320", a: 16, h: "۱۰٪ می‌شود ۳۲، نصف کن → ۱۶"},
                 {q: "10% of 85", a: 8.5, h: "یک ممیز به چپ → ۸.۵"},
-                {q: "1% of 250", a: 2.5, h: "دو ممیز به چپ → ۲.۵"}
+                {q: "1% of 250", a: 2.5, h: "دو ممیز به چپ → ۲.5"}
             ],
             p1_d10: [
                 {q: "10% of 64", a: 6.4, h: "یک ممیز به چپ → ۶.۴"},
@@ -469,7 +467,6 @@
         }
         function closeReview() { playClick(); document.getElementById('reviewModal').style.display = 'none'; }
 
-        // --- پاپ‌آپ اصلاح‌شده ---
         function showPopup(title, msg, callback) {
             document.getElementById('popupTitle').textContent = title;
             document.getElementById('popupMsg').innerHTML = msg;
@@ -482,7 +479,6 @@
         }
         function closePopup() { document.getElementById('popupOverlay').style.display = 'none'; }
 
-        // --- تولید سؤال رندوم ---
         function generateQ(phase) {
             if (currentModule === 'percent') {
                 let bases = [10, 1, 5]; let b = bases[Math.floor(Math.random() * bases.length)];
@@ -495,12 +491,11 @@
             }
         }
 
-        // --- موتور اصلی تمرین ---
-        let currentSession = { phase: 1, isExam: false, day: 1, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, startTime: 0, timerObj: null, timeLeft: 0 };
+        let currentSession = { phase: 1, isExam: false, day: 1, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: 0, timerObj: null, timeLeft: 0 };
         
         function startSession(phase, isExam, day, isReplay = false) {
             let isTutorial = (phase === 1 && day <= 2 && !isExam); 
-            currentSession = { phase, isExam, day, isReplay, isTutorial, questions: [], qIndex: 0, errors: 0, startTime: Date.now(), timeLeft: 0 };
+            currentSession = { phase, isExam, day, isReplay, isTutorial, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now(), timeLeft: 0 };
             currentInput = "";
             
             let qCount = isExam ? (phase === 1 ? 15 : 25) : 5;
@@ -527,9 +522,8 @@
             let tt = document.getElementById('timerText');
             tt.classList.remove('timer-danger');
             
-            // مدیریت تایمر معکوس در فاز 3
             if (currentSession.phase === 3) {
-                currentSession.timeLeft = currentSession.questions.length * 4; // 4s per question
+                currentSession.timeLeft = currentSession.questions.length * 4; 
                 tt.textContent = `00:${String(currentSession.timeLeft).padStart(2,'0')}`;
                 
                 currentSession.timerObj = setInterval(() => {
@@ -538,7 +532,7 @@
                     if (currentSession.timeLeft <= 5 && currentSession.timeLeft > 0) { tt.classList.add('timer-danger'); }
                     if (currentSession.timeLeft <= 0) {
                         clearInterval(currentSession.timerObj);
-                        currentSession.errors += (currentSession.questions.length - currentSession.qIndex); // خطای بدون پاسخ
+                        currentSession.errors += (currentSession.questions.length - currentSession.qIndex); 
                         endSession(true, "تایم اوت!");
                     }
                 }, 1000);
@@ -563,14 +557,14 @@
             let nb = document.getElementById('numpadWrapper');
             let tb = document.getElementById('tutorialControls');
             
+            // رفع باگ: مخفی‌سازی کامل راهنما بعد از روز دوم
             if (currentSession.isTutorial) {
                 document.getElementById('answerBox').textContent = qData.a;
                 nb.style.display = 'none'; tb.style.display = 'block';
                 hb.style.display = 'block'; hb.textContent = qData.h;
             } else {
                 nb.style.display = 'block'; tb.style.display = 'none';
-                if (currentSession.phase === 1 && !currentSession.isExam) { hb.style.display = 'block'; hb.textContent = qData.h; } 
-                else { hb.style.display = 'none'; }
+                hb.style.display = 'none'; // راهنما کاملاً مخفی می‌شود
             }
 
             if (currentSession.phase === 2 && !currentSession.isTutorial) {
@@ -583,12 +577,11 @@
             if (currentSession.qIndex < currentSession.questions.length) loadQ(); else endSession(false);
         }
 
-        // عملکرد کیبورد ممیزدار
         document.querySelectorAll('.numpad button[data-val]').forEach(b => {
             b.addEventListener('click', (e) => { 
                 playClick(); 
                 let val = e.target.getAttribute('data-val');
-                if(val === '.' && currentInput.includes('.')) return; // جلوگیری از دو ممیز
+                if(val === '.' && currentInput.includes('.')) return; 
                 currentInput += val;
                 document.getElementById('answerBox').textContent = currentInput; 
             });
@@ -605,12 +598,13 @@
             if (isNaN(userAns)) return;
             
             let qData = currentSession.questions[currentSession.qIndex];
-            
-            // جلوگیری از باگ‌های محاسبات اعشاری جاوااسکریپت با دقت 0.001
             let isCorrect = Math.abs(userAns - qData.a) < 0.001; 
             
             if (!isCorrect) {
                 currentSession.errors++;
+                // ثبت مشخصات خطای کاربر
+                currentSession.errorDetails.push({ q: qData.q, correct: qData.a, user: userAns });
+                
                 document.getElementById('answerBox').style.color = 'var(--error)';
                 document.getElementById('answerBox').style.borderBottomColor = 'var(--error)';
                 setTimeout(() => { document.getElementById('answerBox').style.color = 'var(--accent)'; document.getElementById('answerBox').style.borderBottomColor = 'var(--accent)'; }, 300);
@@ -652,6 +646,23 @@
             else if (isFailedExam) fb = customFailMsg ? customFailMsg : "آزمون ناموفق بود. خطاهایت بیشتر از حد مجاز است. دوباره تلاش کن.";
             else if (currentSession.errors === 0) fb = "🔥 بی‌نظیر! تسلط کامل به وضوح دیده می‌شود.";
             document.getElementById('aiFeedback').textContent = fb;
+
+            // نمایش لیست کالبدشکافی خطاها در کارنامه
+            let elc = document.getElementById('errorLogContainer');
+            let el = document.getElementById('errorLog');
+            if (currentSession.errors > 0 && currentSession.errorDetails && currentSession.errorDetails.length > 0) {
+                elc.style.display = 'block';
+                el.innerHTML = '';
+                currentSession.errorDetails.forEach(e => {
+                    el.innerHTML += `<div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border); direction: rtl; text-align: right;">
+                        سوال: <b style="direction:ltr; display:inline-block; font-size:1.2rem;">${e.q}</b> <br> 
+                        پاسخ شما: <span style="color:var(--error); direction:ltr; display:inline-block; font-weight:bold;">${e.user}</span> | 
+                        جواب درست: <span style="color:var(--success); direction:ltr; display:inline-block; font-weight:bold;">${e.correct}</span>
+                    </div>`;
+                });
+            } else {
+                elc.style.display = 'none';
+            }
 
             let activeDB = getActiveDB();
 
