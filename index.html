@@ -19,6 +19,7 @@
             --bg-color: #f7f8fa; --text-color: #1a1b22; --card-bg: #ffffff;
             --btn-bg: #e8ebf0; --btn-active: #d1d5db; --accent: #2c3e50; --error: #e74c3c; --success: #2ecc71;
             --border: rgba(0,0,0,0.06); --shadow: 0 4px 15px rgba(0,0,0,0.03);
+            --gold: #f1c40f;
         }
         [data-theme="dark"] {
             --bg-color: #0f0f11; --text-color: #e0e0e0; --card-bg: #1c1c1e;
@@ -35,17 +36,18 @@
         .header button { background: var(--btn-bg); border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-color); border-radius: 50%; width: 35px; height: 35px; display:flex; justify-content:center; align-items:center;}
         .header-title { font-weight: bold; font-size: 1.1rem; }
 
-        .container { padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
-        .module-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 25px 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
+        .container { padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; padding-bottom: 40px; }
+        .module-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
         .module-card.locked { opacity: 0.5; cursor: not-allowed; }
-        .module-title { font-size: 1.2rem; font-weight: bold;}
+        .module-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px;}
+        .module-sub { font-size: 0.85rem; opacity: 0.7;}
         .module-icon { font-size: 1.2rem; }
         
         .phase-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); text-align: right;}
         .locked-content { opacity: 0.4; pointer-events: none; }
         .phase-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
         .phase-title { font-weight: bold; font-size: 1.15rem; color: var(--accent);}
-        .phase-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;}
+        .phase-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px; line-height: 1.5;}
         
         .primary-btn { background-color: var(--accent); color: white; border: none; padding: 12px 20px; font-size: 1.05rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;}
         .outline-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 12px 20px; font-size: 0.95rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
@@ -59,10 +61,10 @@
 
         .stats-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; font-weight: bold; opacity: 0.8; }
         .hearts { color: var(--error); font-size: 1.2rem; letter-spacing: 5px;}
-        .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px;}
-        .question-box { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; direction: ltr; transition: opacity 0.2s;}
+        .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px; position: relative;}
+        .question-box { font-size: 2.8rem; font-weight: 900; margin-bottom: 20px; direction: ltr; transition: opacity 0.2s; text-align: center; word-wrap: break-word;}
         .answer-box { font-size: 3rem; min-height: 60px; min-width: 150px; text-align: center; border-bottom: 3px solid var(--accent); color: var(--accent); font-weight: bold; direction: ltr;}
-        .hint-text { margin-top: 20px; font-size: 0.95rem; background: var(--card-bg); padding: 15px; border-radius: 12px; border-right: 4px solid var(--accent); max-width: 320px; text-align: right; display: none; box-shadow: var(--shadow);}
+        .hint-text { margin-top: 20px; font-size: 0.95rem; background: rgba(44, 62, 80, 0.1); padding: 15px; border-radius: 12px; border-right: 4px solid var(--gold); max-width: 320px; text-align: right; display: none; box-shadow: var(--shadow); color: var(--text-color);}
         
         .numpad-container { padding: 15px; background-color: var(--card-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; border-top: 1px solid var(--border); box-shadow: 0 -4px 15px rgba(0,0,0,0.02);}
         .numpad { width: 100%; max-width: 400px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -86,6 +88,7 @@
 </head>
 <body data-theme="dark">
 
+    <!-- صفحه اصلی ماژول‌ها -->
     <div id="screen-modules" class="screen active">
         <div class="header">
             <button id="themeToggleBtn">☀️</button>
@@ -93,22 +96,51 @@
             <div style="width:35px"></div>
         </div>
         <div class="container">
-            <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 10px;">ماژول تمرینی خود را انتخاب کنید</div>
+            <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 5px; width: 100%; text-align: right; max-width: 400px;">ماژول‌های تمرینی</div>
+            
             <div class="module-card" onclick="openModule('addsub')">
-                <div class="module-title">جمع و تفریق</div>
+                <div>
+                    <div class="module-title">جمع و تفریق</div>
+                    <div class="module-sub">شامل فاز ۰ (رفلکس‌های پایه) تا فاز ۳</div>
+                </div>
                 <div class="module-icon">➔</div>
             </div>
+            
             <div class="module-card" onclick="openModule('percent')">
-                <div class="module-title">محاسبه درصد</div>
+                <div>
+                    <div class="module-title">محاسبه درصد</div>
+                    <div class="module-sub">فاز ۱: سه آجر پایه (۱۰٪، ۱٪ و ۵٪)</div>
+                </div>
                 <div class="module-icon">➔</div>
             </div>
+
+            <div class="module-card" style="border-color: var(--accent); background: rgba(77, 166, 255, 0.05);" onclick="openModule('street')">
+                <div>
+                    <div class="module-title" style="color: var(--accent);">ریاضیات خیابانی (کاربردی)</div>
+                    <div class="module-sub">سناریوهای روزمره: سبد خرید، سن و تقویم</div>
+                </div>
+                <div class="module-icon" style="color: var(--accent);">➔</div>
+            </div>
+
+            <div class="module-card" style="border-color: var(--gold); background: rgba(241, 196, 15, 0.05);" onclick="openModule('market')">
+                <div>
+                    <div class="module-title" style="color: var(--gold);">هوش ریاضی بازار</div>
+                    <div class="module-sub">۵ گام مستقل: از تقریب سریع تا احتمالات</div>
+                </div>
+                <div class="module-icon" style="color: var(--gold);">➔</div>
+            </div>
+
             <div class="module-card locked">
-                <div class="module-title">ضرب و تقسیم</div>
+                <div>
+                    <div class="module-title">ضرب و تقسیم</div>
+                    <div class="module-sub">به‌زودی...</div>
+                </div>
                 <div class="module-icon">🔒</div>
             </div>
         </div>
     </div>
 
+    <!-- صفحه فازها / زیرمنوها -->
     <div id="screen-phases" class="screen">
         <div class="header">
             <button onclick="nav('screen-modules')">➔</button>
@@ -118,6 +150,7 @@
         <div class="container" id="phasesContainer"></div>
     </div>
 
+    <!-- صفحه نقشه راه -->
     <div id="screen-path" class="screen">
         <div class="header">
             <button onclick="nav('screen-phases')">➔</button>
@@ -129,11 +162,13 @@
         </div>
     </div>
 
+    <!-- رینگ تمرین -->
     <div id="screen-training" class="screen">
         <div class="header">
             <button onclick="abortTraining()">✕</button>
             <div class="header-title" id="trainingTitle">--</div>
-            <div style="width:35px"></div>
+            <!-- دکمه راهنمای استراتژی -->
+            <button id="hintToggleBtn" onclick="toggleHint()" style="background:var(--card-bg); border:1px solid var(--gold); color:var(--gold);">💡</button>
         </div>
         <div class="stats-bar">
             <div id="progressText">۱/۵</div>
@@ -151,8 +186,9 @@
                 <button data-val="1">۱</button> <button data-val="2">۲</button> <button data-val="3">۳</button>
                 <button data-val="4">۴</button> <button data-val="5">۵</button> <button data-val="6">۶</button>
                 <button data-val="7">۷</button> <button data-val="8">۸</button> <button data-val="9">۹</button>
-                <button data-val=".">.</button> <button data-val="0">۰</button> <button onclick="clearAnswer()">⌫</button>
-                <button class="btn-submit" style="grid-column: span 3;" onclick="submitAnswer()">تأیید</button>
+                <button data-val="-">-</button> <button data-val="0">۰</button> <button onclick="clearAnswer()">⌫</button>
+                <button data-val=".">.</button>
+                <button class="btn-submit" style="grid-column: span 2;" onclick="submitAnswer()">تأیید</button>
             </div>
         </div>
         
@@ -161,6 +197,7 @@
         </div>
     </div>
 
+    <!-- کارنامه تحلیلی -->
     <div id="screen-summary" class="screen">
         <div class="header">
             <button onclick="backFromSummary()">➔</button>
@@ -208,28 +245,18 @@
     <script>
         let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
+        // دیتابیس هوشمند با افزودن ماژول‌های جدید
         let db = {
-            addsub: { unlockedPhases: [0, 1], phase0Day: 1, phase1Day: 1, phase2Day: 1, phase3Day: 1, records: {} },
-            percent: { unlockedPhases: [1], phase1Day: 1, phase2Day: 1, phase3Day: 1, records: {} }
+            addsub: { unlockedPhases: [1], phase0Exams: 0, phase1Day: 1, phase2Day: 1, phase3Day: 1, records: {} },
+            percent: { unlockedPhases: [1], phase1Day: 1, phase2Day: 1, phase3Day: 1, records: {} },
+            street: { records: {} }, // ماژول مستقل
+            market: { records: {} }  // ماژول مستقل
         };
+        
         let currentModule = 'addsub';
         let currentInput = "";
 
         const contentDB_addsub = {
-            p0_d1: [
-                {q: "3 + 7", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."},
-                {q: "10 - 2", a: 8, h: "فاصله عدد تا ۱۰."},
-                {q: "6 + 4", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."},
-                {q: "10 - 7", a: 3, h: "فاصله عدد تا ۱۰."},
-                {q: "5 + 5", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."}
-            ],
-            p0_d2: [
-                {q: "10 - 4", a: 6, h: "فاصله عدد تا ۱۰."},
-                {q: "8 + 2", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."},
-                {q: "10 - 1", a: 9, h: "فاصله عدد تا ۱۰."},
-                {q: "9 + 1", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."},
-                {q: "10 - 6", a: 4, h: "فاصله عدد تا ۱۰."}
-            ],
             p1_d1: [
                 {q: "56 + 38", a: 94, h: "شکستن: ابتدا ۵۶+۳۰=۸۶، سپس ۸۶+۸=۹۴."},
                 {q: "74 + 49", a: 123, h: "رند کردن: ۴۹ نزدیک ۵۰ است. ۷۴+۵۰=۱۲۴. یکی کم کن → ۱۲۳."},
@@ -237,12 +264,7 @@
                 {q: "63 - 27", a: 36, h: "پرش به جلو: از ۲۷ تا ۳۰ (۳ تا). از ۳۰ تا ۶۳ (۳۳ تا). جمع: ۳۳+۳=۳۶."},
                 {q: "92 - 48", a: 44, h: "رند کردن: ۹۲-۵۰=۴۲. چون ۲ تا اضافه کم کردی، پس می‌گیری → ۴۴."}
             ],
-            p1_d2: [
-                {q: "48 + 37", a: 85, h: "جمع روان از چپ به راست."},
-                {q: "85 + 58", a: 143, h: "شکستن: ۸۵+۵۰=۱۳۵. سپس ۱۳۵+۸=۱۴۳."},
-                {q: "54 - 28", a: 26, h: "رند کردن: ۵۴-۳۰=۲۴. دو تا طلبکاری → ۲۶."},
-                {q: "81 - 39", a: 42, h: "پرش به جلو: از ۳۹ تا ۴۰ (۱ تا). از ۴۰ تا ۸۱ (۴۱ تا). جمع → ۴۲."}
-            ]
+            p1_d2: [ {q: "48 + 37", a: 85, h: ""}, {q: "85 + 58", a: 143, h: ""}, {q: "54 - 28", a: 26, h: ""}, {q: "81 - 39", a: 42, h: ""} ]
         };
 
         const contentDB_percent = {
@@ -275,16 +297,16 @@
 
         function saveDb() {
             let dataStr = JSON.stringify(db);
-            localStorage.setItem('mentalmath_db_v3', dataStr);
-            if (tg && tg.CloudStorage) tg.CloudStorage.setItem('mentalmath_db_v3', dataStr, (err, ok) => {});
+            localStorage.setItem('mentalmath_db_v4', dataStr);
+            if (tg && tg.CloudStorage) tg.CloudStorage.setItem('mentalmath_db_v4', dataStr, (err, ok) => {});
         }
 
         function loadDb() {
-            let local = localStorage.getItem('mentalmath_db_v3');
-            if (local) { try { let parsed = JSON.parse(local); if(parsed.addsub && parsed.percent) db = parsed; } catch(e){} }
+            let local = localStorage.getItem('mentalmath_db_v4');
+            if (local) { try { let parsed = JSON.parse(local); if(parsed.addsub && parsed.percent && parsed.market) db = parsed; } catch(e){} }
             if (tg && tg.CloudStorage) {
-                tg.CloudStorage.getItem('mentalmath_db_v3', (err, value) => {
-                    if (!err && value) { try { let parsed = JSON.parse(value); if(parsed.addsub && parsed.percent) db = parsed; } catch(e){} }
+                tg.CloudStorage.getItem('mentalmath_db_v4', (err, value) => {
+                    if (!err && value) { try { let parsed = JSON.parse(value); if(parsed.addsub && parsed.percent && parsed.market) db = parsed; } catch(e){} }
                 });
             }
         }
@@ -318,7 +340,8 @@
 
         function openModule(mod) {
             currentModule = mod;
-            document.getElementById('phaseScreenTitle').textContent = mod === 'percent' ? "محاسبه درصد" : "جمع و تفریق";
+            let titles = { 'addsub': 'جمع و تفریق', 'percent': 'محاسبه درصد', 'street': 'ریاضیات خیابانی', 'market': 'هوش ریاضی بازار' };
+            document.getElementById('phaseScreenTitle').textContent = titles[mod];
             renderPhases(); nav('screen-phases');
         }
 
@@ -328,59 +351,91 @@
             const c = document.getElementById('phasesContainer'); c.innerHTML = '';
             let activeDB = getActiveDB();
             
-            // فاز ۰ (فقط برای جمع و تفریق)
             if (currentModule === 'addsub') {
                 c.innerHTML += `
-                <div class="phase-card" style="border: 2px solid var(--accent);">
-                    <div class="phase-header"><span class="phase-title">فاز ۰: رفلکس‌های پایه</span> ${activeDB.phase0Day > 10 ? '✅' : ''}</div>
-                    <div class="phase-desc">تسلط بر مکمل‌های ۱۰ (پیش‌نیاز جبران). روز ${Math.min(activeDB.phase0Day || 1, 10)} از ۱۰</div>
+                <div class="phase-card" style="border: 2px solid var(--accent); background: rgba(77,166,255,0.05);">
+                    <div class="phase-header"><span class="phase-title">فاز ۰: رفلکس‌های پایه</span></div>
+                    <div class="phase-desc">میدان تمرین همیشگی. ۱۰ سوال ترکیبی، سخت و آسان از مکمل‌ها بدون روزشمار.</div>
                     <div style="display:flex; gap:10px;">
-                        <button class="primary-btn" style="flex:2; background-color: var(--text-color);" onclick="${(activeDB.phase0Day || 1) <= 10 ? `startSession(0, false, ${activeDB.phase0Day || 1})` : `startSession(0, true, 11)`}">${(activeDB.phase0Day || 1) <= 10 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۱'}</button>
-                        <button class="outline-btn" style="flex:1; margin:0; border-color: var(--text-color); color: var(--text-color);" onclick="openPath(0)">نقشه راه</button>
+                        <button class="primary-btn" style="width:100%;" onclick="startSession(0, true, 0)">شروع آزمون ${activeDB.phase0Exams + 1}</button>
                     </div>
                 </div>`;
             }
 
-            let p1Locked = !activeDB.unlockedPhases.includes(1);
-            c.innerHTML += `
-                <div class="phase-card">
-                    <div class="${p1Locked ? 'locked-content' : ''}">
-                        <div class="phase-header"><span class="phase-title">فاز ۱: فونداسیون</span> ${p1Locked ? '🔒' : (activeDB.phase1Day > 10 ? '✅' : '')}</div>
-                        <div class="phase-desc">تثبیت تکنیک‌ها. روز ${Math.min(activeDB.phase1Day, 10)} از ۱۰</div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="primary-btn" style="flex:2;" onclick="${activeDB.phase1Day <= 10 ? `startSession(1, false, ${activeDB.phase1Day})` : `startSession(1, true, 11)`}">${activeDB.phase1Day <= 10 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۲'}</button>
-                            <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(1)">نقشه راه</button>
+            if (currentModule === 'addsub' || currentModule === 'percent') {
+                let p1Locked = !activeDB.unlockedPhases.includes(1);
+                c.innerHTML += `
+                    <div class="phase-card">
+                        <div class="${p1Locked ? 'locked-content' : ''}">
+                            <div class="phase-header"><span class="phase-title">فاز ۱: فونداسیون</span> ${p1Locked ? '🔒' : (activeDB.phase1Day > 10 ? '✅' : '')}</div>
+                            <div class="phase-desc">تثبیت تکنیک‌ها. روز ${Math.min(activeDB.phase1Day, 10)} از ۱۰</div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="primary-btn" style="flex:2;" onclick="${activeDB.phase1Day <= 10 ? `startSession(1, false, ${activeDB.phase1Day})` : `startSession(1, true, 11)`}">${activeDB.phase1Day <= 10 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۲'}</button>
+                                <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(1)">نقشه راه</button>
+                            </div>
                         </div>
-                    </div>
-                </div>`;
-            
-            let p2Locked = !activeDB.unlockedPhases.includes(2);
-            c.innerHTML += `
-                <div class="phase-card">
-                    <div class="${p2Locked ? 'locked-content' : ''}">
-                        <div class="phase-header"><span class="phase-title">فاز ۲: حافظه کاری</span> ${p2Locked ? '🔒' : ''}</div>
-                        <div class="phase-desc">حذف تکیه‌گاه چشمی (چشم بسته). روز ${Math.min(activeDB.phase2Day, 20)} از ۲۰</div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="primary-btn" style="flex:2;" onclick="${activeDB.phase2Day <= 20 ? `startSession(2, false, ${activeDB.phase2Day})` : `startSession(2, true, 21)`}">${activeDB.phase2Day <= 20 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۳'}</button>
-                            <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(2)">نقشه راه</button>
+                    </div>`;
+                
+                let p2Locked = !activeDB.unlockedPhases.includes(2);
+                c.innerHTML += `
+                    <div class="phase-card">
+                        <div class="${p2Locked ? 'locked-content' : ''}">
+                            <div class="phase-header"><span class="phase-title">فاز ۲: حافظه کاری</span> ${p2Locked ? '🔒' : ''}</div>
+                            <div class="phase-desc">حذف تکیه‌گاه چشمی. روز ${Math.min(activeDB.phase2Day, 20)} از ۲۰</div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="primary-btn" style="flex:2;" onclick="${activeDB.phase2Day <= 20 ? `startSession(2, false, ${activeDB.phase2Day})` : `startSession(2, true, 21)`}">${activeDB.phase2Day <= 20 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۳'}</button>
+                                <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(2)">نقشه راه</button>
+                            </div>
                         </div>
-                    </div>
-                    ${p2Locked ? `<button class="outline-btn" style="margin-top:15px;" onclick="startSession(1, true, 11)">میان‌بر: شرکت در آزمون فاز ۱</button>` : ''}
-                </div>`;
+                    </div>`;
 
-            let p3Locked = !activeDB.unlockedPhases.includes(3);
-            c.innerHTML += `
-                <div class="phase-card">
-                    <div class="${p3Locked ? 'locked-content' : ''}">
-                        <div class="phase-header"><span class="phase-title">فاز ۳: غرقیگی</span> ${p3Locked ? '🔒' : ''}</div>
-                        <div class="phase-desc">فشار زمانی و سرعت خالص. روز ${Math.min(activeDB.phase3Day, 30)} از ۳0</div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="primary-btn" style="flex:2;" onclick="startSession(3, false, ${activeDB.phase3Day})">ادامه مسیر</button>
-                            <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(3)">نقشه راه</button>
+                let p3Locked = !activeDB.unlockedPhases.includes(3);
+                c.innerHTML += `
+                    <div class="phase-card">
+                        <div class="${p3Locked ? 'locked-content' : ''}">
+                            <div class="phase-header"><span class="phase-title">فاز ۳: غرقیگی</span> ${p3Locked ? '🔒' : ''}</div>
+                            <div class="phase-desc">فشار زمانی و تایمر معکوس. روز ${Math.min(activeDB.phase3Day, 30)} از ۳0</div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="primary-btn" style="flex:2;" onclick="startSession(3, false, ${activeDB.phase3Day})">ادامه مسیر</button>
+                                <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(3)">نقشه راه</button>
+                            </div>
                         </div>
-                    </div>
-                    ${p3Locked ? `<button class="outline-btn" style="margin-top:15px;" onclick="startSession(2, true, 21)">میان‌بر: شرکت در آزمون فاز ۲</button>` : ''}
-                </div>`;
+                    </div>`;
+            }
+
+            if (currentModule === 'street') {
+                const streets = [
+                    { id: 'cart', title: 'سبد خرید', desc: 'نگهداری عدد قبلی در ذهن حین جمع اعداد پی‌درپی.' },
+                    { id: 'age', title: 'تقویم و سن', desc: 'محاسبه سریع فاصله سال‌ها و پرش‌های تاریخی.' },
+                    { id: 'cashier', title: 'صندوق‌دار', desc: 'محاسبه سریع باقیمانده پول پرداختی مشتری.' }
+                ];
+                streets.forEach(s => {
+                    c.innerHTML += `
+                    <div class="phase-card" style="border-color:var(--accent);">
+                        <div class="phase-header"><span class="phase-title">${s.title}</span></div>
+                        <div class="phase-desc">${s.desc}</div>
+                        <button class="primary-btn" onclick="startCustomSession('street', '${s.id}', '${s.title}')">شروع تمرین</button>
+                    </div>`;
+                });
+            }
+
+            if (currentModule === 'market') {
+                const steps = [
+                    { id: 's1', title: 'گام اول: تقریب سریع', desc: 'محاسبه حدود قیمت‌ها بدون درگیری با اعداد خرد.' },
+                    { id: 's2', title: 'گام دوم: تراز مالی', desc: 'برایند‌گیری سریع بین بدهی‌ها (-) و مطالبات (+).' },
+                    { id: 's3', title: 'گام سوم: معادله‌سازی', desc: 'پیدا کردن مجهول ذهنی در چند ثانیه.' },
+                    { id: 's4', title: 'گام چهارم: خرد کردن', desc: 'ترفندهای بخش‌پذیری و تناسب برای اعداد بزرگ.' },
+                    { id: 's5', title: 'گام پنجم: احتمالات', desc: 'وزن‌دهی سرانگشتی به شانس در تصمیم‌گیری.' }
+                ];
+                steps.forEach(s => {
+                    c.innerHTML += `
+                    <div class="phase-card" style="border-color:var(--gold);">
+                        <div class="phase-header"><span class="phase-title" style="color:var(--gold);">${s.title}</span></div>
+                        <div class="phase-desc">${s.desc}</div>
+                        <button class="primary-btn" style="background:var(--gold); color:#000;" onclick="startCustomSession('market', '${s.id}', '${s.title}')">ورود به رینگ</button>
+                    </div>`;
+                });
+            }
         }
 
         function openPath(phase) {
@@ -388,7 +443,7 @@
             let grid = document.getElementById('sagaGrid'); grid.innerHTML = '';
             let activeDB = getActiveDB();
             
-            let totalDays = phase === 1 || phase === 0 ? 10 : (phase === 2 ? 20 : 30);
+            let totalDays = phase === 1 ? 10 : (phase === 2 ? 20 : 30);
             let currentDay = activeDB[`phase${phase}Day`] || 1;
             
             for(let i=1; i<=totalDays; i++) {
@@ -410,7 +465,7 @@
         }
         function handleExamClick(phase, status) {
             playClick(); if (status === 'locked') return;
-            if (status === 'current') startSession(phase, true, phase === 1 || phase === 0 ? 11 : 21);
+            if (status === 'current') startSession(phase, true, phase === 1 ? 11 : 21);
             if (status === 'passed') showPopup("آزمون پاس شده", "قبلاً این آزمون را با موفقیت گذرانده‌اید.", null);
         }
 
@@ -459,24 +514,66 @@
             };
         }
         function closePopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+        
+        function toggleHint() {
+            playClick();
+            let hb = document.getElementById('hintBox');
+            hb.style.display = (hb.style.display === 'none' || hb.style.display === '') ? 'block' : 'none';
+        }
 
-        function generateQ(phase) {
+        // --- موتور تولید کننده محتوای هوشمند ---
+        function generateQ(phase, customType = null) {
             if (currentModule === 'percent') {
                 let bases = [10, 1, 5]; let b = bases[Math.floor(Math.random() * bases.length)];
                 let num = (Math.floor(Math.random() * 90) + 10) * 10;
                 return { q: `${b}% of ${num}`, a: (b * num) / 100, h: "بدون مکث پاسخ دهید" };
-            } else {
-                if (phase === 0) {
-                    // تولید خودکار مکمل‌های 10 و جمع و تفریق ساده
+            } 
+            else if (currentModule === 'street') {
+                if (customType === 'cart') {
+                    let n1 = Math.floor(Math.random() * 40)+10; let n2 = Math.floor(Math.random() * 40)+10; let n3 = Math.floor(Math.random() * 30)+10;
+                    return {q: `سبد: ${n1} + ${n2} + ${n3}`, a: n1+n2+n3, h: "عدد اول و دوم را جمع کن، در ذهن نگه دار، سپس سومی را اضافه کن."};
+                } else if (customType === 'age') {
+                    let y1 = Math.floor(Math.random() * 40) + 1350; let y2 = y1 + Math.floor(Math.random() * 50) + 10;
+                    return {q: `متولد ${y1} در سال ${y2}`, a: y2 - y1, h: "پرش ذهنی کن: اول از سال تولد تا سال رندِ بعدی حساب کن."};
+                } else if (customType === 'cashier') {
+                    let cost = (Math.floor(Math.random() * 8) + 1) * 50 + (Math.floor(Math.random() * 9) * 10);
+                    let paid = Math.ceil(cost / 100) * 100; if(paid === cost) paid += 100;
+                    if(Math.random()>0.5 && paid < 500) paid = 500;
+                    return {q: `فاکتور: ${cost} | پرداختی: ${paid}`, a: paid - cost, h: "برای یافتن باقیمانده، مکملِ رقم فاکتور تا پرداختی را پیدا کن."};
+                }
+            }
+            else if (currentModule === 'market') {
+                if (customType === 's1') { // تقریب
+                    let n1 = (Math.floor(Math.random() * 8) + 2) * 10 + (Math.random()>0.5?1:-1); 
+                    let n2 = (Math.floor(Math.random() * 8) + 2) * 10 + (Math.random()>0.5?1:-1);
+                    return {q: `${n1} × ${n2} ≈ ?`, a: Math.round(n1/10)*10 * Math.round(n2/10)*10, h: "استراتژی: اعداد خرد را به نزدیک‌ترین دهگان گرد کن و بعد ضرب کن."};
+                } else if (customType === 's2') { // تراز
+                    let n1 = Math.floor(Math.random() * 9)*10; let n2 = -Math.floor(Math.random() * 9)*10; let n3 = Math.floor(Math.random() * 9)*10;
+                    return {q: `برایند: ${n1} و ${n2} و ${n3}`, a: n1+n2+n3, h: "استراتژی: ابتدا اعداد هم‌علامت را جمع کن، سپس با عدد مخالف تفریق کن."};
+                } else if (customType === 's3') { // معادله
+                    let x = Math.floor(Math.random() * 10)+2; let a = Math.floor(Math.random() * 8)+2;
+                    return {q: `${a}x = ${a*x}`, a: x, h: "استراتژی: چه عددی در ضریب ضرب شود تا حاصل بدست آید؟"};
+                } else if (customType === 's4') { // خرد کردن
+                    let a = Math.floor(Math.random() * 7)+2; let b = (Math.floor(Math.random() * 8)+2)*10;
+                    return {q: `${a*b} ÷ ${a}`, a: b, h: "استراتژی: صفرها را نادیده بگیر، بخش اصلی را تقسیم کن و در نهایت صفر را برگردان."};
+                } else if (customType === 's5') { // احتمال
+                    let a = Math.floor(Math.random() * 4)+1; let b = a * (Math.floor(Math.random() * 4)+2);
+                    return {q: `${a} از ${b} (به درصد)`, a: (a/b)*100, h: "استراتژی: کسر را ساده کن و ببین چه نسبتی از ۱۰۰ می‌شود."};
+                }
+            }
+            else { // addsub
+                if (phase === 0) { // فاز 0 - رفلکس‌ها
                     let n1 = Math.floor(Math.random() * 9) + 1;
                     let n2 = Math.floor(Math.random() * 9) + 1;
                     let isAdd = Math.random() > 0.5;
+                    let isHard = Math.random() > 0.5;
                     if (isAdd) {
-                        if (Math.random() > 0.5) n2 = 10 - n1;
-                        return {q: `${n1} + ${n2}`, a: n1 + n2, h: "بدون مکث"};
+                        if (!isHard) n2 = 10 - n1;
+                        return {q: `${n1} + ${n2}`, a: n1 + n2, h: "بدون مکث مکمل‌ها را فراخوانی کن"};
                     } else {
-                        let sum = n1 + n2;
-                        return {q: `${sum} - ${n1}`, a: n2, h: "فاصله تا عدد مکمل"};
+                        let sum = isHard ? (Math.floor(Math.random()*8)+11) : 10;
+                        let sub = Math.floor(Math.random()*(sum-1))+1;
+                        return {q: `${sum} - ${sub}`, a: sum - sub, h: "فاصله تا عدد را ببین"};
                     }
                 } else {
                     let n1 = Math.floor(Math.random() * 80) + 20; let n2 = Math.floor(Math.random() * 50) + 15;
@@ -486,22 +583,40 @@
             }
         }
 
-        let currentSession = { phase: 1, isExam: false, day: 1, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: 0, timerObj: null, timeLeft: 0 };
+        let currentSession = { phase: 1, customType: null, isExam: false, day: 1, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: 0, timerObj: null, timeLeft: 0 };
         
+        function startCustomSession(mod, type, title) {
+            currentModule = mod;
+            currentSession = { phase: 'custom', customType: type, isExam: false, day: 0, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now(), timeLeft: 0 };
+            currentInput = "";
+            for(let i=0; i<5; i++) currentSession.questions.push(generateQ('custom', type));
+            document.getElementById('trainingTitle').textContent = title;
+            document.getElementById('heartsContainer').textContent = '';
+            document.getElementById('hintToggleBtn').style.display = 'flex'; // دکمه راهنما روشن
+            initArena();
+        }
+
         function startSession(phase, isExam, day, isReplay = false) {
-            let isTutorial = (phase === 1 && day <= 2 && !isExam) || (phase === 0 && day <= 2 && !isExam); 
-            currentSession = { phase, isExam, day, isReplay, isTutorial, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now(), timeLeft: 0 };
+            let isTutorial = (phase === 1 && day <= 2 && !isExam); 
+            currentSession = { phase, customType: null, isExam, day, isReplay, isTutorial, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now(), timeLeft: 0 };
             currentInput = "";
             
-            let qCount = isExam ? ((phase === 1 || phase === 0) ? 15 : 25) : 5;
+            // فاز 0 همیشه 10 سوال است
+            let qCount = (phase === 0) ? 10 : (isExam ? (phase === 1 ? 15 : 25) : 5);
             let dayKey = `p${phase}_d${day}`;
             let cDB = getContentDB();
-            if (!isExam && cDB[dayKey]) { currentSession.questions = [...cDB[dayKey]]; } 
+            if (!isExam && cDB[dayKey] && phase !== 0) { currentSession.questions = [...cDB[dayKey]]; } 
             else { for(let i=0; i<qCount; i++) currentSession.questions.push(generateQ(phase)); }
 
-            document.getElementById('trainingTitle').textContent = isExam ? `آزمون فاز ${phase}` : (isReplay ? `تکرار روز ${day}` : `فاز ${phase} - روز ${day}`);
+            let titleTxt = "";
+            if (phase === 0) titleTxt = `آزمون فاز ۰`;
+            else titleTxt = isExam ? `آزمون فاز ${phase}` : (isReplay ? `تکرار روز ${day}` : `فاز ${phase} - روز ${day}`);
+            document.getElementById('trainingTitle').textContent = titleTxt;
             document.getElementById('heartsContainer').textContent = isExam ? '❤️❤️' : '';
             
+            // در فازهای استاندارد، دکمه راهنمای دستی خاموش است مگر در فازهای مجزا
+            document.getElementById('hintToggleBtn').style.display = 'none';
+
             if (phase === 2 && !isExam && !isReplay) {
                 showPopup("پروتکل حافظه کاری", "سوال را فقط ۱.۵ ثانیه می‌بینی.<br>آن را در ذهن تکرار کن، چشم‌ها را ببند و حل کن.", () => { initArena(); });
             } else if (phase === 3 && !isReplay) {
@@ -552,13 +667,16 @@
             let nb = document.getElementById('numpadWrapper');
             let tb = document.getElementById('tutorialControls');
             
+            // مخفی سازی راهنما به صورت پیش‌فرض در لود سوال جدید
+            hb.style.display = 'none';
+            hb.textContent = qData.h;
+
             if (currentSession.isTutorial) {
                 document.getElementById('answerBox').textContent = qData.a;
                 nb.style.display = 'none'; tb.style.display = 'block';
-                hb.style.display = 'block'; hb.textContent = qData.h;
+                hb.style.display = 'block';
             } else {
                 nb.style.display = 'block'; tb.style.display = 'none';
-                hb.style.display = 'none'; // مخفی سازی کامل راهنما حین تمرین
             }
 
             if (currentSession.phase === 2 && !currentSession.isTutorial) {
@@ -575,6 +693,7 @@
             b.addEventListener('click', (e) => { 
                 playClick(); 
                 let val = e.target.getAttribute('data-val');
+                if(val === '-' && currentInput !== "") return; // منفی فقط اول خط
                 if(val === '.' && currentInput.includes('.')) return; 
                 currentInput += val;
                 document.getElementById('answerBox').textContent = currentInput; 
@@ -634,9 +753,9 @@
             document.getElementById('sumTime').textContent = totalTime + 's';
             document.getElementById('sumAvgTime').textContent = currentSession.isTutorial ? '-' : avgTime.toFixed(1) + 's';
             
-            let fb = "خوب بود. آماده‌ای برای فردا؟";
+            let fb = "خوب بود. عالی پیش رفتی.";
             if (currentSession.isTutorial) fb = "عالی! ذهن شما در حال آشنایی با مسیرهای عصبیِ جدید است.";
-            else if (isFailedExam) fb = customFailMsg ? customFailMsg : "آزمون ناموفق بود. خطاهایت بیشتر از حد مجاز است. دوباره تلاش کن.";
+            else if (isFailedExam) fb = customFailMsg ? customFailMsg : "آزمون ناموفق بود. خطاهایت بیشتر از حد مجاز است.";
             else if (currentSession.errors === 0) fb = "🔥 بی‌نظیر! تسلط کامل به وضوح دیده می‌شود.";
             document.getElementById('aiFeedback').textContent = fb;
 
@@ -647,7 +766,7 @@
                 el.innerHTML = '';
                 currentSession.errorDetails.forEach(e => {
                     el.innerHTML += `<div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border); direction: rtl; text-align: right;">
-                        سوال: <b style="direction:ltr; display:inline-block; font-size:1.2rem;">${e.q}</b> <br> 
+                        سوال: <b style="direction:ltr; display:inline-block; font-size:1.1rem;">${e.q}</b> <br> 
                         پاسخ شما: <span style="color:var(--error); direction:ltr; display:inline-block; font-weight:bold;">${e.user}</span> | 
                         جواب درست: <span style="color:var(--success); direction:ltr; display:inline-block; font-weight:bold;">${e.correct}</span>
                     </div>`;
@@ -657,17 +776,19 @@
             let activeDB = getActiveDB();
 
             if (!isFailedExam && !currentSession.isReplay) {
-                if (!currentSession.isTutorial) {
+                if (currentSession.phase === 0) {
+                    activeDB.phase0Exams++; // پیشروی شمارنده آزمون‌های فاز 0
+                }
+                else if (currentSession.phase !== 'custom' && !currentSession.isTutorial) {
                     let dayKey = `p${currentSession.phase}_d${currentSession.day}`;
                     if (!activeDB.records) activeDB.records = {};
                     activeDB.records[dayKey] = { correct: corrects, errors: currentSession.errors, time: totalTime, avgTime: avgTime.toFixed(1) };
                 }
 
                 if (currentSession.isExam) {
-                    if (currentSession.phase === 0 && !activeDB.unlockedPhases.includes(1)) activeDB.unlockedPhases.push(1);
                     if (currentSession.phase === 1 && !activeDB.unlockedPhases.includes(2)) activeDB.unlockedPhases.push(2);
                     if (currentSession.phase === 2 && !activeDB.unlockedPhases.includes(3)) activeDB.unlockedPhases.push(3);
-                } else {
+                } else if (currentSession.phase !== 'custom' && currentSession.phase !== 0) {
                     activeDB[`phase${currentSession.phase}Day`]++;
                 }
                 saveDb();
