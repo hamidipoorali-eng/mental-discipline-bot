@@ -121,7 +121,7 @@
     <div id="screen-path" class="screen">
         <div class="header">
             <button onclick="nav('screen-phases')">➔</button>
-            <div class="header-title" id="pathTitle">مسیر فاز ۱</div>
+            <div class="header-title" id="pathTitle">مسیر فاز</div>
             <div style="width:35px"></div>
         </div>
         <div class="container">
@@ -132,7 +132,7 @@
     <div id="screen-training" class="screen">
         <div class="header">
             <button onclick="abortTraining()">✕</button>
-            <div class="header-title" id="trainingTitle">فاز ۱ - روز ۱</div>
+            <div class="header-title" id="trainingTitle">--</div>
             <div style="width:35px"></div>
         </div>
         <div class="stats-bar">
@@ -176,7 +176,6 @@
                     <div class="metric-item"><div class="metric-val" id="sumTime">0s</div><div class="metric-label">زمان کل</div></div>
                     <div class="metric-item"><div class="metric-val" id="sumAvgTime">0s</div><div class="metric-label">میانگین</div></div>
                 </div>
-                <!-- بخش جدید: کالبدشکافی خطاها -->
                 <div id="errorLogContainer" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:15px;">
                     <div style="font-weight:bold; margin-bottom:15px; color:var(--accent);">کالبدشکافی خطاها:</div>
                     <div id="errorLog" style="font-size:0.95rem;"></div>
@@ -210,13 +209,27 @@
         let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
         let db = {
-            addsub: { unlockedPhases: [1], phase1Day: 1, phase2Day: 1, phase3Day: 1, records: {} },
+            addsub: { unlockedPhases: [0, 1], phase0Day: 1, phase1Day: 1, phase2Day: 1, phase3Day: 1, records: {} },
             percent: { unlockedPhases: [1], phase1Day: 1, phase2Day: 1, phase3Day: 1, records: {} }
         };
         let currentModule = 'addsub';
         let currentInput = "";
 
         const contentDB_addsub = {
+            p0_d1: [
+                {q: "3 + 7", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."},
+                {q: "10 - 2", a: 8, h: "فاصله عدد تا ۱۰."},
+                {q: "6 + 4", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."},
+                {q: "10 - 7", a: 3, h: "فاصله عدد تا ۱۰."},
+                {q: "5 + 5", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."}
+            ],
+            p0_d2: [
+                {q: "10 - 4", a: 6, h: "فاصله عدد تا ۱۰."},
+                {q: "8 + 2", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."},
+                {q: "10 - 1", a: 9, h: "فاصله عدد تا ۱۰."},
+                {q: "9 + 1", a: 10, h: "بدون مکث، عدد مکمل ۱۰ را بگو."},
+                {q: "10 - 6", a: 4, h: "فاصله عدد تا ۱۰."}
+            ],
             p1_d1: [
                 {q: "56 + 38", a: 94, h: "شکستن: ابتدا ۵۶+۳۰=۸۶، سپس ۸۶+۸=۹۴."},
                 {q: "74 + 49", a: 123, h: "رند کردن: ۴۹ نزدیک ۵۰ است. ۷۴+۵۰=۱۲۴. یکی کم کن → ۱۲۳."},
@@ -247,62 +260,14 @@
                 {q: "10% of 48", a: 4.8, h: "آجر ۱۰٪: یک رقم ممیز به چپ → ۴.۸"},
                 {q: "1% of 94", a: 0.94, h: "آجر ۱٪: دو رقم ممیز به چپ → ۰.۹۴"}
             ],
-            p1_d3: [
-                {q: "1% of 450", a: 4.5, h: "دو قدم ممیز به چپ → ۴.۵"},
-                {q: "1% of 3200", a: 32, h: "دو صفر را حذف کن → ۳۲"},
-                {q: "1% of 80", a: 0.8, h: "دو قدم ممیز به چپ → ۰.۸"},
-                {q: "1% of 650", a: 6.5, h: "دو قدم ممیز به چپ → ۶.۵"},
-                {q: "1% of 1200", a: 12, h: "دو صفر را حذف کن → ۱۲"}
-            ],
-            p1_d4: [
-                {q: "5% of 420", a: 21, h: "اول ۱۰٪ می‌شود ۴۲، نصفش کن → ۲۱"},
-                {q: "5% of 840", a: 42, h: "اول ۱۰٪ می‌شود ۸۴، نصفش کن → ۴۲"},
-                {q: "5% of 280", a: 14, h: "اول ۱۰٪ می‌شود ۲۸، نصفش کن → ۱۴"},
-                {q: "5% of 660", a: 33, h: "اول ۱۰٪ می‌شود ۶۶، نصفش کن → ۳۳"},
-                {q: "5% of 120", a: 6, h: "اول ۱۰٪ می‌شود ۱۲، نصفش کن → ۶"}
-            ],
-            p1_d5: [
-                {q: "10% of 850", a: 85, h: "یک صفر را حذف کن → ۸۵"},
-                {q: "1% of 1500", a: 15, h: "دو صفر را حذف کن → ۱۵"},
-                {q: "5% of 600", a: 30, h: "۱۰٪ می‌شود ۶۰، نصفش کن → ۳۰"},
-                {q: "10% of 370", a: 37, h: "یک صفر را حذف کن → ۳۷"},
-                {q: "5% of 240", a: 12, h: "۱۰٪ می‌شود ۲۴، نصفش کن → ۱۲"}
-            ],
-            p1_d6: [
-                {q: "10% of 45", a: 4.5, h: "یک ممیز به چپ → ۴.۵"},
-                {q: "10% of 72", a: 7.2, h: "یک ممیز به چپ → ۷.۲"},
-                {q: "10% of 18", a: 1.8, h: "یک ممیز به چپ → ۱.۸"},
-                {q: "10% of 99", a: 9.9, h: "یک ممیز به چپ → ۹.۹"},
-                {q: "10% of 53", a: 5.3, h: "یک ممیز به چپ → ۵.۳"}
-            ],
-            p1_d7: [
-                {q: "5% of 30", a: 1.5, h: "۱۰٪ می‌شود ۳، نصفِ فرد → ۱.۵"},
-                {q: "5% of 50", a: 2.5, h: "۱۰٪ می‌شود ۵، نصفِ فرد → ۲.۵"},
-                {q: "5% of 70", a: 3.5, h: "۱۰٪ می‌شود ۷، نصفِ فرد → ۳.۵"},
-                {q: "5% of 90", a: 4.5, h: "۱۰٪ می‌شود ۹، نصفِ فرد → ۴.۵"},
-                {q: "5% of 150", a: 7.5, h: "۱۰٪ می‌شود ۱۵، نصفِ ۱۵ → ۷.۵"}
-            ],
-            p1_d8: [
-                {q: "10% of 1000", a: 100, h: "یک صفر حذف → ۱۰۰"},
-                {q: "1% of 10000", a: 100, h: "دو صفر حذف → ۱۰۰"},
-                {q: "5% of 2000", a: 100, h: "۱۰٪ می‌شود ۲۰۰، نصف کن → ۱۰۰"},
-                {q: "10% of 150", a: 15, h: "یک صفر حذف → ۱۵"},
-                {q: "1% of 5000", a: 50, h: "دو صفر حذف → ۵۰"}
-            ],
-            p1_d9: [
-                {q: "10% of 125", a: 12.5, h: "یک ممیز به چپ → ۱۲.۵"},
-                {q: "1% of 400", a: 4, h: "دو صفر حذف → ۴"},
-                {q: "5% of 320", a: 16, h: "۱۰٪ می‌شود ۳۲، نصف کن → ۱۶"},
-                {q: "10% of 85", a: 8.5, h: "یک ممیز به چپ → ۸.۵"},
-                {q: "1% of 250", a: 2.5, h: "دو ممیز به چپ → ۲.5"}
-            ],
-            p1_d10: [
-                {q: "10% of 64", a: 6.4, h: "یک ممیز به چپ → ۶.۴"},
-                {q: "1% of 350", a: 3.5, h: "دو ممیز به چپ → ۳.۵"},
-                {q: "5% of 480", a: 24, h: "۱۰٪ می‌شود ۴۸، نصف کن → ۲۴"},
-                {q: "10% of 92", a: 9.2, h: "یک ممیز به چپ → ۹.۲"},
-                {q: "5% of 860", a: 43, h: "۱۰٪ می‌شود ۸۶، نصف کن → ۴۳"}
-            ]
+            p1_d3: [ {q: "1% of 450", a: 4.5, h: ""}, {q: "1% of 3200", a: 32, h: ""}, {q: "1% of 80", a: 0.8, h: ""}, {q: "1% of 650", a: 6.5, h: ""}, {q: "1% of 1200", a: 12, h: ""} ],
+            p1_d4: [ {q: "5% of 420", a: 21, h: ""}, {q: "5% of 840", a: 42, h: ""}, {q: "5% of 280", a: 14, h: ""}, {q: "5% of 660", a: 33, h: ""}, {q: "5% of 120", a: 6, h: ""} ],
+            p1_d5: [ {q: "10% of 850", a: 85, h: ""}, {q: "1% of 1500", a: 15, h: ""}, {q: "5% of 600", a: 30, h: ""}, {q: "10% of 370", a: 37, h: ""}, {q: "5% of 240", a: 12, h: ""} ],
+            p1_d6: [ {q: "10% of 45", a: 4.5, h: ""}, {q: "10% of 72", a: 7.2, h: ""}, {q: "10% of 18", a: 1.8, h: ""}, {q: "10% of 99", a: 9.9, h: ""}, {q: "10% of 53", a: 5.3, h: ""} ],
+            p1_d7: [ {q: "5% of 30", a: 1.5, h: ""}, {q: "5% of 50", a: 2.5, h: ""}, {q: "5% of 70", a: 3.5, h: ""}, {q: "5% of 90", a: 4.5, h: ""}, {q: "5% of 150", a: 7.5, h: ""} ],
+            p1_d8: [ {q: "10% of 1000", a: 100, h: ""}, {q: "1% of 10000", a: 100, h: ""}, {q: "5% of 2000", a: 100, h: ""}, {q: "10% of 150", a: 15, h: ""}, {q: "1% of 5000", a: 50, h: ""} ],
+            p1_d9: [ {q: "10% of 125", a: 12.5, h: ""}, {q: "1% of 400", a: 4, h: ""}, {q: "5% of 320", a: 16, h: ""}, {q: "10% of 85", a: 8.5, h: ""}, {q: "1% of 250", a: 2.5, h: ""} ],
+            p1_d10: [ {q: "10% of 64", a: 6.4, h: ""}, {q: "1% of 350", a: 3.5, h: ""}, {q: "5% of 480", a: 24, h: ""}, {q: "10% of 92", a: 9.2, h: ""}, {q: "5% of 860", a: 43, h: ""} ]
         };
 
         function getActiveDB() { return db[currentModule]; }
@@ -310,15 +275,15 @@
 
         function saveDb() {
             let dataStr = JSON.stringify(db);
-            localStorage.setItem('mentalmath_db_v2', dataStr);
-            if (tg && tg.CloudStorage) tg.CloudStorage.setItem('mentalmath_db_v2', dataStr, (err, ok) => {});
+            localStorage.setItem('mentalmath_db_v3', dataStr);
+            if (tg && tg.CloudStorage) tg.CloudStorage.setItem('mentalmath_db_v3', dataStr, (err, ok) => {});
         }
 
         function loadDb() {
-            let local = localStorage.getItem('mentalmath_db_v2');
+            let local = localStorage.getItem('mentalmath_db_v3');
             if (local) { try { let parsed = JSON.parse(local); if(parsed.addsub && parsed.percent) db = parsed; } catch(e){} }
             if (tg && tg.CloudStorage) {
-                tg.CloudStorage.getItem('mentalmath_db_v2', (err, value) => {
+                tg.CloudStorage.getItem('mentalmath_db_v3', (err, value) => {
                     if (!err && value) { try { let parsed = JSON.parse(value); if(parsed.addsub && parsed.percent) db = parsed; } catch(e){} }
                 });
             }
@@ -363,13 +328,29 @@
             const c = document.getElementById('phasesContainer'); c.innerHTML = '';
             let activeDB = getActiveDB();
             
+            // فاز ۰ (فقط برای جمع و تفریق)
+            if (currentModule === 'addsub') {
+                c.innerHTML += `
+                <div class="phase-card" style="border: 2px solid var(--accent);">
+                    <div class="phase-header"><span class="phase-title">فاز ۰: رفلکس‌های پایه</span> ${activeDB.phase0Day > 10 ? '✅' : ''}</div>
+                    <div class="phase-desc">تسلط بر مکمل‌های ۱۰ (پیش‌نیاز جبران). روز ${Math.min(activeDB.phase0Day || 1, 10)} از ۱۰</div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="primary-btn" style="flex:2; background-color: var(--text-color);" onclick="${(activeDB.phase0Day || 1) <= 10 ? `startSession(0, false, ${activeDB.phase0Day || 1})` : `startSession(0, true, 11)`}">${(activeDB.phase0Day || 1) <= 10 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۱'}</button>
+                        <button class="outline-btn" style="flex:1; margin:0; border-color: var(--text-color); color: var(--text-color);" onclick="openPath(0)">نقشه راه</button>
+                    </div>
+                </div>`;
+            }
+
+            let p1Locked = !activeDB.unlockedPhases.includes(1);
             c.innerHTML += `
                 <div class="phase-card">
-                    <div class="phase-header"><span class="phase-title">فاز ۱: فونداسیون</span> ${activeDB.phase1Day > 10 ? '✅' : ''}</div>
-                    <div class="phase-desc">تثبیت تکنیک‌ها با راهنما. روز ${Math.min(activeDB.phase1Day, 10)} از ۱۰</div>
-                    <div style="display:flex; gap:10px;">
-                        <button class="primary-btn" style="flex:2;" onclick="${activeDB.phase1Day <= 10 ? `startSession(1, false, ${activeDB.phase1Day})` : `startSession(1, true, 11)`}">${activeDB.phase1Day <= 10 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۲'}</button>
-                        <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(1)">نقشه راه</button>
+                    <div class="${p1Locked ? 'locked-content' : ''}">
+                        <div class="phase-header"><span class="phase-title">فاز ۱: فونداسیون</span> ${p1Locked ? '🔒' : (activeDB.phase1Day > 10 ? '✅' : '')}</div>
+                        <div class="phase-desc">تثبیت تکنیک‌ها. روز ${Math.min(activeDB.phase1Day, 10)} از ۱۰</div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="primary-btn" style="flex:2;" onclick="${activeDB.phase1Day <= 10 ? `startSession(1, false, ${activeDB.phase1Day})` : `startSession(1, true, 11)`}">${activeDB.phase1Day <= 10 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۲'}</button>
+                            <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(1)">نقشه راه</button>
+                        </div>
                     </div>
                 </div>`;
             
@@ -407,8 +388,8 @@
             let grid = document.getElementById('sagaGrid'); grid.innerHTML = '';
             let activeDB = getActiveDB();
             
-            let totalDays = phase === 1 ? 10 : (phase === 2 ? 20 : 30);
-            let currentDay = activeDB[`phase${phase}Day`];
+            let totalDays = phase === 1 || phase === 0 ? 10 : (phase === 2 ? 20 : 30);
+            let currentDay = activeDB[`phase${phase}Day`] || 1;
             
             for(let i=1; i<=totalDays; i++) {
                 let status = 'locked';
@@ -429,7 +410,7 @@
         }
         function handleExamClick(phase, status) {
             playClick(); if (status === 'locked') return;
-            if (status === 'current') startSession(phase, true, phase === 1 ? 11 : 21);
+            if (status === 'current') startSession(phase, true, phase === 1 || phase === 0 ? 11 : 21);
             if (status === 'passed') showPopup("آزمون پاس شده", "قبلاً این آزمون را با موفقیت گذرانده‌اید.", null);
         }
 
@@ -483,22 +464,36 @@
             if (currentModule === 'percent') {
                 let bases = [10, 1, 5]; let b = bases[Math.floor(Math.random() * bases.length)];
                 let num = (Math.floor(Math.random() * 90) + 10) * 10;
-                return { q: `${b}% of ${num}`, a: (b * num) / 100, h: "تولید خودکار" };
+                return { q: `${b}% of ${num}`, a: (b * num) / 100, h: "بدون مکث پاسخ دهید" };
             } else {
-                let n1 = Math.floor(Math.random() * 80) + 20; let n2 = Math.floor(Math.random() * 50) + 15;
-                let isAdd = Math.random() > 0.5; if(!isAdd && n1 < n2) [n1, n2] = [n2, n1];
-                return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2, h: "تولید خودکار"};
+                if (phase === 0) {
+                    // تولید خودکار مکمل‌های 10 و جمع و تفریق ساده
+                    let n1 = Math.floor(Math.random() * 9) + 1;
+                    let n2 = Math.floor(Math.random() * 9) + 1;
+                    let isAdd = Math.random() > 0.5;
+                    if (isAdd) {
+                        if (Math.random() > 0.5) n2 = 10 - n1;
+                        return {q: `${n1} + ${n2}`, a: n1 + n2, h: "بدون مکث"};
+                    } else {
+                        let sum = n1 + n2;
+                        return {q: `${sum} - ${n1}`, a: n2, h: "فاصله تا عدد مکمل"};
+                    }
+                } else {
+                    let n1 = Math.floor(Math.random() * 80) + 20; let n2 = Math.floor(Math.random() * 50) + 15;
+                    let isAdd = Math.random() > 0.5; if(!isAdd && n1 < n2) [n1, n2] = [n2, n1];
+                    return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2, h: "تکنیک را مرور کن"};
+                }
             }
         }
 
         let currentSession = { phase: 1, isExam: false, day: 1, isReplay: false, isTutorial: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: 0, timerObj: null, timeLeft: 0 };
         
         function startSession(phase, isExam, day, isReplay = false) {
-            let isTutorial = (phase === 1 && day <= 2 && !isExam); 
+            let isTutorial = (phase === 1 && day <= 2 && !isExam) || (phase === 0 && day <= 2 && !isExam); 
             currentSession = { phase, isExam, day, isReplay, isTutorial, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now(), timeLeft: 0 };
             currentInput = "";
             
-            let qCount = isExam ? (phase === 1 ? 15 : 25) : 5;
+            let qCount = isExam ? ((phase === 1 || phase === 0) ? 15 : 25) : 5;
             let dayKey = `p${phase}_d${day}`;
             let cDB = getContentDB();
             if (!isExam && cDB[dayKey]) { currentSession.questions = [...cDB[dayKey]]; } 
@@ -557,14 +552,13 @@
             let nb = document.getElementById('numpadWrapper');
             let tb = document.getElementById('tutorialControls');
             
-            // رفع باگ: مخفی‌سازی کامل راهنما بعد از روز دوم
             if (currentSession.isTutorial) {
                 document.getElementById('answerBox').textContent = qData.a;
                 nb.style.display = 'none'; tb.style.display = 'block';
                 hb.style.display = 'block'; hb.textContent = qData.h;
             } else {
                 nb.style.display = 'block'; tb.style.display = 'none';
-                hb.style.display = 'none'; // راهنما کاملاً مخفی می‌شود
+                hb.style.display = 'none'; // مخفی سازی کامل راهنما حین تمرین
             }
 
             if (currentSession.phase === 2 && !currentSession.isTutorial) {
@@ -602,7 +596,6 @@
             
             if (!isCorrect) {
                 currentSession.errors++;
-                // ثبت مشخصات خطای کاربر
                 currentSession.errorDetails.push({ q: qData.q, correct: qData.a, user: userAns });
                 
                 document.getElementById('answerBox').style.color = 'var(--error)';
@@ -647,7 +640,6 @@
             else if (currentSession.errors === 0) fb = "🔥 بی‌نظیر! تسلط کامل به وضوح دیده می‌شود.";
             document.getElementById('aiFeedback').textContent = fb;
 
-            // نمایش لیست کالبدشکافی خطاها در کارنامه
             let elc = document.getElementById('errorLogContainer');
             let el = document.getElementById('errorLog');
             if (currentSession.errors > 0 && currentSession.errorDetails && currentSession.errorDetails.length > 0) {
@@ -660,9 +652,7 @@
                         جواب درست: <span style="color:var(--success); direction:ltr; display:inline-block; font-weight:bold;">${e.correct}</span>
                     </div>`;
                 });
-            } else {
-                elc.style.display = 'none';
-            }
+            } else { elc.style.display = 'none'; }
 
             let activeDB = getActiveDB();
 
@@ -674,6 +664,7 @@
                 }
 
                 if (currentSession.isExam) {
+                    if (currentSession.phase === 0 && !activeDB.unlockedPhases.includes(1)) activeDB.unlockedPhases.push(1);
                     if (currentSession.phase === 1 && !activeDB.unlockedPhases.includes(2)) activeDB.unlockedPhases.push(2);
                     if (currentSession.phase === 2 && !activeDB.unlockedPhases.includes(3)) activeDB.unlockedPhases.push(3);
                 } else {
