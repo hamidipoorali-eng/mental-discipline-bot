@@ -11,6 +11,12 @@
         @font-face { font-family: 'Yekan Bakh'; src: url('https://cdn.jsdelivr.net/gh/Dimaaweb/yekan-bakh-font@master/fonts/woff2/YekanBakh-Bold.woff2') format('woff2'); font-weight: bold; }
         
         :root {
+            --bg-color: #f7f8fa; --text-color: #1a1b22; --card-bg: #ffffff;
+            --btn-bg: #e8ebf0; --btn-active: #d1d5db; --accent: #2c3e50; --error: #e74c3c; --success: #2ecc71;
+            --border: rgba(0,0,0,0.06); --shadow: 0 4px 15px rgba(0,0,0,0.03);
+            --gold: #f1c40f; --purple: #9b59b6;
+        }
+        [data-theme="dark"] {
             --bg-color: #0f0f11; --text-color: #e0e0e0; --card-bg: #1c1c1e;
             --btn-bg: #2c2c2e; --btn-active: #3a3a3c; --accent: #4da6ff; --error: #ff6b6b; --success: #2ecc71;
             --border: rgba(255,255,255,0.1); --shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -71,14 +77,14 @@
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; transform:scale(1.1); } 100% { opacity: 1; } }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
     <!-- صفحه اصلی -->
     <div id="screen-main" class="screen active">
         <div class="header">
-            <button onclick="tgClose()">✕</button>
+            <button id="themeToggleBtn">☀️</button>
             <div class="header-title">آکادمی محاسبات ذهنی</div>
-            <div style="width:35px"></div>
+            <button onclick="tgClose()" style="font-size:1rem;">✕</button>
         </div>
         <div class="container">
             <div class="module-card" style="border-color: var(--accent);" onclick="openModule('addsub')">
@@ -181,7 +187,7 @@
         <div class="popup-content">
             <h3 id="popupTitle" style="margin-bottom:15px; color:var(--accent); font-size:1.2rem;"></h3>
             <div id="popupMsg" style="margin-bottom:20px; line-height:1.7; font-size:0.95rem; text-align:justify;"></div>
-            <button class="btn primary-btn" onclick="closePopup()">متوجه شدم</button>
+            <button class="btn primary-btn" id="btnPopupAction" onclick="closePopup()">متوجه شدم</button>
         </div>
     </div>
 
@@ -210,12 +216,31 @@
             }
         };
 
-        function saveDb() { localStorage.setItem('math_db_v7', JSON.stringify(db)); }
+        function saveDb() { localStorage.setItem('math_db_v7_fixed', JSON.stringify(db)); }
         function loadDb() {
-            let local = localStorage.getItem('math_db_v7');
+            let local = localStorage.getItem('math_db_v7_fixed');
             if (local) { try { let p = JSON.parse(local); if(p.addsub) db = p; } catch(e){} }
         }
         window.onload = () => { if (tg) tg.expand(); loadDb(); };
+
+        let audioCtx;
+        function playClick() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+            } catch(e) {}
+        }
+        
+        document.getElementById('themeToggleBtn').addEventListener('click', () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('themeToggleBtn').textContent = isDark ? '🌙' : '☀️';
+            playClick();
+        });
 
         let currentMod = 'addsub';
         let currentInput = "";
@@ -298,28 +323,27 @@
             nav('screen-path');
         }
 
-        // --- تابع جدید فراخوانی تکنیک‌ها از فایل مجزا ---
         async function showTechniques() {
             try {
-                // خواندن اطلاعات از فایل مجزای جیسون
                 let response = await fetch('techniques.json');
                 let data = await response.json();
-                
-                // پیدا کردن متن مربوط به ماژول فعلی
                 let msg = data[currentMod] || "تکنیکی برای این بخش نوشته نشده است.";
-                
                 showPopup("تکنیک‌های این مسیر", msg);
             } catch (error) {
-                showPopup("خطا", "امکان دریافت فایل تکنیک‌ها وجود ندارد. لطفا پس از آپلود در گیت‌هاب بررسی کنید یا اینترنت خود را چک کنید.");
+                showPopup("خطا", "امکان دریافت فایل تکنیک‌ها وجود ندارد. لطفا پس از آپلود در گیت‌هاب بررسی کنید.");
             }
         }
 
-        function showPopup(title, msg) {
+        function showPopup(title, msg, callback = null) {
             document.getElementById('popupTitle').textContent = title;
             document.getElementById('popupMsg').innerHTML = msg;
             document.getElementById('popupOverlay').style.display = 'flex';
+            document.getElementById('btnPopupAction').onclick = () => {
+                closePopup();
+                if(callback) callback();
+            };
         }
-        function closePopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+        function closePopup() { playClick(); document.getElementById('popupOverlay').style.display = 'none'; }
 
         // --- Core Session Logic ---
         let sesh = { type: '', mod: '', phase: 0, qs: [], qIndex: 0, errs: 0, errLog: [], startT: 0, tObj: null, tLeft: 0, maxErr: 0 };
@@ -335,13 +359,11 @@
             if (type === 'day') {
                 qCount = phase === 0 ? 10 : phaseConfig[mod][phase].qs;
                 title = phase === 0 ? `آزمون فاز ۰` : `فاز ${phase} - روز ${db[mod][`p${phase}Day`]}`;
-                sesh.maxErr = 100; // Unlimited for days, just practice
+                sesh.maxErr = 100; // Unlimited for days
             } else if (type === 'shortcut') {
                 qCount = 10; revTimer = true; sesh.maxErr = 1; title = `آزمون میان‌بر فاز ${phase}`;
-                showPopup("قوانین میان‌بر", "شما ۱۰ سوال با تایمر معکوس دارید.<br><b>حداکثر ۱ خطا</b> مجاز است.");
             } else if (type === 'exam') {
                 qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون پایان فاز ${phase}`;
-                showPopup("آزمون پایانی", "تایمر معکوس فعال است.<br><b>حداکثر ۲ خطا</b> برای قبولی مجاز است.");
             } else if (type === 'comprehensive' || type === 'grand') {
                 qCount = 10; revTimer = true; sesh.maxErr = 2; title = type === 'grand' ? `ابرآزمون جامع` : `آزمون جامع ${mod === 'addsub'?'جمع':'درصد'}`;
             }
@@ -351,9 +373,10 @@
             document.getElementById('trainingTitle').textContent = title;
             document.getElementById('heartsContainer').textContent = (sesh.maxErr < 10) ? '❤️'.repeat(sesh.maxErr + 1) : '';
             
-            setTimeout(initArena, (type === 'shortcut' || type === 'exam') ? 2000 : 0); 
-            if(type === 'shortcut' || type === 'exam') {
-                document.getElementById('popupOverlay').onclick = () => { closePopup(); initArena(); document.getElementById('popupOverlay').onclick=null;};
+            if (type === 'shortcut') {
+                showPopup("قوانین میان‌بر", "شما ۱۰ سوال با تایمر معکوس دارید.<br><b>حداکثر ۱ خطا</b> مجاز است.", initArena);
+            } else if (type === 'exam') {
+                showPopup("آزمون پایانی", "تایمر معکوس فعال است.<br><b>حداکثر ۲ خطا</b> برای قبولی مجاز است.", initArena);
             } else {
                 initArena();
             }
@@ -402,7 +425,7 @@
         }
 
         function initArena() {
-            closePopup(); nav('screen-training');
+            nav('screen-training');
             sesh.startT = Date.now();
             clearInterval(sesh.tObj); clearTimeout(blurTimeout);
             
