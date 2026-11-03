@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>آکادمی محاسبات ذهنی</title>
+    <title>Discipline</title>
     
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
@@ -83,7 +83,7 @@
     <div id="screen-main" class="screen active">
         <div class="header">
             <button id="themeToggleBtn">☀️</button>
-            <div class="header-title">آکادمی محاسبات ذهنی</div>
+            <div class="header-title">Discipline</div>
             <button onclick="tgClose()" style="font-size:1rem;">✕</button>
         </div>
         <div class="container">
@@ -424,7 +424,7 @@
             return `${String(Math.floor(secs/60)).padStart(2,'0')}:${String(secs%60).padStart(2,'0')}`;
         }
 
-        function initArena() {
+      function initArena() {
             nav('screen-training');
             sesh.startT = Date.now();
             clearInterval(sesh.tObj); clearTimeout(blurTimeout);
@@ -446,7 +446,17 @@
                     if (sesh.tLeft <= 5 && sesh.tLeft > 0) tt.classList.add('timer-danger');
                     if (sesh.tLeft <= 0) {
                         clearInterval(sesh.tObj);
-                        sesh.errs += (sesh.qs.length - sesh.qIndex); 
+                        
+                        // اضافه کردن سوالاتِ بی‌جواب به لیست کالبدشکافی
+                        for (let i = sesh.qIndex; i < sesh.qs.length; i++) {
+                            let qData = sesh.qs[i];
+                            if(qData.a === null) {
+                                try { qData.a = eval(qData.q.replace('×','*').replace('÷','/').replace('٪ از','/100*')); } catch(e){ qData.a = 0; }
+                            }
+                            sesh.errLog.push({ q: qData.q, correct: qData.a, user: '⏱ بدون پاسخ' });
+                            sesh.errs++;
+                        }
+                        
                         endSession(true, "تایم اوت شدی!");
                     }
                 }, 1000);
