@@ -3,31 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>باشگاه دیسپلین ذهنی</title>
+    <title>آکادمی محاسبات ذهنی</title>
     
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
-        @font-face { font-family: 'Yekan Bakh'; src: url('https://cdn.jsdelivr.net/gh/Dimaaweb/yekan-bakh-font@master/fonts/woff2/YekanBakh-Regular.woff2') format('woff2'); font-weight: normal; font-style: normal; }
-        @font-face { font-family: 'Yekan Bakh'; src: url('https://cdn.jsdelivr.net/gh/Dimaaweb/yekan-bakh-font@master/fonts/woff2/YekanBakh-Bold.woff2') format('woff2'); font-weight: bold; font-style: normal; }
-    </style>
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    
-    <style>
+        @font-face { font-family: 'Yekan Bakh'; src: url('https://cdn.jsdelivr.net/gh/Dimaaweb/yekan-bakh-font@master/fonts/woff2/YekanBakh-Regular.woff2') format('woff2'); }
+        @font-face { font-family: 'Yekan Bakh'; src: url('https://cdn.jsdelivr.net/gh/Dimaaweb/yekan-bakh-font@master/fonts/woff2/YekanBakh-Bold.woff2') format('woff2'); font-weight: bold; }
+        
         :root {
-            --bg-color: #f7f8fa; --text-color: #1a1b22; --card-bg: #ffffff;
-            --btn-bg: #e8ebf0; --btn-active: #d1d5db; --accent: #2c3e50; --error: #e74c3c; --success: #2ecc71;
-            --border: rgba(0,0,0,0.06); --shadow: 0 4px 15px rgba(0,0,0,0.03);
-            --gold: #f1c40f; --purple: #9b59b6;
-        }
-        [data-theme="dark"] {
             --bg-color: #0f0f11; --text-color: #e0e0e0; --card-bg: #1c1c1e;
             --btn-bg: #2c2c2e; --btn-active: #3a3a3c; --accent: #4da6ff; --error: #ff6b6b; --success: #2ecc71;
             --border: rgba(255,255,255,0.1); --shadow: 0 4px 15px rgba(0,0,0,0.2);
             --gold: #f1c40f; --purple: #b266ff;
         }
-        * { box-sizing: border-box; font-family: 'Yekan Bakh', 'Vazirmatn', sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0;}
+        * { box-sizing: border-box; font-family: 'Yekan Bakh', 'Vazirmatn', sans-serif; margin: 0; padding: 0; user-select: none;}
         body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column;}
         
         .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; overflow-y: auto;}
@@ -39,121 +28,70 @@
 
         .container { padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; padding-bottom: 40px; }
         .module-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
-        .module-card.locked { opacity: 0.5; cursor: not-allowed; }
         .module-title { font-size: 1.15rem; font-weight: bold; margin-bottom: 6px;}
         .module-sub { font-size: 0.85rem; opacity: 0.7; line-height: 1.5;}
-        .module-icon { font-size: 1.3rem; }
         
-        .phase-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); text-align: right;}
+        .phase-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--border); position: relative;}
         .locked-content { opacity: 0.4; pointer-events: none; }
         .phase-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
         .phase-title { font-weight: bold; font-size: 1.15rem; color: var(--accent);}
         .phase-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px; line-height: 1.5;}
         
-        .primary-btn { background-color: var(--accent); color: white; border: none; padding: 12px 20px; font-size: 1.05rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;}
-        .outline-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 12px 20px; font-size: 0.95rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
+        .btn { border: none; padding: 12px 20px; font-size: 1.05rem; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; display: inline-block; text-align: center;}
+        .primary-btn { background-color: var(--accent); color: white; }
+        .outline-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .tg-btn { background-color: #2AABEE; color: white; margin-top:10px; display: flex; align-items: center; justify-content: center; gap: 8px;}
 
         .saga-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 400px; direction: rtl; }
         .day-btn { aspect-ratio: 1; border-radius: 12px; font-size: 1.2rem; font-weight: bold; border: none; cursor: pointer; display:flex; justify-content:center; align-items:center; }
-        .day-btn.locked { background: var(--btn-bg); color: var(--text-color); opacity: 0.3; cursor: not-allowed; }
-        .day-btn.current { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(77, 166, 255, 0.3); border: 2px solid var(--bg-color); }
+        .day-btn.locked { background: var(--btn-bg); color: var(--text-color); opacity: 0.3; }
+        .day-btn.current { background: var(--accent); color: white; border: 2px solid var(--bg-color); box-shadow: 0 0 10px rgba(77, 166, 255, 0.4);}
         .day-btn.passed { background: var(--success); color: white; opacity: 0.8; }
-        .exam-btn { grid-column: span 4; aspect-ratio: auto; padding: 15px; border-radius: 12px; font-size: 1.1rem; }
+        .exam-btn { grid-column: span 4; aspect-ratio: auto; padding: 15px; font-size: 1.1rem; }
 
-        .stats-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; font-weight: bold; opacity: 0.8; }
-        .hearts { color: var(--error); font-size: 1.2rem; letter-spacing: 5px;}
-        .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px; position: relative;}
-        .question-box { font-size: 2.6rem; font-weight: 900; margin-bottom: 20px; direction: ltr; transition: filter 0.3s, opacity 0.3s; text-align: center; word-wrap: break-word;}
-        .blur-text { filter: blur(10px); opacity: 0.3; user-select: none; }
+        .arena { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: 20px;}
+        .question-box { font-size: 2.8rem; font-weight: 900; margin-bottom: 20px; direction: ltr; transition: filter 0.2s, opacity 0.2s; text-align: center;}
+        .blur-text { filter: blur(12px); opacity: 0.2; }
         .answer-box { font-size: 3rem; min-height: 60px; min-width: 150px; text-align: center; border-bottom: 3px solid var(--accent); color: var(--accent); font-weight: bold; direction: ltr;}
-        .hint-text { margin-top: 20px; font-size: 0.95rem; background: rgba(44, 62, 80, 0.1); padding: 15px; border-radius: 12px; border-right: 4px solid var(--gold); max-width: 320px; text-align: right; display: none; box-shadow: var(--shadow); color: var(--text-color);}
         
-        .numpad-container { padding: 15px; background-color: var(--card-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; border-top: 1px solid var(--border); box-shadow: 0 -4px 15px rgba(0,0,0,0.02);}
+        .numpad-container { padding: 15px; background-color: var(--card-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; border-top: 1px solid var(--border);}
         .numpad { width: 100%; max-width: 400px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .numpad button { background-color: var(--btn-bg); color: var(--text-color); border: none; padding: 15px 10px; font-size: 1.5rem; font-weight: bold; border-radius: 12px; user-select: none;}
+        .numpad button { background-color: var(--btn-bg); color: var(--text-color); border: none; padding: 15px 10px; font-size: 1.5rem; font-weight: bold; border-radius: 12px;}
         .numpad button:active { background-color: var(--btn-active); transform: scale(0.95); }
-        .btn-submit { background-color: var(--accent) !important; color: white !important;}
 
-        .summary-card { background: var(--card-bg); padding: 20px; border-radius: 16px; width: 100%; max-width: 400px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: var(--shadow);}
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; text-align: center;}
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: center;}
         .metric-item { background: var(--bg-color); padding: 15px; border-radius: 12px;}
-        .metric-val { font-size: 1.5rem; font-weight: bold; color: var(--accent);}
+        .metric-val { font-size: 1.4rem; font-weight: bold; color: var(--accent); direction: ltr;}
         .metric-label { font-size: 0.85rem; opacity: 0.7;}
-        .ai-feedback { background: rgba(77, 166, 255, 0.1); border-right: 4px solid var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.6;}
         
-        .popup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 50; padding: 20px; text-align: center; backdrop-filter: blur(5px);}
-        .popup-content { background: var(--card-bg); padding: 25px; border-radius: 16px; max-width: 380px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2);}
+        .popup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 50; padding: 20px; backdrop-filter: blur(5px);}
+        .popup-content { background: var(--card-bg); padding: 25px; border-radius: 16px; max-width: 380px; width: 100%; max-height: 85vh; overflow-y: auto;}
         
-        @keyframes pulseRed { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
-        .timer-danger { color: var(--error) !important; animation: pulseRed 1s infinite; }
+        .timer-danger { color: var(--error) !important; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; transform:scale(1.1); } 100% { opacity: 1; } }
     </style>
 </head>
-<body data-theme="dark">
+<body>
 
-    <!-- डैशبورد اصلی (Main Menu) -->
+    <!-- صفحه اصلی -->
     <div id="screen-main" class="screen active">
         <div class="header">
-            <button id="themeToggleBtn">☀️</button>
-            <div class="header-title">باشگاه دیسپلین ذهنی</div>
+            <button onclick="tgClose()">✕</button>
+            <div class="header-title">آکادمی محاسبات ذهنی</div>
             <div style="width:35px"></div>
         </div>
         <div class="container">
-            <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 5px; width: 100%; text-align: right; max-width: 400px;">آکادمی محاسبات</div>
-            
-            <div class="module-card" style="border-color: var(--accent); background: rgba(77, 166, 255, 0.05);" onclick="nav('screen-hosh')">
-                <div>
-                    <div class="module-title" style="color: var(--accent);">هوش پایه (ماشین حساب ذهنی)</div>
-                    <div class="module-sub">مسیرهای جامع: جمع/تفریق، درصد، ضرب/تقسیم<br>شامل فاز ۰ تا ریاضیات خیابانی</div>
-                </div>
-                <div class="module-icon" style="color: var(--accent);">➔</div>
+            <div class="module-card" style="border-color: var(--accent);" onclick="openModule('addsub')">
+                <div><div class="module-title" style="color: var(--accent);">جمع و تفریق</div><div class="module-sub">فاز ۰ تا ۳ (از تک‌رقمی تا سه‌رقمی دشوار)</div></div>
+                <div style="font-size:1.5rem; color:var(--accent);">➔</div>
             </div>
-
-            <div class="module-card" style="border-color: var(--purple); background: rgba(155, 89, 182, 0.05);" onclick="startGrandArena()">
-                <div>
-                    <div class="module-title" style="color: var(--purple);">آزمون جامع (The Grand Arena)</div>
-                    <div class="module-sub">رینگ بی‌نهایت: ۱۰ سوال تصادفی از تمام ماژول‌ها و سناریوهای خیابانی با تایمر.</div>
-                </div>
-                <div class="module-icon" style="color: var(--purple);">⚔️</div>
+            <div class="module-card" style="border-color: var(--gold);" onclick="openModule('percent')">
+                <div><div class="module-title" style="color: var(--gold);">محاسبه درصدها</div><div class="module-sub">فاز ۱ تا ۳ (از آجرهای پایه تا بلوک سرعتی)</div></div>
+                <div style="font-size:1.5rem; color:var(--gold);">➔</div>
             </div>
-
-            <div class="module-card" style="border-color: var(--gold); background: rgba(241, 196, 15, 0.05);" onclick="openMarket()">
-                <div>
-                    <div class="module-title" style="color: var(--gold);">هوش ریاضی بازار</div>
-                    <div class="module-sub">۵ گام مستقل تحلیلی: از تقریب تا احتمالات</div>
-                </div>
-                <div class="module-icon" style="color: var(--gold);">➔</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- منوی هوش پایه -->
-    <div id="screen-hosh" class="screen">
-        <div class="header">
-            <button onclick="nav('screen-main')">➔</button>
-            <div class="header-title">هوش پایه</div>
-            <div style="width:35px"></div>
-        </div>
-        <div class="container">
-            <div class="module-card" onclick="openPathModules('addsub')">
-                <div>
-                    <div class="module-title">جمع و تفریق</div>
-                    <div class="module-sub">رفلکس‌ها تا ریاضیات خیابانی</div>
-                </div>
-                <div class="module-icon">➔</div>
-            </div>
-            <div class="module-card" onclick="openPathModules('percent')">
-                <div>
-                    <div class="module-title">محاسبه درصد</div>
-                    <div class="module-sub">آجرهای پایه تا ریاضیات خیابانی</div>
-                </div>
-                <div class="module-icon">➔</div>
-            </div>
-            <div class="module-card" onclick="openPathModules('muldiv')">
-                <div>
-                    <div class="module-title">ضرب و تقسیم</div>
-                    <div class="module-sub">جداول پایه تا ریاضیات خیابانی</div>
-                </div>
-                <div class="module-icon">➔</div>
+            <div class="module-card" style="border-color: var(--purple);" onclick="startSession('grand', 0, 'grand')">
+                <div><div class="module-title" style="color: var(--purple);">ابرآزمون جامع</div><div class="module-sub">رینگ بی‌نهایت با تایمر (۱۰ سوال ترکیبی)</div></div>
+                <div style="font-size:1.5rem; color:var(--purple);">⚔️</div>
             </div>
         </div>
     </div>
@@ -161,14 +99,14 @@
     <!-- صفحه فازها -->
     <div id="screen-phases" class="screen">
         <div class="header">
-            <button onclick="nav(currentModType === 'market' ? 'screen-main' : 'screen-hosh')">➔</button>
+            <button onclick="nav('screen-main')">➔</button>
             <div class="header-title" id="phaseScreenTitle">--</div>
-            <div style="width:35px"></div>
+            <button onclick="showTechniques()" style="font-size:0.9rem; width:auto; padding:0 10px; border-radius:8px; background:var(--gold); color:#000;">تکنیک‌ها</button>
         </div>
         <div class="container" id="phasesContainer"></div>
     </div>
 
-    <!-- صفحه نقشه راه -->
+    <!-- صفحه نقشه راه (روزها) -->
     <div id="screen-path" class="screen">
         <div class="header">
             <button onclick="nav('screen-phases')">➔</button>
@@ -185,477 +123,314 @@
         <div class="header">
             <button onclick="abortTraining()">✕</button>
             <div class="header-title" id="trainingTitle">--</div>
-            <button id="hintToggleBtn" onclick="toggleHint()" style="background:var(--card-bg); border:1px solid var(--gold); color:var(--gold);">💡</button>
+            <div style="width:35px"></div>
         </div>
-        <div class="stats-bar">
-            <div id="progressText">۱/۵</div>
-            <div id="heartsContainer" class="hearts"></div>
-            <div id="timerText">00:00</div>
+        <div style="display: flex; justify-content: space-between; padding: 10px 20px; font-weight: bold; font-size:1.1rem;">
+            <div id="progressText">۱/۱۰</div>
+            <div id="heartsContainer" style="color:var(--error); letter-spacing:3px;"></div>
+            <div id="timerText" style="direction:ltr;">00:00</div>
         </div>
         <div class="arena">
             <div class="question-box" id="questionBox">--</div>
             <div class="answer-box" id="answerBox"></div>
-            <div class="hint-text" id="hintBox"></div>
         </div>
-        
-        <div class="numpad-container" id="numpadWrapper">
+        <div class="numpad-container">
             <div class="numpad">
                 <button data-val="1">۱</button> <button data-val="2">۲</button> <button data-val="3">۳</button>
                 <button data-val="4">۴</button> <button data-val="5">۵</button> <button data-val="6">۶</button>
                 <button data-val="7">۷</button> <button data-val="8">۸</button> <button data-val="9">۹</button>
                 <button data-val="-">-</button> <button data-val="0">۰</button> <button onclick="clearAnswer()">⌫</button>
                 <button data-val=".">.</button>
-                <button class="btn-submit" style="grid-column: span 2;" onclick="submitAnswer()">تأیید</button>
+                <button class="btn primary-btn" style="grid-column: span 2;" onclick="submitAnswer()">تأیید</button>
             </div>
-        </div>
-        
-        <div id="tutorialControls" style="display:none; padding:20px; width:100%; max-width:400px; margin: 0 auto;">
-            <button class="primary-btn" onclick="submitTutorial()">متوجه شدم ➔</button>
         </div>
     </div>
 
     <!-- کارنامه تحلیلی -->
     <div id="screen-summary" class="screen">
         <div class="header">
-            <button onclick="backFromSummary()">➔</button>
+            <button onclick="nav('screen-phases')">➔</button>
             <div class="header-title">کارنامه تحلیلی</div>
             <div style="width:35px"></div>
         </div>
         <div class="container">
-            <div class="summary-card">
-                <div class="ai-feedback" id="aiFeedback"></div>
+            <div style="background:var(--card-bg); padding:20px; border-radius:16px; width:100%; max-width:400px; border:1px solid var(--border);">
+                <div id="aiFeedback" style="text-align:center; font-size:1.1rem; margin-bottom:15px; font-weight:bold; color:var(--accent);"></div>
+                <div id="progressChart" style="text-align:center; font-size:0.9rem; margin-bottom:15px; padding:10px; background:var(--bg-color); border-radius:8px;"></div>
+                
                 <div class="metrics-grid">
                     <div class="metric-item"><div class="metric-val" id="sumCorrect" style="color:var(--success)">0</div><div class="metric-label">درست</div></div>
                     <div class="metric-item"><div class="metric-val" id="sumError" style="color:var(--error)">0</div><div class="metric-label">خطا</div></div>
-                    <div class="metric-item"><div class="metric-val" id="sumTime">0s</div><div class="metric-label">زمان کل</div></div>
-                    <div class="metric-item"><div class="metric-val" id="sumAvgTime">0s</div><div class="metric-label">میانگین</div></div>
+                    <div class="metric-item"><div class="metric-val" id="sumTime">00:00</div><div class="metric-label">زمان کل</div></div>
+                    <div class="metric-item"><div class="metric-val" id="sumAvg">00:00</div><div class="metric-label">میانگین هر سوال</div></div>
                 </div>
-                <div id="errorLogContainer" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:15px;">
-                    <div style="font-weight:bold; margin-bottom:15px; color:var(--accent);">کالبدشکافی خطاها:</div>
-                    <div id="errorLog" style="font-size:0.95rem;"></div>
+                
+                <div id="errorLogContainer" style="display:none; border-top:1px solid var(--border); padding-top:15px;">
+                    <div style="font-weight:bold; margin-bottom:10px; color:var(--error);">کالبدشکافی خطاها:</div>
+                    <div id="errorLog" style="font-size:0.95rem; max-height:200px; overflow-y:auto; padding-right:5px;"></div>
                 </div>
             </div>
-            <button class="primary-btn" onclick="backFromSummary()">بازگشت به منو</button>
+            
+            <button class="btn tg-btn" onclick="shareToTelegram()">✈️ اشتراک‌گذاری در تلگرام</button>
+            <button class="btn primary-btn" onclick="nav(currentMod === 'grand' ? 'screen-main' : 'screen-phases')">بازگشت</button>
         </div>
     </div>
 
+    <!-- پاپ آپ نمایش تکنیک و پیام‌ها -->
     <div id="popupOverlay" class="popup">
         <div class="popup-content">
-            <h3 id="popupTitle" style="margin-bottom:15px; color:var(--accent);">توجه</h3>
-            <p id="popupMsg" style="margin-bottom:20px; line-height:1.6;"></p>
-            <button class="primary-btn" id="popupActionBtn">فهمیدم</button>
-        </div>
-    </div>
-
-    <div id="reviewModal" class="popup">
-        <div class="popup-content" style="text-align:right;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-                <h3 id="reviewTitle" style="color:var(--accent); font-size:1.1rem;">مرور</h3>
-                <button onclick="closeReview()" style="background:var(--btn-bg); border:none; font-size:1rem; width:30px; height:30px; border-radius:50%; color:var(--text-color); cursor:pointer;">✕</button>
-            </div>
-            <div id="reviewStats" style="margin-bottom:15px;"></div>
-            <div id="reviewBody" style="margin-bottom:20px; max-height:40vh; overflow-y:auto; padding-right:5px;"></div>
-            <button class="primary-btn" id="btnReplayDay">تکرار این روز (بدون ثبت)</button>
+            <h3 id="popupTitle" style="margin-bottom:15px; color:var(--accent); font-size:1.2rem;"></h3>
+            <div id="popupMsg" style="margin-bottom:20px; line-height:1.7; font-size:0.95rem; text-align:justify;"></div>
+            <button class="btn primary-btn" onclick="closePopup()">متوجه شدم</button>
         </div>
     </div>
 
     <script>
+        // --- Database & Setup ---
         let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+        function tgClose() { if(tg) tg.close(); }
 
         let db = {
-            addsub: { unlockedPhases: [0, 1], p0Exams: 0, p1Day: 1, p2Day: 1, p3Day: 1, records: {} },
-            percent: { unlockedPhases: [1], p1Day: 1, p2Day: 1, p3Day: 1, records: {} },
-            muldiv: { unlockedPhases: [1], p1Day: 1, p2Day: 1, p3Day: 1, records: {} },
-            market: { records: {} },
-            grand: { records: {} }
+            addsub: { unlocked: [0,1], p1Day: 1, p2Day: 1, p3Day: 1, lastScore: 0 },
+            percent: { unlocked: [1], p1Day: 1, p2Day: 1, p3Day: 1, lastScore: 0 },
+            grand: { lastScore: 0 }
         };
-        
-        let currentModType = 'addsub'; // addsub, percent, muldiv, market, grand
+
+        const phaseConfig = {
+            addsub: {
+                0: { title: "فاز ۰: تک‌رقمی", days: 0, qs: 10, blur: false, revTimer: false, locked: false },
+                1: { title: "فاز ۱: دو رقمی در دو رقمی", days: 10, qs: 5, blur: false, revTimer: false, locked: false },
+                2: { title: "فاز ۲: سه رقمی پایه", days: 15, qs: 5, blur: true, revTimer: false, locked: true },
+                3: { title: "فاز ۳: سه رقمی دشوار", days: 20, qs: 5, blur: true, revTimer: true, locked: true }
+            },
+            percent: {
+                1: { title: "فاز ۱: آجرهای پایه (۱۰٪، ۱٪، ۵٪)", days: 10, qs: 5, blur: false, revTimer: false, locked: false },
+                2: { title: "فاز ۲: مونتاژ لگویی (۱۵٪، ۲۰٪)", days: 10, qs: 5, blur: true, revTimer: false, locked: true },
+                3: { title: "فاز ۳: سرعتی (۲.۵٪، ۳۰٪)", days: 10, qs: 5, blur: true, revTimer: true, locked: true }
+            }
+        };
+
+        function saveDb() { localStorage.setItem('math_db_v7', JSON.stringify(db)); }
+        function loadDb() {
+            let local = localStorage.getItem('math_db_v7');
+            if (local) { try { let p = JSON.parse(local); if(p.addsub) db = p; } catch(e){} }
+        }
+        window.onload = () => { if (tg) tg.expand(); loadDb(); };
+
+        let currentMod = 'addsub';
         let currentInput = "";
         let blurTimeout = null;
 
-        function getActiveDB() { return db[currentModType]; }
-
-        function saveDb() {
-            let dataStr = JSON.stringify(db);
-            localStorage.setItem('mentalmath_db_v6', dataStr);
-            if (tg && tg.CloudStorage) tg.CloudStorage.setItem('mentalmath_db_v6', dataStr, (err, ok) => {});
-        }
-
-        function loadDb() {
-            let local = localStorage.getItem('mentalmath_db_v6');
-            if (local) { try { let parsed = JSON.parse(local); if(parsed.addsub) db = parsed; } catch(e){} }
-            if (tg && tg.CloudStorage) {
-                tg.CloudStorage.getItem('mentalmath_db_v6', (err, value) => {
-                    if (!err && value) { try { let parsed = JSON.parse(value); if(parsed.addsub) db = parsed; } catch(e){} }
-                });
-            }
-        }
-
-        window.onload = () => { if (tg) tg.ready(); loadDb(); };
-
-        let audioCtx;
-        function playClick() {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
-                gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); 
-                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-            } catch(e) {}
-        }
-        
-        document.getElementById('themeToggleBtn').addEventListener('click', () => {
-            const isDark = document.body.getAttribute('data-theme') === 'dark';
-            document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            document.getElementById('themeToggleBtn').textContent = isDark ? '🌙' : '☀️';
-            playClick();
-        });
-
-        function nav(screenId) {
-            playClick();
+        function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
-        function openPathModules(mod) {
-            currentModType = mod;
-            let titles = { 'addsub': 'جمع و تفریق', 'percent': 'محاسبه درصد', 'muldiv': 'ضرب و تقسیم' };
-            document.getElementById('phaseScreenTitle').textContent = titles[mod];
-            renderStandardPhases(); 
-            nav('screen-phases');
+        function openModule(mod) {
+            currentMod = mod;
+            document.getElementById('phaseScreenTitle').textContent = mod === 'addsub' ? 'جمع و تفریق' : 'محاسبه درصدها';
+            renderPhases(); nav('screen-phases');
         }
 
-        function openMarket() {
-            currentModType = 'market';
-            document.getElementById('phaseScreenTitle').textContent = 'هوش ریاضی بازار';
-            renderMarketSteps();
-            nav('screen-phases');
-        }
-
-        function backFromSummary() { 
-            if (currentModType === 'grand') nav('screen-main');
-            else if (currentModType === 'market') { renderMarketSteps(); nav('screen-phases'); }
-            else { renderStandardPhases(); nav('screen-phases'); }
-        }
-
-        function renderStandardPhases() {
+        // --- UI Renders ---
+        function renderPhases() {
             const c = document.getElementById('phasesContainer'); c.innerHTML = '';
-            let activeDB = getActiveDB();
-            
-            // Phase 0
-            if (currentModType === 'addsub') {
-                c.innerHTML += `
-                <div class="phase-card" style="border: 2px solid var(--accent); background: rgba(77,166,255,0.05);">
-                    <div class="phase-header"><span class="phase-title">فاز ۰: رفلکس‌های پایه</span></div>
-                    <div class="phase-desc">میدان تمرین همیشگی. ۱۰ سوال ترکیبی، سخت و آسان از مکمل‌ها بدون روزشمار.</div>
-                    <div style="display:flex; gap:10px;">
-                        <button class="primary-btn" style="width:100%;" onclick="startSession(0, false, 0)">شروع آزمون ${activeDB.p0Exams + 1}</button>
+            let activeDB = db[currentMod];
+            let conf = phaseConfig[currentMod];
+
+            for (let p in conf) {
+                let phase = parseInt(p);
+                let isLocked = !activeDB.unlocked.includes(phase);
+                let currentDay = activeDB[`p${phase}Day`] || 1;
+                let dayText = conf[phase].days > 0 ? `روز ${Math.min(currentDay, conf[phase].days)} از ${conf[phase].days}` : 'آزمون‌محور (بی‌نهایت)';
+                let blurBadge = conf[phase].blur ? `<span style="font-size:0.75rem; background:rgba(231,76,60,0.2); color:var(--error); padding:2px 6px; border-radius:4px; margin-right:5px;">👁‍🗨 محو ۲ ثانیه</span>` : '';
+                let timerBadge = conf[phase].revTimer ? `<span style="font-size:0.75rem; background:rgba(241,196,15,0.2); color:var(--gold); padding:2px 6px; border-radius:4px; margin-right:5px;">⏳ تایمر معکوس</span>` : '';
+
+                let html = `<div class="phase-card" style="border-color: ${isLocked ? 'var(--border)' : 'var(--accent)'};">`;
+                
+                if (isLocked) {
+                    html += `<div class="locked-content">
+                        <div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> 🔒</div>
+                        <div class="phase-desc">${dayText}</div>
                     </div>
-                </div>`;
+                    <button class="btn outline-btn" style="margin-top:10px; font-size:0.9rem;" onclick="startSession('${currentMod}', ${phase}, 'shortcut')">⚡ میان‌بر (آزمون تعیین سطح)</button>`;
+                } else {
+                    html += `<div>
+                        <div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div>
+                        <div class="phase-desc" style="margin-bottom:5px;">${dayText}</div>
+                        <div style="margin-bottom:15px;">${blurBadge}${timerBadge}</div>
+                        <div style="display:flex; gap:10px;">`;
+                    
+                    if (conf[phase].days === 0) {
+                        html += `<button class="btn primary-btn" onclick="startSession('${currentMod}', ${phase}, 'day')">شروع آزمون</button>`;
+                    } else {
+                        let isDone = currentDay > conf[phase].days;
+                        html += `<button class="btn primary-btn" style="flex:2;" onclick="startSession('${currentMod}', ${phase}, '${isDone ? 'exam' : 'day'}')">${isDone ? 'آزمون پایان فاز' : 'ادامه مسیر'}</button>
+                                 <button class="btn outline-btn" style="flex:1;" onclick="openPath(${phase})">نقشه راه</button>`;
+                    }
+                    html += `</div></div>`;
+                }
+                html += `</div>`;
+                c.innerHTML += html;
             }
-
-            // Phase 1
-            let p1Locked = !activeDB.unlockedPhases.includes(1);
-            c.innerHTML += `
-                <div class="phase-card">
-                    <div class="${p1Locked ? 'locked-content' : ''}">
-                        <div class="phase-header"><span class="phase-title">فاز ۱: فونداسیون</span> ${p1Locked ? '🔒' : (activeDB.p1Day > 10 ? '✅' : '')}</div>
-                        <div class="phase-desc">تثبیت تکنیک‌ها. روز ${Math.min(activeDB.p1Day, 10)} از ۱۰</div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="primary-btn" style="flex:2;" onclick="${activeDB.p1Day <= 10 ? `startSession(1, false, ${activeDB.p1Day})` : `startSession(1, true, 11)`}">${activeDB.p1Day <= 10 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۲'}</button>
-                            <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(1)">نقشه راه</button>
-                        </div>
-                    </div>
-                </div>`;
             
-            // Phase 2
-            let p2Locked = !activeDB.unlockedPhases.includes(2);
             c.innerHTML += `
-                <div class="phase-card">
-                    <div class="${p2Locked ? 'locked-content' : ''}">
-                        <div class="phase-header"><span class="phase-title">فاز ۲: حافظه کاری</span> ${p2Locked ? '🔒' : ''}</div>
-                        <div class="phase-desc">حذف تکیه‌گاه چشمی. روز ${Math.min(activeDB.p2Day, 20)} از ۲۰</div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="primary-btn" style="flex:2;" onclick="${activeDB.p2Day <= 20 ? `startSession(2, false, ${activeDB.p2Day})` : `startSession(2, true, 21)`}">${activeDB.p2Day <= 20 ? 'ادامه مسیر' : 'آزمون ورودی فاز ۳'}</button>
-                            <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(2)">نقشه راه</button>
-                        </div>
-                    </div>
-                    ${p2Locked ? `<button class="outline-btn" style="margin-top:15px;" onclick="startSession(1, true, 11)">میان‌بر: شرکت در آزمون فاز ۱</button>` : ''}
-                </div>`;
-
-            // Phase 3
-            let p3Locked = !activeDB.unlockedPhases.includes(3);
-            c.innerHTML += `
-                <div class="phase-card">
-                    <div class="${p3Locked ? 'locked-content' : ''}">
-                        <div class="phase-header"><span class="phase-title">فاز ۳: غرقیگی</span> ${p3Locked ? '🔒' : ''}</div>
-                        <div class="phase-desc">فشار زمانی و تایمر معکوس. روز ${Math.min(activeDB.p3Day, 30)} از ۳0</div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="primary-btn" style="flex:2;" onclick="${activeDB.p3Day <= 30 ? `startSession(3, false, ${activeDB.p3Day})` : `startSession(3, true, 31)`}">${activeDB.p3Day <= 30 ? 'ادامه مسیر' : 'آزمون ورود به فاز نهایی'}</button>
-                            <button class="outline-btn" style="flex:1; margin:0;" onclick="openPath(3)">نقشه راه</button>
-                        </div>
-                    </div>
-                    ${p3Locked ? `<button class="outline-btn" style="margin-top:15px;" onclick="startSession(2, true, 21)">میان‌بر: شرکت در آزمون فاز ۲</button>` : ''}
-                </div>`;
-
-            // Final Phase (Street Math)
-            let p4Locked = !activeDB.unlockedPhases.includes(4);
-            let finalDesc = currentModType === 'addsub' ? 'سناریوهای: سبد خرید، پرش تقویم، صندوق‌دار' : 
-                           (currentModType === 'percent' ? 'سناریوهای: شکارچی تخفیف، سود و زیان' : 'سناریوهای: دُنگ کافه، بنزین، تناسب');
-            c.innerHTML += `
-                <div class="phase-card" style="border-color: ${p4Locked ? 'var(--border)' : 'var(--accent)'};">
-                    <div class="${p4Locked ? 'locked-content' : ''}">
-                        <div class="phase-header"><span class="phase-title" style="color: ${p4Locked ? 'inherit' : 'var(--accent)'};">فاز نهایی: ریاضیات خیابانی</span> ${p4Locked ? '🔒' : '🏆'}</div>
-                        <div class="phase-desc">شبیه‌سازی واقعیت. صورت‌مسئله بعد از ۲.۵ ثانیه محو می‌شود! <br><span style="font-size:0.8rem;opacity:0.8;">${finalDesc}</span></div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="primary-btn" style="width:100%;" onclick="startSession(4, false, 0)">شروع ماموریت (۱۰ سوال تصادفی)</button>
-                        </div>
-                    </div>
-                    ${p4Locked ? `<button class="outline-btn" style="margin-top:15px;" onclick="startSession(3, true, 31)">میان‌بر: شرکت در آزمون فاز ۳</button>` : ''}
-                </div>`;
-        }
-
-        function renderMarketSteps() {
-            const c = document.getElementById('phasesContainer'); c.innerHTML = '';
-            const steps = [
-                { id: 's1', title: 'گام اول: تقریب سریع', desc: 'محاسبه حدود قیمت‌ها بدون درگیری با اعداد خرد.' },
-                { id: 's2', title: 'گام دوم: تراز مالی', desc: 'برایند‌گیری سریع بین بدهی‌ها (-) و مطالبات (+).' },
-                { id: 's3', title: 'گام سوم: معادله‌سازی', desc: 'پیدا کردن مجهول ذهنی در چند ثانیه.' },
-                { id: 's4', title: 'گام چهارم: خرد کردن', desc: 'ترفندهای بخش‌پذیری و تناسب برای اعداد بزرگ.' },
-                { id: 's5', title: 'گام پنجم: احتمالات', desc: 'وزن‌دهی سرانگشتی به شانس در تصمیم‌گیری.' }
-            ];
-            steps.forEach(s => {
-                c.innerHTML += `
-                <div class="phase-card" style="border-color:var(--gold);">
-                    <div class="phase-header"><span class="phase-title" style="color:var(--gold);">${s.title}</span></div>
-                    <div class="phase-desc">${s.desc}</div>
-                    <button class="primary-btn" style="background:var(--gold); color:#000;" onclick="startSession('market', false, '${s.id}')">ورود به رینگ</button>
-                </div>`;
-            });
+            <div class="phase-card" style="border-color: var(--purple); text-align:center;">
+                <div class="phase-title" style="color:var(--purple); margin-bottom:10px;">آزمون جامع ${currentMod === 'addsub' ? 'جمع و تفریق' : 'درصد'}</div>
+                <div class="phase-desc">۱۰ سوال رندوم از تمام فازهای این مسیر با تایمر معکوس.</div>
+                <button class="btn primary-btn" style="background:var(--purple);" onclick="startSession('${currentMod}', 0, 'comprehensive')">ورود به آزمون جامع</button>
+            </div>`;
         }
 
         function openPath(phase) {
+            let conf = phaseConfig[currentMod][phase];
             document.getElementById('pathTitle').textContent = `مسیر فاز ${phase}`;
             let grid = document.getElementById('sagaGrid'); grid.innerHTML = '';
-            let activeDB = getActiveDB();
+            let currentDay = db[currentMod][`p${phase}Day`];
             
-            let totalDays = phase === 1 ? 10 : (phase === 2 ? 20 : 30);
-            let currentDay = activeDB[`p${phase}Day`] || 1;
-            
-            for(let i=1; i<=totalDays; i++) {
-                let status = 'locked';
-                if(i < currentDay) status = 'passed'; else if(i === currentDay) status = 'current';
-                grid.innerHTML += `<button class="day-btn ${status}" onclick="handleDayClick(${phase}, ${i}, '${status}')">${i}</button>`;
+            for(let i=1; i<=conf.days; i++) {
+                let status = i < currentDay ? 'passed' : (i === currentDay ? 'current' : 'locked');
+                grid.innerHTML += `<button class="day-btn ${status}" onclick="${status === 'current' ? `startSession('${currentMod}', ${phase}, 'day')` : ''}">${i}</button>`;
             }
-            
-            let examStatus = currentDay > totalDays ? 'current' : 'locked';
-            if (activeDB.unlockedPhases.includes(phase + 1)) examStatus = 'passed';
-            grid.innerHTML += `<button class="day-btn exam-btn ${examStatus}" onclick="handleExamClick(${phase}, '${examStatus}')">آزمون ورودی فاز بعدی</button>`;
+            let exStatus = currentDay > conf.days ? 'current' : 'locked';
+            if (db[currentMod].unlocked.includes(phase + 1)) exStatus = 'passed';
+            grid.innerHTML += `<button class="day-btn exam-btn ${exStatus}" onclick="${exStatus === 'current' ? `startSession('${currentMod}', ${phase}, 'exam')` : ''}">آزمون ورود به فاز بعدی</button>`;
             nav('screen-path');
         }
 
-        function handleDayClick(phase, day, status) {
-            playClick(); if (status === 'locked') return;
-            if (status === 'current') startSession(phase, false, day);
-            if (status === 'passed') showDayReview(phase, day);
-        }
-        function handleExamClick(phase, status) {
-            playClick(); if (status === 'locked') return;
-            let examDay = phase === 1 ? 11 : (phase === 2 ? 21 : 31);
-            if (status === 'current') startSession(phase, true, examDay);
-            if (status === 'passed') showPopup("آزمون پاس شده", "قبلاً این آزمون را با موفقیت گذرانده‌اید.", null);
+        // --- تابع جدید فراخوانی تکنیک‌ها از فایل مجزا ---
+        async function showTechniques() {
+            try {
+                // خواندن اطلاعات از فایل مجزای جیسون
+                let response = await fetch('techniques.json');
+                let data = await response.json();
+                
+                // پیدا کردن متن مربوط به ماژول فعلی
+                let msg = data[currentMod] || "تکنیکی برای این بخش نوشته نشده است.";
+                
+                showPopup("تکنیک‌های این مسیر", msg);
+            } catch (error) {
+                showPopup("خطا", "امکان دریافت فایل تکنیک‌ها وجود ندارد. لطفا پس از آپلود در گیت‌هاب بررسی کنید یا اینترنت خود را چک کنید.");
+            }
         }
 
-        function showDayReview(phase, day) {
-            // (Simplified review logic for brevity, uses generic placeholder if not saved)
-            document.getElementById('reviewStats').innerHTML = `<div style="text-align:center; opacity:0.6; font-size:0.85rem; margin-bottom:15px;">رکوردی در بایگانی یافت نشد یا تمرین تصادفی بوده است.</div>`;
-            document.getElementById('reviewBody').innerHTML = `<div style="text-align:center; opacity:0.6; padding:20px;">شما این روز را با موفقیت پشت سر گذاشته‌اید.</div>`;
-            document.getElementById('reviewTitle').textContent = `مرور فاز ${phase} - روز ${day}`;
-            document.getElementById('reviewModal').style.display = 'flex';
-            document.getElementById('btnReplayDay').onclick = () => { closeReview(); startSession(phase, false, day, true); };
-        }
-        function closeReview() { playClick(); document.getElementById('reviewModal').style.display = 'none'; }
-
-        function showPopup(title, msg, callback) {
+        function showPopup(title, msg) {
             document.getElementById('popupTitle').textContent = title;
             document.getElementById('popupMsg').innerHTML = msg;
             document.getElementById('popupOverlay').style.display = 'flex';
-            document.getElementById('popupActionBtn').onclick = () => {
-                playClick();
-                document.getElementById('popupOverlay').style.display = 'none';
-                if (callback) callback();
-            };
         }
         function closePopup() { document.getElementById('popupOverlay').style.display = 'none'; }
-        function toggleHint() { playClick(); let hb = document.getElementById('hintBox'); hb.style.display = (hb.style.display === 'none' || hb.style.display === '') ? 'block' : 'none'; }
 
-        // --- Core Content Generator ---
-        function generateQ(mod, phase, dayOrType) {
-            let q = "", a = 0, h = "";
-            let r = Math.random();
+        // --- Core Session Logic ---
+        let sesh = { type: '', mod: '', phase: 0, qs: [], qIndex: 0, errs: 0, errLog: [], startT: 0, tObj: null, tLeft: 0, maxErr: 0 };
+
+        function startSession(mod, phase, type) {
+            sesh = { type, mod, phase, qs: [], qIndex: 0, errs: 0, errLog: [], startT: Date.now(), tLeft: 0, maxErr: 0 };
+            currentMod = mod; currentInput = "";
             
-            if (mod === 'grand') {
-                let mods = ['addsub', 'percent', 'muldiv', 'market'];
-                mod = mods[Math.floor(Math.random() * mods.length)];
-                phase = Math.random() > 0.3 ? 4 : (Math.floor(Math.random() * 3) + 1); // favor street math
-                if (mod === 'market') phase = 'market';
+            let qCount = 5; 
+            let revTimer = false;
+            let title = "";
+
+            if (type === 'day') {
+                qCount = phase === 0 ? 10 : phaseConfig[mod][phase].qs;
+                title = phase === 0 ? `آزمون فاز ۰` : `فاز ${phase} - روز ${db[mod][`p${phase}Day`]}`;
+                sesh.maxErr = 100; // Unlimited for days, just practice
+            } else if (type === 'shortcut') {
+                qCount = 10; revTimer = true; sesh.maxErr = 1; title = `آزمون میان‌بر فاز ${phase}`;
+                showPopup("قوانین میان‌بر", "شما ۱۰ سوال با تایمر معکوس دارید.<br><b>حداکثر ۱ خطا</b> مجاز است.");
+            } else if (type === 'exam') {
+                qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون پایان فاز ${phase}`;
+                showPopup("آزمون پایانی", "تایمر معکوس فعال است.<br><b>حداکثر ۲ خطا</b> برای قبولی مجاز است.");
+            } else if (type === 'comprehensive' || type === 'grand') {
+                qCount = 10; revTimer = true; sesh.maxErr = 2; title = type === 'grand' ? `ابرآزمون جامع` : `آزمون جامع ${mod === 'addsub'?'جمع':'درصد'}`;
+            }
+
+            for(let i=0; i<qCount; i++) sesh.qs.push(generateQ(mod, phase, type));
+            
+            document.getElementById('trainingTitle').textContent = title;
+            document.getElementById('heartsContainer').textContent = (sesh.maxErr < 10) ? '❤️'.repeat(sesh.maxErr + 1) : '';
+            
+            setTimeout(initArena, (type === 'shortcut' || type === 'exam') ? 2000 : 0); 
+            if(type === 'shortcut' || type === 'exam') {
+                document.getElementById('popupOverlay').onclick = () => { closePopup(); initArena(); document.getElementById('popupOverlay').onclick=null;};
+            } else {
+                initArena();
+            }
+        }
+
+        function generateQ(mod, phase, type) {
+            if (type === 'grand') {
+                mod = Math.random() > 0.5 ? 'addsub' : 'percent';
+                phase = mod === 'addsub' ? (Math.floor(Math.random()*3)+1) : (Math.floor(Math.random()*3)+1);
+            } else if (type === 'comprehensive') {
+                phase = mod === 'addsub' ? (Math.floor(Math.random()*3)+1) : (Math.floor(Math.random()*3)+1);
             }
 
             if (mod === 'addsub') {
-                if (phase === 0) {
+                if (phase === 0) { 
                     let n1 = Math.floor(Math.random() * 9) + 1;
-                    let isAdd = Math.random() > 0.5;
-                    if (isAdd) { return {q: `${n1} + ${10-n1}`, a: 10, h: "بدون مکثمکمل‌ها"}; } 
-                    else { return {q: `${Math.floor(Math.random()*8)+11} - ${Math.floor(Math.random()*5)+3}`, a: 0, h: "فاصله"}; } // simplified a
-                } else if (phase === 4) {
-                    if (r < 0.33) {
-                        let n1 = Math.floor(Math.random() * 40)+10; let n2 = Math.floor(Math.random() * 40)+10; let n3 = Math.floor(Math.random() * 30)+10;
-                        return {q: `سبد: ${n1} + ${n2} + ${n3}`, a: n1+n2+n3, h: "اعداد را پی‌درپی جمع کن."};
-                    } else if (r < 0.66) {
-                        let y1 = Math.floor(Math.random() * 40) + 1350; let y2 = y1 + Math.floor(Math.random() * 50) + 10;
-                        return {q: `متولد ${y1} در سال ${y2}`, a: y2 - y1, h: "پرش ذهنی سال."};
-                    } else {
-                        let cost = (Math.floor(Math.random() * 8) + 1) * 50 + (Math.floor(Math.random() * 9) * 10);
-                        let paid = Math.ceil(cost / 100) * 100; if(paid === cost) paid += 100;
-                        return {q: `فاکتور: ${cost} | پرداختی: ${paid}`, a: paid - cost, h: "یافتن مکمل تا پرداختی."};
-                    }
-                } else {
-                    let n1 = Math.floor(Math.random() * 80) + 20; let n2 = Math.floor(Math.random() * 50) + 15;
-                    let isAdd = Math.random() > 0.5; if(!isAdd && n1 < n2) [n1, n2] = [n2, n1];
-                    return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2, h: "محاسبه سریع"};
+                    return Math.random() > 0.5 ? {q: `${n1} + ${10-n1}`, a: 10} : {q: `${Math.floor(Math.random()*8)+11} - ${Math.floor(Math.random()*5)+3}`, a: null};
+                } else if (phase === 1) { 
+                    let n1 = Math.floor(Math.random() * 90) + 10; let n2 = Math.floor(Math.random() * 90) + 10;
+                    let isAdd = Math.random() > 0.5; if(!isAdd && n1<n2) [n1,n2] = [n2,n1];
+                    return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2};
+                } else if (phase === 2) { 
+                    let n1 = (Math.floor(Math.random() * 9)+1)*100 + (Math.floor(Math.random() * 9)*10); 
+                    let n2 = (Math.floor(Math.random() * 9)+1)*100 + (Math.floor(Math.random() * 9)*10);
+                    let isAdd = Math.random() > 0.5; if(!isAdd && n1<n2) [n1,n2] = [n2,n1];
+                    return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2};
+                } else { 
+                    let n1 = Math.floor(Math.random() * 900) + 100; let n2 = Math.floor(Math.random() * 900) + 100;
+                    let isAdd = Math.random() > 0.5; if(!isAdd && n1<n2) [n1,n2] = [n2,n1];
+                    return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2};
                 }
-            } 
-            else if (mod === 'percent') {
-                if (phase === 4) {
-                    if (r < 0.5) {
-                        let price = (Math.floor(Math.random() * 8) + 2) * 100; let off = (Math.floor(Math.random() * 4) + 1) * 10;
-                        return {q: `${price} با ${off}٪ تخفیف`, a: price * (100-off)/100, h: "تخفیف را کم کن."};
-                    } else {
-                        let base = (Math.floor(Math.random() * 5) + 1) * 200; let tax = 5;
-                        return {q: `${base} با ${tax}٪ مالیات/سود`, a: base * (100+tax)/100, h: "درصد را اضافه کن."};
-                    }
-                } else {
-                    let bases = [10, 1, 5]; let b = bases[Math.floor(Math.random() * bases.length)];
-                    let num = (Math.floor(Math.random() * 90) + 10) * 10;
-                    return { q: `${b}٪ از ${num}`, a: (b * num) / 100, h: "آجرهای پایه" };
-                }
-            }
-            else if (mod === 'muldiv') {
-                if (phase === 4) {
-                    if (r < 0.5) {
-                        let ppl = Math.floor(Math.random() * 3) + 3; let total = ppl * (Math.floor(Math.random() * 20) + 10) * 10; 
-                        return {q: `دُنگ ${ppl} نفر از ${total}`, a: total / ppl, h: "تقسیم ذهنی."};
-                    } else {
-                        let price = Math.random() > 0.5 ? 3000 : 1500; let liters = Math.floor(Math.random() * 30) + 10;
-                        return {q: `بنزین ${price * liters} (لیتری ${price})`, a: liters, h: "تقسیم بر قیمت پایه."};
-                    }
-                } else {
-                    let isMul = Math.random() > 0.5;
-                    let n1 = Math.floor(Math.random() * 11) + 2; let n2 = Math.floor(Math.random() * 11) + 2;
-                    if (isMul) return {q: `${n1} × ${n2}`, a: n1*n2, h: "ضرب پایه"};
-                    else return {q: `${n1*n2} ÷ ${n1}`, a: n2, h: "تقسیم پایه"};
-                }
-            }
-            else if (mod === 'market') {
-                let type = (dayOrType && dayOrType.startsWith('s')) ? dayOrType : `s${Math.floor(Math.random()*5)+1}`;
-                if (type === 's1') {
-                    let n1 = (Math.floor(Math.random() * 8) + 2) * 10 + (Math.random()>0.5?1:-1); let n2 = (Math.floor(Math.random() * 8) + 2) * 10 + (Math.random()>0.5?1:-1);
-                    return {q: `${n1} × ${n2} ≈ ?`, a: Math.round(n1/10)*10 * Math.round(n2/10)*10, h: "اعداد خرد را به نزدیک‌ترین دهگان گرد کن."};
-                } else if (type === 's2') {
-                    let n1 = Math.floor(Math.random() * 9)*10; let n2 = -Math.floor(Math.random() * 9)*10; let n3 = Math.floor(Math.random() * 9)*10;
-                    return {q: `برایند: ${n1} و ${n2} و ${n3}`, a: n1+n2+n3, h: "هم‌علامت‌ها را جمع، سپس تفریق."};
-                } else if (type === 's3') {
-                    let x = Math.floor(Math.random() * 10)+2; let a = Math.floor(Math.random() * 8)+2;
-                    return {q: `${a}x = ${a*x}`, a: x, h: "چه عددی در ضریب ضرب شود؟"};
-                } else if (type === 's4') {
-                    let a = Math.floor(Math.random() * 7)+2; let b = (Math.floor(Math.random() * 8)+2)*10;
-                    return {q: `${a*b} ÷ ${a}`, a: b, h: "صفرها را نادیده بگیر."};
-                } else if (type === 's5') {
-                    let a = Math.floor(Math.random() * 4)+1; let b = a * (Math.floor(Math.random() * 4)+2);
-                    return {q: `${a} از ${b} (درصد)`, a: (a/b)*100, h: "کسر را ساده کن و به ۱۰۰ تعمیم بده."};
-                }
+            } else if (mod === 'percent') {
+                let base = (Math.floor(Math.random() * 90) + 10) * 10; 
+                let p = 10;
+                if (phase === 1) p = [10, 1, 5][Math.floor(Math.random()*3)];
+                else if (phase === 2) p = [15, 20][Math.floor(Math.random()*2)];
+                else p = [2.5, 30][Math.floor(Math.random()*2)];
+                return {q: `${p}٪ از ${base}`, a: (p * base) / 100};
             }
             
-            // fallback
-            let a_fb = Math.floor(Math.random() * 10) + 1;
-            return {q: `${a_fb} + 0`, a: a_fb, h: ""};
+            return {q: `15 - 8`, a: 7};
         }
 
-        let currentSession = { mod: '', phase: 1, isExam: false, day: 1, isTutorial: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: 0, timerObj: null, timeLeft: 0 };
-        
-        function startGrandArena() {
-            currentModType = 'grand';
-            currentSession = { mod: 'grand', phase: 'grand', isExam: true, day: 0, isTutorial: false, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now(), timeLeft: 0 };
-            currentInput = "";
-            for(let i=0; i<10; i++) currentSession.questions.push(generateQ('grand', null, null));
-            document.getElementById('trainingTitle').textContent = "آزمون جامع (Grand Arena)";
-            document.getElementById('heartsContainer').textContent = '';
-            document.getElementById('hintToggleBtn').style.display = 'none'; 
-            initArena();
-        }
-
-        function startSession(phase, isExam, day) {
-            let mod = currentModType;
-            let isTutorial = (phase === 1 && day <= 2 && !isExam); 
-            currentSession = { mod, phase, isExam, day, isTutorial, questions: [], qIndex: 0, errors: 0, errorDetails: [], startTime: Date.now(), timeLeft: 0 };
-            currentInput = "";
-            
-            let qCount = 5;
-            if (mod === 'market') qCount = 5;
-            else if (phase === 4) qCount = 10;
-            else if (phase === 0) qCount = 10;
-            else if (isExam) qCount = (phase === 1 ? 15 : 25);
-
-            for(let i=0; i<qCount; i++) currentSession.questions.push(generateQ(mod, phase, day));
-
-            let titleTxt = "";
-            if (mod === 'market') titleTxt = "هوش ریاضی بازار";
-            else if (phase === 0) titleTxt = `آزمون فاز ۰`;
-            else if (phase === 4) titleTxt = `فاز نهایی: خیابان`;
-            else titleTxt = isExam ? `آزمون فاز ${phase}` : `فاز ${phase} - روز ${day}`;
-            
-            document.getElementById('trainingTitle').textContent = titleTxt;
-            document.getElementById('heartsContainer').textContent = (isExam && phase !== 0 && phase !== 4) ? '❤️❤️' : '';
-            document.getElementById('hintToggleBtn').style.display = (mod === 'market' || phase === 4) ? 'flex' : 'none';
-
-            if (phase === 2 && !isExam) {
-                showPopup("پروتکل حافظه کاری", "سوال را فقط ۱.۵ ثانیه می‌بینی.<br>آن را در ذهن تکرار کن و چشم‌ها را ببند.", () => { initArena(); });
-            } else if (phase === 3) {
-                showPopup("ورود به غرقیگی (تایمر معکوس)", `شما فقط <b>${currentSession.questions.length * 4} ثانیه</b> زمان دارید.<br>بدون توقف پاسخ دهید!`, () => { initArena(); });
-            } else if (phase === 4 || mod === 'grand') {
-                showPopup("شبیه‌ساز واقعیت", "صورت‌مسئله بعد از ۲.۵ ثانیه <b>محو</b> می‌شود!<br>اعداد را سریع به حافظه کاری بسپار.", () => { initArena(); });
-            } else { initArena(); }
+        function formatTime(secs) {
+            return `${String(Math.floor(secs/60)).padStart(2,'0')}:${String(secs%60).padStart(2,'0')}`;
         }
 
         function initArena() {
-            nav('screen-training');
-            currentSession.startTime = Date.now();
-            clearInterval(currentSession.timerObj);
-            clearTimeout(blurTimeout);
+            closePopup(); nav('screen-training');
+            sesh.startT = Date.now();
+            clearInterval(sesh.tObj); clearTimeout(blurTimeout);
             
             let tt = document.getElementById('timerText');
             tt.classList.remove('timer-danger');
             
-            if (currentSession.phase === 3) {
-                currentSession.timeLeft = currentSession.questions.length * 4; 
-                tt.textContent = `00:${String(currentSession.timeLeft).padStart(2,'0')}`;
+            let isRev = false;
+            if (sesh.type !== 'day') isRev = true; 
+            if (sesh.type === 'day' && phaseConfig[sesh.mod] && phaseConfig[sesh.mod][sesh.phase] && phaseConfig[sesh.mod][sesh.phase].revTimer) isRev = true;
+
+            if (isRev) {
+                sesh.tLeft = sesh.qs.length * 6; 
+                tt.textContent = formatTime(sesh.tLeft);
                 
-                currentSession.timerObj = setInterval(() => {
-                    currentSession.timeLeft--;
-                    tt.textContent = `00:${String(currentSession.timeLeft).padStart(2,'0')}`;
-                    if (currentSession.timeLeft <= 5 && currentSession.timeLeft > 0) { tt.classList.add('timer-danger'); }
-                    if (currentSession.timeLeft <= 0) {
-                        clearInterval(currentSession.timerObj);
-                        currentSession.errors += (currentSession.questions.length - currentSession.qIndex); 
-                        endSession(true, "تایم اوت!");
+                sesh.tObj = setInterval(() => {
+                    sesh.tLeft--;
+                    tt.textContent = formatTime(sesh.tLeft);
+                    if (sesh.tLeft <= 5 && sesh.tLeft > 0) tt.classList.add('timer-danger');
+                    if (sesh.tLeft <= 0) {
+                        clearInterval(sesh.tObj);
+                        sesh.errs += (sesh.qs.length - sesh.qIndex); 
+                        endSession(true, "تایم اوت شدی!");
                     }
                 }, 1000);
             } else {
-                currentSession.timerObj = setInterval(() => {
-                    let s = Math.floor((Date.now() - currentSession.startTime)/1000);
-                    tt.textContent = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+                sesh.tObj = setInterval(() => {
+                    let s = Math.floor((Date.now() - sesh.startT)/1000);
+                    tt.textContent = formatTime(s);
                 }, 1000);
             }
             loadQ();
@@ -664,44 +439,23 @@
         function loadQ() {
             currentInput = "";
             let qb = document.getElementById('questionBox');
-            let ab = document.getElementById('answerBox');
-            ab.textContent = "";
-            qb.style.opacity = '1';
-            qb.classList.remove('blur-text');
+            document.getElementById('answerBox').textContent = "";
+            qb.style.opacity = '1'; qb.classList.remove('blur-text');
             clearTimeout(blurTimeout);
 
-            let qData = currentSession.questions[currentSession.qIndex];
-            
-            // رفع باگ محاسباتی: در تفریقِ فاز صفر مطمئن شویم عدد منفی نیست (ساده‌سازی موقت در تابع جنریتور انجام شد)
+            let qData = sesh.qs[sesh.qIndex];
             qb.textContent = qData.q;
-            document.getElementById('progressText').textContent = `${currentSession.qIndex + 1}/${currentSession.questions.length}`;
+            document.getElementById('progressText').textContent = `${sesh.qIndex + 1}/${sesh.qs.length}`;
             
-            let hb = document.getElementById('hintBox');
-            let nb = document.getElementById('numpadWrapper');
-            let tb = document.getElementById('tutorialControls');
-            
-            hb.style.display = 'none';
-            hb.textContent = qData.h;
+            let doBlur = false;
+            if (sesh.type === 'grand' || sesh.type === 'comprehensive') doBlur = true;
+            else if (phaseConfig[sesh.mod] && phaseConfig[sesh.mod][sesh.phase] && phaseConfig[sesh.mod][sesh.phase].blur) doBlur = true;
 
-            if (currentSession.isTutorial) {
-                ab.textContent = qData.a;
-                nb.style.display = 'none'; tb.style.display = 'block';
-                hb.style.display = 'block';
-            } else {
-                nb.style.display = 'block'; tb.style.display = 'none';
+            if (doBlur) {
+                blurTimeout = setTimeout(() => { 
+                    if(document.getElementById('screen-training').classList.contains('active')) qb.classList.add('blur-text'); 
+                }, 2000);
             }
-
-            if (currentSession.phase === 2 && !currentSession.isTutorial) {
-                blurTimeout = setTimeout(() => { if(document.getElementById('screen-training').classList.contains('active')) qb.style.opacity = '0.05'; }, 1500);
-            } else if (currentSession.phase === 4 || currentSession.mod === 'grand') {
-                // پیاده‌سازی محو شدن صورت‌مسئله بعد از 2.5 ثانیه برای خیابان و گرند آرنا
-                blurTimeout = setTimeout(() => { if(document.getElementById('screen-training').classList.contains('active')) qb.classList.add('blur-text'); }, 2500);
-            }
-        }
-
-        function submitTutorial() {
-            playClick(); currentSession.qIndex++;
-            if (currentSession.qIndex < currentSession.questions.length) loadQ(); else endSession(false);
         }
 
         document.querySelectorAll('.numpad button[data-val]').forEach(b => {
@@ -714,95 +468,104 @@
                 document.getElementById('answerBox').textContent = currentInput; 
             });
         });
-        function clearAnswer() { 
-            playClick(); 
-            currentInput = currentInput.slice(0,-1); 
-            document.getElementById('answerBox').textContent = currentInput; 
-        }
+        function clearAnswer() { playClick(); currentInput = currentInput.slice(0,-1); document.getElementById('answerBox').textContent = currentInput; }
 
         function submitAnswer() {
             playClick();
             let userAns = parseFloat(currentInput);
             if (isNaN(userAns)) return;
             
-            let qData = currentSession.questions[currentSession.qIndex];
+            let qData = sesh.qs[sesh.qIndex];
+            if(qData.a === null) {
+                try { qData.a = eval(qData.q.replace('×','*').replace('÷','/').replace('٪ از','/100*')); } catch(e){ qData.a = 0; }
+            }
+            
             let isCorrect = Math.abs(userAns - qData.a) < 0.001; 
             
             if (!isCorrect) {
-                currentSession.errors++;
-                currentSession.errorDetails.push({ q: qData.q, correct: qData.a, user: userAns });
+                sesh.errs++;
+                sesh.errLog.push({ q: qData.q, correct: qData.a, user: userAns });
                 
-                document.getElementById('answerBox').style.color = 'var(--error)';
-                document.getElementById('answerBox').style.borderBottomColor = 'var(--error)';
-                setTimeout(() => { document.getElementById('answerBox').style.color = 'var(--accent)'; document.getElementById('answerBox').style.borderBottomColor = 'var(--accent)'; }, 300);
+                let ab = document.getElementById('answerBox');
+                ab.style.color = 'var(--error)'; ab.style.borderBottomColor = 'var(--error)';
+                setTimeout(() => { ab.style.color = 'var(--accent)'; ab.style.borderBottomColor = 'var(--accent)'; }, 300);
                 
-                if (currentSession.isExam && currentSession.phase !== 0 && currentSession.phase !== 4 && currentSession.mod !== 'grand') {
-                    let hStr = ""; for(let i=0; i<2-currentSession.errors; i++) hStr+="❤️";
-                    document.getElementById('heartsContainer').textContent = hStr;
-                    if (currentSession.errors > 1) { endSession(true, "تعداد خطاها از حد مجاز گذشت."); return; }
+                if (sesh.maxErr < 10) { 
+                    let hearts = sesh.maxErr + 1 - sesh.errs;
+                    document.getElementById('heartsContainer').textContent = hearts > 0 ? '❤️'.repeat(hearts) : '';
+                    if (sesh.errs > sesh.maxErr) { endSession(true, "تعداد خطاهای شما از حد مجاز گذشت."); return; }
                 }
             }
             
-            currentSession.qIndex++;
-            if (currentSession.qIndex < currentSession.questions.length) loadQ(); else endSession(false);
+            sesh.qIndex++;
+            if (sesh.qIndex < sesh.qs.length) loadQ(); else endSession(false);
         }
 
-        function abortTraining() { clearInterval(currentSession.timerObj); clearTimeout(blurTimeout); backFromSummary(); }
+        function abortTraining() { clearInterval(sesh.tObj); clearTimeout(blurTimeout); nav(sesh.type === 'grand' ? 'screen-main' : 'screen-phases'); }
 
-        function endSession(isFailedExam, customFailMsg = null) {
-            clearInterval(currentSession.timerObj);
-            clearTimeout(blurTimeout);
-            document.getElementById('timerText').classList.remove('timer-danger');
+        function endSession(isFailed, failMsg = null) {
+            clearInterval(sesh.tObj); clearTimeout(blurTimeout);
             
-            let totalTime = 0;
-            if (currentSession.phase === 3) {
-                totalTime = (currentSession.questions.length * 4) - currentSession.timeLeft;
-            } else {
-                totalTime = Math.floor((Date.now() - currentSession.startTime)/1000);
-            }
-            
-            let avgTime = totalTime / currentSession.questions.length;
-            let corrects = currentSession.questions.length - currentSession.errors;
+            let totalSecs = Math.floor((Date.now() - sesh.startT)/1000);
+            if (sesh.tLeft > 0) totalSecs = (sesh.qs.length * 6) - sesh.tLeft; 
+            let avgSecs = totalSecs / sesh.qs.length;
+            let corrects = sesh.qs.length - sesh.errs;
+            let scorePercent = Math.round((corrects / sesh.qs.length) * 100);
             
             document.getElementById('sumCorrect').textContent = corrects;
-            document.getElementById('sumError').textContent = currentSession.errors;
-            document.getElementById('sumTime').textContent = totalTime + 's';
-            document.getElementById('sumAvgTime').textContent = currentSession.isTutorial ? '-' : avgTime.toFixed(1) + 's';
+            document.getElementById('sumError').textContent = sesh.errs;
+            document.getElementById('sumTime').textContent = formatTime(totalSecs);
+            document.getElementById('sumAvg').textContent = formatTime(Math.floor(avgSecs));
             
-            let fb = "خوب بود. عالی پیش رفتی.";
-            if (currentSession.isTutorial) fb = "عالی! مسیر عصبی در حال شکل‌گیری است.";
-            else if (isFailedExam) fb = customFailMsg ? customFailMsg : "آزمون ناموفق بود.";
-            else if (currentSession.errors === 0) fb = "🔥 بی‌نظیر! تسلط کامل به وضوح دیده می‌شود.";
+            let fb = "خوب بود. ادامه بده.";
+            if (isFailed) fb = failMsg || "متاسفانه رد شدی.";
+            else if (sesh.errs === 0) fb = "🔥 بی‌نظیر! بدون هیچ خطایی.";
             document.getElementById('aiFeedback').textContent = fb;
+            document.getElementById('aiFeedback').style.color = isFailed ? 'var(--error)' : 'var(--accent)';
 
             let elc = document.getElementById('errorLogContainer');
             let el = document.getElementById('errorLog');
-            if (currentSession.errors > 0 && currentSession.errorDetails && currentSession.errorDetails.length > 0) {
+            if (sesh.errs > 0 && sesh.errLog.length > 0) {
                 elc.style.display = 'block'; el.innerHTML = '';
-                currentSession.errorDetails.forEach(e => {
+                sesh.errLog.forEach(e => {
                     el.innerHTML += `<div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border); direction: rtl; text-align: right;">
-                        سوال: <b style="direction:ltr; display:inline-block; font-size:1.1rem;">${e.q}</b> <br> 
-                        شما: <span style="color:var(--error); direction:ltr; display:inline-block; font-weight:bold;">${e.user}</span> | 
-                        صحیح: <span style="color:var(--success); direction:ltr; display:inline-block; font-weight:bold;">${e.correct}</span>
+                        <span style="font-size:0.85rem; opacity:0.8;">سوال:</span> <b style="direction:ltr; display:inline-block; font-size:1.1rem;">${e.q}</b> <br> 
+                        <span style="font-size:0.85rem; opacity:0.8;">شما:</span> <span style="color:var(--error); direction:ltr; display:inline-block; font-weight:bold;">${e.user} ❌</span> | 
+                        <span style="font-size:0.85rem; opacity:0.8;">صحیح:</span> <span style="color:var(--success); direction:ltr; display:inline-block; font-weight:bold;">${e.correct} ✅</span>
                     </div>`;
                 });
             } else { elc.style.display = 'none'; }
 
-            if (currentSession.mod !== 'grand' && currentSession.mod !== 'market') {
-                let activeDB = getActiveDB();
-                if (!isFailedExam && !currentSession.isTutorial) {
-                    if (currentSession.phase === 0) activeDB.p0Exams++; 
-                    else if (currentSession.isExam) {
-                        if (currentSession.phase === 1 && !activeDB.unlockedPhases.includes(2)) activeDB.unlockedPhases.push(2);
-                        if (currentSession.phase === 2 && !activeDB.unlockedPhases.includes(3)) activeDB.unlockedPhases.push(3);
-                        if (currentSession.phase === 3 && !activeDB.unlockedPhases.includes(4)) activeDB.unlockedPhases.push(4);
-                    } else if (currentSession.phase !== 4) {
-                        activeDB[`p${currentSession.phase}Day`]++;
-                    }
-                    saveDb();
-                }
+            let targetDB = sesh.mod === 'grand' ? db.grand : db[sesh.mod];
+            let diff = scorePercent - (targetDB.lastScore || 0);
+            let chartTxt = `دقت شما: %${scorePercent}`;
+            if (targetDB.lastScore > 0) {
+                if(diff > 0) chartTxt += ` <span style="color:var(--success); direction:ltr;">(+${diff}%) 📈</span>`;
+                else if(diff < 0) chartTxt += ` <span style="color:var(--error); direction:ltr;">(${diff}%) 📉</span>`;
+                else chartTxt += ` <span style="color:var(--gold);">- بدون تغییر نسبت به قبل</span>`;
             }
+            document.getElementById('progressChart').innerHTML = chartTxt;
+            targetDB.lastScore = scorePercent;
+
+            if (!isFailed) {
+                if (sesh.type === 'day' && sesh.phase !== 0) {
+                    db[sesh.mod][`p${sesh.phase}Day`]++; 
+                } else if (sesh.type === 'shortcut' || sesh.type === 'exam') {
+                    if (!db[sesh.mod].unlocked.includes(sesh.phase + 1)) {
+                        db[sesh.mod].unlocked.push(sesh.phase + 1);
+                    }
+                }
+                saveDb();
+            }
+
             nav('screen-summary');
+        }
+
+        function shareToTelegram() {
+            let corrects = document.getElementById('sumCorrect').textContent;
+            let time = document.getElementById('sumTime').textContent;
+            let txt = `🏆 من در آکادمی محاسبات ذهنی موفق شدم!\n✅ پاسخ صحیح: ${corrects} از ${sesh.qs.length}\n⏱ زمان: ${time}\n\nتو هم می‌تونی رکورد منو بزنی؟ 👇`;
+            window.open('https://t.me/share/url?url=https://t.me/YourBotUsername&text=' + encodeURIComponent(txt));
         }
     </script>
 </body>
