@@ -584,12 +584,13 @@
             nav('screen-summary');
         }
 
-        function shareToTelegram() {
-            let corrects = document.getElementById('sumCorrect').textContent;
-            let time = document.getElementById('sumTime').textContent;
-            let txt = `🏆 من در آکادمی محاسبات ذهنی موفق شدم!\n✅ پاسخ صحیح: ${corrects} از ${sesh.qs.length}\n⏱ زمان: ${time}\n\nتو هم می‌تونی رکورد منو بزنی؟ 👇`;
-            window.open('https://t.me/share/url?url=https://t.me/YourBotUsername&text=' + encodeURIComponent(txt));
-        }
+    function shareToTelegram() {
+    let corrects = document.getElementById('sumCorrect').textContent;
+    let time = document.getElementById('sumTime').textContent;
+    let txt = `🏆 من در آکادمی محاسبات ذهنی موفق شدم!\n✅ پاسخ صحیح: ${corrects} از ${sesh.qs.length}\n⏱ زمان: ${time}\n\nتو هم می‌تونی رکورد منو بزنی؟ 👇`;
+    
+    window.open('https://t.me/share/url?url=https://t.me/MentalDiscipline_Bot&text=' + encodeURIComponent(txt));
+}
     </script>
 </body>
 </html>
