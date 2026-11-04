@@ -87,14 +87,6 @@
             <button onclick="tgClose()" style="font-size:1rem;">✕</button>
         </div>
         <div class="container">
-            
-            <!-- ماژول جدید زبان انگلیسی -->
-            <div class="module-card" style="border-color: #3498db;" onclick="startEnglishModule('peppa_1')">
-                <div><div class="module-title" style="color: #3498db;">زبان انگلیسی</div><div class="module-sub">تمرین شنیداری پپا پیگ</div></div>
-                <div style="font-size:1.5rem; color:#3498db;">🇬🇧</div>
-            </div>
-
-            <!-- ماژول‌های قبلی -->
             <div class="module-card" style="border-color: var(--accent);" onclick="openModule('addsub')">
                 <div><div class="module-title" style="color: var(--accent);">جمع و تفریق</div><div class="module-sub">فاز ۰ تا ۳ (از تک‌رقمی تا سه‌رقمی دشوار)</div></div>
                 <div style="font-size:1.5rem; color:var(--accent);">➔</div>
@@ -160,25 +152,6 @@
                 <button data-val=".">.</button>
                 <button class="btn primary-btn" style="grid-column: span 2;" onclick="submitAnswer()">تأیید</button>
             </div>
-        </div>
-    </div>
-
-    <!-- رینگ تمرین زبان انگلیسی -->
-    <div id="screen-english" class="screen">
-        <div class="header">
-            <button onclick="nav('screen-main')">✕</button>
-            <h2 id="engPhaseTitle" style="font-size: 1.1rem;">آزمون زبان</h2>
-            <div class="progress" id="engProgress" style="font-weight:bold; font-size: 1.1rem; direction:ltr;">1/10</div>
-        </div>
-        
-        <div class="arena" style="text-align: center;">
-            <button id="playAudioBtn" onclick="playCurrentAudio()" style="margin-bottom: 20px; font-size: 2.5rem; background: transparent; border: none; cursor: pointer;">🔊</button>
-            
-            <div class="question-box" id="engQuestionBox" style="direction: ltr; font-family: sans-serif; font-size: 1.8rem; margin-top: 20px;">--</div>
-            
-            <input type="text" id="engInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="تایپ کنید..." style="width: 80%; padding: 15px; font-size: 1.4rem; margin-top: 20px; border-radius: 12px; border: 1px solid var(--gold); background: #000; color: #fff; text-align: center; direction: ltr;">
-            
-            <button class="btn primary-btn" onclick="checkEnglishAnswer()" style="margin-top: 30px; background: #3498db;">بررسی پاسخ</button>
         </div>
     </div>
 
@@ -507,14 +480,14 @@
             if (sesh.type !== 'day') isRev = true; 
             if (sesh.type === 'day' && phaseConfig[sesh.mod] && phaseConfig[sesh.mod][sesh.phase] && phaseConfig[sesh.mod][sesh.phase].revTimer) isRev = true;
 
-            // تنظیم تایمرهای جدید: 1:15, 1:20, 1:30
+            // تنظیم دقیق تایمرها مطابق خواسته شما (۱۵، ۲۰ و ۳۰ ثانیه)
             if (isRev) {
                 if (sesh.type === 'comprehensive' || sesh.type === 'grand') {
-                    sesh.tLeft = 75; // ۱ دقیقه و ۱۵ ثانیه (۷۵ ثانیه)
+                    sesh.tLeft = 15; // ۱۵ ثانیه برای آزمون‌های جامع
                 } else {
-                    if (sesh.phase === 1) sesh.tLeft = 75; // ۱:۱۵ ثانیه فاز 1
-                    else if (sesh.phase === 2) sesh.tLeft = 80; // ۱:۲۰ ثانیه فاز 2
-                    else if (sesh.phase === 3) sesh.tLeft = 90; // ۱:۳۰ ثانیه فاز 3
+                    if (sesh.phase === 1) sesh.tLeft = 15; // ۱۵ ثانیه فاز 1
+                    else if (sesh.phase === 2) sesh.tLeft = 20; // ۲۰ ثانیه فاز 2
+                    else if (sesh.phase === 3) sesh.tLeft = 30; // ۳۰ ثانیه فاز 3
                     else sesh.tLeft = sesh.qs.length * 6;
                 }
                 
@@ -686,127 +659,6 @@
             let txt = `🏆 موفق شدم!\n✅ پاسخ صحیح: ${corrects} از ${sesh.qs.length}\n⏱ زمان: ${time}\n\nتو هم می‌تونی رکورد منو بزنی؟ 👇`;
             
             window.open('https://t.me/share/url?url=https://t.me/MentalDiscipline_Bot&text=' + encodeURIComponent(txt));
-        }
-
-        // ==========================================
-        // ماژول زبان انگلیسی (Peppa Pig)
-        // ==========================================
-        
-        let langSesh = { currentEp: '', phaseIndex: 0, qIndex: 0, qs: [], corrects: 0, episodeData: null };
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                let utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US'; // تنظیم روی استاندارد جهانی برای پشتیبانی بهتر گوشی‌ها
-                utterance.rate = 0.85; 
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        function playCurrentAudio() {
-            if(langSesh.qs[langSesh.qIndex]) {
-                let qData = langSesh.qs[langSesh.qIndex];
-                let fullText = qData.q.replace('___', qData.a);
-                speakText(fullText);
-            }
-        }
-
-        async function startEnglishModule(epKey) {
-            // ترفند بیدار کردن موتور صوتی در لحظه کلیک کاربر (دور زدن بلاک مرورگر)
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
-            }
-
-            langSesh.currentEp = epKey;
-            langSesh.phaseIndex = 0;
-            
-            try {
-                let res = await fetch('english.json');
-                let data = await res.json();
-                langSesh.episodeData = data[epKey];
-                
-                if (langSesh.episodeData && langSesh.episodeData.phases.length > 0) {
-                    loadEnglishPhase();
-                } else {
-                    showPopup("خطا", "محتوایی برای این قسمت در فایل JSON یافت نشد.");
-                }
-            } catch (err) {
-                showPopup("خطا", "فایل english.json یافت نشد. لطفا مطمئن شوید آن را آپلود کرده‌اید.");
-            }
-        }
-
-        function loadEnglishPhase() {
-            let currentPhaseData = langSesh.episodeData.phases[langSesh.phaseIndex];
-            document.getElementById('engPhaseTitle').textContent = currentPhaseData.phaseName;
-            
-            let allQuestions = [...currentPhaseData.questions];
-            shuffleArray(allQuestions);
-            
-            let questionsPerRound = Math.min(5, allQuestions.length); 
-            langSesh.qs = allQuestions.slice(0, questionsPerRound);
-            
-            langSesh.qIndex = 0;
-            langSesh.corrects = 0;
-            
-            nav('screen-english');
-            loadEnglishQ();
-        }
-
-        function loadEnglishQ() {
-            let qData = langSesh.qs[langSesh.qIndex];
-            document.getElementById('engProgress').textContent = `${langSesh.qIndex + 1}/${langSesh.qs.length}`;
-            document.getElementById('engQuestionBox').textContent = qData.q;
-            
-            let input = document.getElementById('engInput');
-            input.value = "";
-            
-            playCurrentAudio();
-        }
-
-        function checkEnglishAnswer() {
-            let inputField = document.getElementById('engInput');
-            let inputVal = inputField.value.trim().toLowerCase();
-            let qData = langSesh.qs[langSesh.qIndex];
-            let correctAns = qData.a.toLowerCase();
-            
-            if (inputVal === correctAns) {
-                langSesh.corrects++;
-                playClick();
-            } else {
-                showPopup("پاسخ اشتباه", `پاسخ صحیح کلمه زیر بود:<br><b style='font-size:1.2rem; color:var(--error);'>${correctAns}</b>`);
-            }
-            
-            langSesh.qIndex++;
-            
-            if (langSesh.qIndex >= langSesh.qs.length) {
-                finishEnglishPhase();
-            } else {
-                loadEnglishQ();
-            }
-        }
-
-        function finishEnglishPhase() {
-            let scorePercent = (langSesh.corrects / langSesh.qs.length) * 100;
-            
-            if (scorePercent >= 70) {
-                langSesh.phaseIndex++;
-                if (langSesh.phaseIndex >= langSesh.episodeData.phases.length) {
-                    showPopup("تبریک! 🎉", `شما این قسمت را با موفقیت کامل به پایان رساندید!`, () => nav('screen-home'));
-                } else {
-                    showPopup("عالی بود! ✅", `نمره شما ${scorePercent.toFixed(0)}٪ شد. قفل آزمون بعدی باز شد.`, loadEnglishPhase);
-                }
-            } else {
-                showPopup("نیاز به تلاش مجدد 🔁", `نمره شما ${scorePercent.toFixed(0)}٪ شد (حداقل ۷۰٪ نیاز است).`, loadEnglishPhase);
-            }
         }
     </script>
 </body>
