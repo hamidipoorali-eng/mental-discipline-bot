@@ -1,0 +1,28 @@
+{
+  "peppa_1": {
+    "title": "قسمت ۱: Muddy Puddles",
+    "phases": [
+      {
+        "phaseName": "آزمون ۱: سینمای ذهنی (شنیداری)",
+        "questions": [
+          { "q": "It is ___ today so Peppa cannot play outside", "a": "raining", "hint": "هوا چطور است؟" },
+          { "q": "Peppa loves jumping in ___ ___", "a": "muddy puddles", "hint": "پپا عاشق پریدن توی چیست؟" }
+        ]
+      },
+      {
+        "phaseName": "آزمون ۲: توقف و پیش‌بینی",
+        "questions": [
+          { "q": "You must wear your ___", "a": "boots", "hint": "برای گودال آب چی می‌پوشند؟" },
+          { "q": "It is ___ for you to jump", "a": "safe", "hint": "چک کردن امنیت پرش" }
+        ]
+      },
+      {
+        "phaseName": "آزمون ۳: تسلط نهایی",
+        "questions": [
+          { "q": "Peppa likes to ___ ___ her brother", "a": "look after", "hint": "مراقبت کردن" },
+          { "q": "Look at the ___ you're in!", "a": "mess", "hint": "کثیفی و شلوغی" }
+        ]
+      }
+    ]
+  }
+}
