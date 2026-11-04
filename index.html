@@ -173,9 +173,8 @@
         
         <div class="arena" style="text-align: center;">
             <button id="playAudioBtn" onclick="playCurrentAudio()" style="margin-bottom: 20px; font-size: 2.5rem; background: transparent; border: none; cursor: pointer;">🔊</button>
-            <div id="engHintBox" style="color: var(--gold); font-size: 0.95rem; margin-bottom: 20px;"></div>
             
-            <div class="question-box" id="engQuestionBox" style="direction: ltr; font-family: sans-serif; font-size: 1.8rem;">--</div>
+            <div class="question-box" id="engQuestionBox" style="direction: ltr; font-family: sans-serif; font-size: 1.8rem; margin-top: 20px;">--</div>
             
             <input type="text" id="engInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="تایپ کنید..." style="width: 80%; padding: 15px; font-size: 1.4rem; margin-top: 20px; border-radius: 12px; border: 1px solid var(--gold); background: #000; color: #fff; text-align: center; direction: ltr;">
             
@@ -482,7 +481,6 @@
                 
                 let qData = {q: `${p}٪ از ${base}`, a: (p * base) / 100, tech: null};
                 
-                // تگ‌گذاری هوشمند برای دکمه راهنما (۵٪ از اعدادی که ده درصد فرد دارند)
                 if (p === 5) {
                     let tenP = base / 10;
                     if (Math.floor(tenP) % 2 !== 0) qData.tech = 'percent_5_odd';
@@ -509,15 +507,15 @@
             if (sesh.type !== 'day') isRev = true; 
             if (sesh.type === 'day' && phaseConfig[sesh.mod] && phaseConfig[sesh.mod][sesh.phase] && phaseConfig[sesh.mod][sesh.phase].revTimer) isRev = true;
 
-            // تنظیم دقیق تایمرها مطابق خواسته شما
+            // تنظیم تایمرهای جدید: 1:15, 1:20, 1:30
             if (isRev) {
                 if (sesh.type === 'comprehensive' || sesh.type === 'grand') {
-                    sesh.tLeft = 15; // 15 ثانیه برای آزمون‌های جامع
+                    sesh.tLeft = 75; // ۱ دقیقه و ۱۵ ثانیه (۷۵ ثانیه)
                 } else {
-                    if (sesh.phase === 1) sesh.tLeft = 15; // 15 ثانیه فاز 1
-                    else if (sesh.phase === 2) sesh.tLeft = 20; // 20 ثانیه فاز 2
-                    else if (sesh.phase === 3) sesh.tLeft = 30; // 30 ثانیه فاز 3
-                    else sesh.tLeft = sesh.qs.length * 6; // حالت پیش‌فرض پشتیبان
+                    if (sesh.phase === 1) sesh.tLeft = 75; // ۱:۱۵ ثانیه فاز 1
+                    else if (sesh.phase === 2) sesh.tLeft = 80; // ۱:۲۰ ثانیه فاز 2
+                    else if (sesh.phase === 3) sesh.tLeft = 90; // ۱:۳۰ ثانیه فاز 3
+                    else sesh.tLeft = sesh.qs.length * 6;
                 }
                 
                 tt.textContent = formatTime(sesh.tLeft);
@@ -561,7 +559,6 @@
             qb.textContent = qData.q;
             document.getElementById('progressText').textContent = `${sesh.qIndex + 1}/${sesh.qs.length}`;
             
-            // نمایش/مخفی کردن دکمه راهنما در صورت وجود تکنیک
             let hintBtn = document.getElementById('hintBtn');
             if (qData.tech) hintBtn.style.display = 'block';
             else hintBtn.style.display = 'none';
@@ -669,7 +666,6 @@
             if (!isFailed) {
                 if (sesh.type === 'day' && sesh.phase !== 0 && !sesh.isReview) {
                     let maxDays = phaseConfig[sesh.mod][sesh.phase].days;
-                    // فیکس باگ رد شدن روزها
                     if (db[sesh.mod][`p${sesh.phase}Day`] <= maxDays) {
                         db[sesh.mod][`p${sesh.phase}Day`]++; 
                     }
@@ -710,7 +706,7 @@
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 let utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-GB'; // لهجه بریتیش (برای پپا پیگ مناسب‌تر است)
+                utterance.lang = 'en-US'; // تنظیم روی استاندارد جهانی برای پشتیبانی بهتر گوشی‌ها
                 utterance.rate = 0.85; 
                 window.speechSynthesis.speak(utterance);
             }
@@ -725,6 +721,11 @@
         }
 
         async function startEnglishModule(epKey) {
+            // ترفند بیدار کردن موتور صوتی در لحظه کلیک کاربر (دور زدن بلاک مرورگر)
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+            }
+
             langSesh.currentEp = epKey;
             langSesh.phaseIndex = 0;
             
@@ -764,12 +765,10 @@
             let qData = langSesh.qs[langSesh.qIndex];
             document.getElementById('engProgress').textContent = `${langSesh.qIndex + 1}/${langSesh.qs.length}`;
             document.getElementById('engQuestionBox').textContent = qData.q;
-            document.getElementById('engHintBox').textContent = qData.hint || "";
             
             let input = document.getElementById('engInput');
             input.value = "";
             
-            // تکنیک سینمای ذهنی: پخش خودکار به محض ورود
             playCurrentAudio();
         }
 
