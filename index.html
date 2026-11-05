@@ -29,7 +29,7 @@
         .screen.active { display: flex; }
         
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); z-index: 10; background: var(--card-bg);}
-        .header button { background: var(--btn-bg); border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-color); border-radius: 50%; width: 35px; height: 35px; display:flex; justify-content:center; align-items:center;}
+        .header button { background: var(--btn-bg); border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-color); border-radius: 50%; width: 45px; height: 35px; display:flex; justify-content:center; align-items:center; font-weight: bold;}
         .header-title { font-weight: bold; font-size: 1.1rem; }
 
         .container { padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; padding-bottom: 40px; }
@@ -92,9 +92,9 @@
 
     <div id="screen-main" class="screen active">
         <div class="header">
-            <button id="themeToggleBtn">☀️</button>
+            <button id="themeToggleBtn">روز</button>
             <div class="header-title">Discipline</div>
-            <button onclick="tgClose()" style="font-size:1rem;">✕</button>
+            <button onclick="tgClose()">بستن</button>
         </div>
         <div class="container" style="justify-content: center; height: 100%;">
             <div class="dept-card" style="border-color: var(--blue);" onclick="nav('screen-lang-menu')">
@@ -113,7 +113,7 @@
         <div class="header">
             <button onclick="nav('screen-main')">➔</button>
             <div class="header-title">دپارتمان ریاضی</div>
-            <div style="width:35px"></div>
+            <div style="width:45px"></div>
         </div>
         <div class="container">
             <div class="module-card" style="border-color: var(--accent);" onclick="openModule('addsub')">
@@ -125,8 +125,8 @@
                 <div style="font-size:1.5rem; color:var(--gold);">➔</div>
             </div>
             <div class="module-card" style="border-color: var(--purple);" onclick="startSession('grand', 0, 'grand')">
-                <div><div class="module-title" style="color: var(--purple);">ابرآزمون جامع</div><div class="module-sub">رینگ بی‌نهایت با تایمر (۱۰ سوال ترکیبی)</div></div>
-                <div style="font-size:1.5rem; color:var(--purple);">⚔️</div>
+                <div><div class="module-title" style="color: var(--purple);">آزمون جامع</div><div class="module-sub">رینگ بی‌نهایت با تایمر (۱۰ سوال ترکیبی)</div></div>
+                <div style="font-size:1.5rem; color:var(--purple);">➔</div>
             </div>
         </div>
     </div>
@@ -144,7 +144,7 @@
         <div class="header">
             <button onclick="nav('screen-phases')">➔</button>
             <div class="header-title" id="pathTitle">مسیر فاز</div>
-            <div style="width:35px"></div>
+            <div style="width:45px"></div>
         </div>
         <div class="container">
             <div class="saga-grid" id="sagaGrid"></div>
@@ -153,17 +153,17 @@
 
     <div id="screen-training" class="screen">
         <div class="header">
-            <button onclick="abortTraining()">✕</button>
+            <button onclick="abortTraining()">بازگشت</button>
             <div class="header-title" id="trainingTitle">--</div>
-            <div style="width:35px"></div>
+            <div style="width:45px"></div>
         </div>
         <div style="display: flex; justify-content: space-between; padding: 10px 20px; font-weight: bold; font-size:1.1rem;">
             <div id="progressText">۱/۱۰</div>
-            <div id="heartsContainer" style="color:var(--error); letter-spacing:3px;"></div>
+            <div id="heartsContainer" style="color:var(--error); letter-spacing:1px; font-size:1rem;"></div>
             <div id="timerText" style="direction:ltr;">00:00</div>
         </div>
         <div class="arena">
-            <button id="hintBtn" onclick="showCurrentHint()" style="display:none; margin-bottom: 15px; font-size: 1.5rem; background: var(--card-bg); border: 1px solid var(--gold); border-radius: 50%; width: 45px; height: 45px; cursor: pointer; box-shadow: 0 0 10px rgba(241,196,15,0.3);">💡</button>
+            <button id="hintBtn" onclick="showCurrentHint()" style="display:none; margin-bottom: 15px; font-size: 1rem; font-weight: bold; background: var(--card-bg); color: var(--gold); border: 1px solid var(--gold); border-radius: 8px; padding: 5px 15px; cursor: pointer; box-shadow: 0 0 10px rgba(241,196,15,0.3);">راهنما</button>
             <div class="question-box" id="questionBox">--</div>
             <div class="answer-box" id="answerBox"></div>
         </div>
@@ -172,9 +172,9 @@
                 <button data-val="1">۱</button> <button data-val="2">۲</button> <button data-val="3">۳</button>
                 <button data-val="4">۴</button> <button data-val="5">۵</button> <button data-val="6">۶</button>
                 <button data-val="7">۷</button> <button data-val="8">۸</button> <button data-val="9">۹</button>
-                <button data-val="-">-</button> <button data-val="0">۰</button> <button onclick="clearAnswer()">⌫</button>
+                <button data-val="-">-</button> <button data-val="0">۰</button> <button onclick="clearAnswer()">پاک</button>
                 <button data-val=".">.</button>
-                <button style="background-color: var(--btn-bg); color: var(--text-color); border: none; font-size: 1.1rem; font-weight: bold; border-radius: 12px; cursor: pointer;" onclick="skipQuestion()">بعدی ⏭</button>
+                <button style="background-color: var(--btn-bg); color: var(--text-color); border: none; font-size: 1.1rem; font-weight: bold; border-radius: 12px; cursor: pointer;" onclick="skipQuestion()">بعدی</button>
                 <button class="btn primary-btn" onclick="submitAnswer()">تأیید</button>
             </div>
         </div>
@@ -185,7 +185,7 @@
         <div class="header">
             <button onclick="nav('screen-main')">➔</button>
             <div class="header-title">فهرست قسمت‌ها</div>
-            <div style="width:35px"></div>
+            <div style="width:45px"></div>
         </div>
         <div class="container">
             <div class="ep-list" id="episodesList"></div>
@@ -196,7 +196,7 @@
         <div class="header">
             <button onclick="nav('screen-lang-menu')">➔</button>
             <div class="header-title" id="episodeDetailTitle">قسمت --</div>
-            <div style="width:35px"></div>
+            <div style="width:45px"></div>
         </div>
         <div class="container">
             <div class="phase-card" style="border-color: var(--blue);">
@@ -214,31 +214,31 @@
 
     <div id="screen-listening" class="screen">
         <div class="header">
-            <button onclick="exitListening()">✕</button>
+            <button onclick="exitListening()">➔</button>
             <div class="header-title" id="listeningTitle">دیالوگ --</div>
-            <div style="width:35px"></div>
+            <div style="width:45px"></div>
         </div>
         <div class="arena" style="text-align: center;">
-            <div style="font-size: 4rem; margin-bottom: 30px;">🎧</div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--blue); margin-bottom: 30px;">بخش شنیداری</div>
             <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 40px; background: var(--card-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border);">
-                <button class="btn outline-btn" id="spd07" style="padding: 5px 10px; font-size: 0.9rem;" onclick="setAudioSpeed(0.7)">کند 🐌</button>
-                <button class="btn primary-btn" id="spd10" style="padding: 5px 10px; font-size: 0.9rem; background: var(--blue);" onclick="setAudioSpeed(1.0)">عادی</button>
-                <button class="btn outline-btn" id="spd12" style="padding: 5px 10px; font-size: 0.9rem;" onclick="setAudioSpeed(1.2)">سریع 🐇</button>
+                <button class="btn outline-btn" id="spd07" style="padding: 5px 10px; font-size: 1rem;" onclick="setAudioSpeed(0.7)">کند</button>
+                <button class="btn primary-btn" id="spd10" style="padding: 5px 10px; font-size: 1rem; background: var(--blue);" onclick="setAudioSpeed(1.0)">عادی</button>
+                <button class="btn outline-btn" id="spd12" style="padding: 5px 10px; font-size: 1rem;" onclick="setAudioSpeed(1.2)">سریع</button>
             </div>
             <button class="btn" style="background: var(--btn-bg); color: var(--text-color); margin-bottom: 15px; height: 60px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="replayDialogAudio()">
-                <span style="font-size: 1.5rem;">🔁</span> تکرار مجدد
+                تکرار مجدد
             </button>
             <button class="btn primary-btn" style="background: var(--success); height: 60px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="markDialogUnderstood()">
-                <span style="font-size: 1.5rem;">✅</span> فهمیدم
+                فهمیدم
             </button>
         </div>
     </div>
 
     <div id="screen-summary" class="screen">
         <div class="header">
-            <button onclick="nav('screen-phases')">➔</button>
+            <button onclick="returnFromSummary()">➔</button>
             <div class="header-title">کارنامه تحلیلی</div>
-            <div style="width:35px"></div>
+            <div style="width:45px"></div>
         </div>
         <div class="container">
             <div style="background:var(--card-bg); padding:20px; border-radius:16px; width:100%; max-width:400px; border:1px solid var(--border);">
@@ -255,8 +255,8 @@
                     <div id="errorLog" style="font-size:0.95rem; max-height:200px; overflow-y:auto; padding-right:5px;"></div>
                 </div>
             </div>
-            <button class="btn tg-btn" onclick="shareToTelegram()">✈️ اشتراک‌گذاری در تلگرام</button>
-            <button class="btn primary-btn" onclick="nav(currentMod === 'grand' ? 'screen-math-menu' : 'screen-phases')">بازگشت</button>
+            <button class="btn tg-btn" onclick="shareToTelegram()">اشتراک‌گذاری در تلگرام</button>
+            <button class="btn primary-btn" onclick="returnFromSummary()">بازگشت</button>
         </div>
     </div>
 
@@ -320,16 +320,25 @@
         document.getElementById('themeToggleBtn').addEventListener('click', () => {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            document.getElementById('themeToggleBtn').textContent = isDark ? '🌙' : '☀️';
+            document.getElementById('themeToggleBtn').textContent = isDark ? 'روز' : 'شب';
             playClick();
         });
 
         function nav(id) {
-            if(langAudioObj) langAudioObj.pause();
+            if(langAudioObj) { try { langAudioObj.pause(); } catch(e) {} }
             let mainAudio = document.getElementById('mainEpAudio');
-            if(mainAudio) mainAudio.pause();
+            if(mainAudio) { try { mainAudio.pause(); } catch(e) {} }
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+        }
+        
+        function returnFromSummary() {
+            if (currentMod === 'grand' || currentMod === 'comprehensive') {
+                nav('screen-math-menu');
+            } else {
+                renderPhases(); // رفع باگ گیر کردن روزها با رفرش صفحه فاز
+                nav('screen-phases');
+            }
         }
 
         let currentMod = 'addsub';
@@ -352,16 +361,16 @@
                 let isLocked = !activeDB.unlocked.includes(phase);
                 let currentDay = activeDB[`p${phase}Day`] || 1;
                 let dayText = conf[phase].days > 0 ? `روز ${Math.min(currentDay, conf[phase].days)} از ${conf[phase].days}` : 'آزمون‌محور (بی‌نهایت)';
-                let blurBadge = conf[phase].blur ? `<span style="font-size:0.75rem; background:rgba(231,76,60,0.2); color:var(--error); padding:2px 6px; border-radius:4px; margin-right:5px;">👁‍🗨 محو ۲ ثانیه</span>` : '';
-                let timerBadge = conf[phase].revTimer ? `<span style="font-size:0.75rem; background:rgba(241,196,15,0.2); color:var(--gold); padding:2px 6px; border-radius:4px; margin-right:5px;">⏳ تایمر معکوس</span>` : '';
+                let blurBadge = conf[phase].blur ? `<span style="font-size:0.75rem; background:rgba(231,76,60,0.2); color:var(--error); padding:2px 6px; border-radius:4px; margin-right:5px;">محو ۲ ثانیه</span>` : '';
+                let timerBadge = conf[phase].revTimer ? `<span style="font-size:0.75rem; background:rgba(241,196,15,0.2); color:var(--gold); padding:2px 6px; border-radius:4px; margin-right:5px;">تایمر معکوس</span>` : '';
 
                 let html = `<div class="phase-card" style="border-color: ${isLocked ? 'var(--border)' : 'var(--accent)'};">`;
                 
                 if (isLocked) {
-                    html += `<div class="locked-content"><div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> 🔒</div><div class="phase-desc">${dayText}</div></div>
-                    <button class="btn outline-btn" style="margin-top:10px; font-size:0.9rem;" onclick="startSession('${currentMod}', ${phase}, 'shortcut')">⚡ میان‌بر (آزمون تعیین سطح)</button>`;
+                    html += `<div class="locked-content"><div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> (قفل)</div><div class="phase-desc">${dayText}</div></div>
+                    <button class="btn outline-btn" style="margin-top:10px; font-size:0.9rem;" onclick="startSession('${currentMod}', ${phase}, 'shortcut')">میان‌بر (آزمون تعیین سطح)</button>`;
                 } else {
-                    html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div><div class="phase-desc" style="margin-bottom:5px;">${dayText}</div>
+                    html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> (باز)</div><div class="phase-desc" style="margin-bottom:5px;">${dayText}</div>
                         <div style="margin-bottom:15px;">${blurBadge}${timerBadge}</div><div style="display:flex; gap:10px;">`;
                     
                     if (conf[phase].days === 0) {
@@ -436,15 +445,15 @@
                 qCount = phase === 0 ? 10 : phaseConfig[mod][phase].qs;
                 let currentRealDay = db[mod][`p${phase}Day`];
                 if (dayNum !== null && dayNum < currentRealDay) { sesh.isReview = true; title = `مرور روز ${dayNum} (فاز ${phase})`; } 
-                else { title = phase === 0 ? `آزمون فاز ۰` : `فاز ${phase} - روز ${currentRealDay}`; }
+                else { title = phase === 0 ? `آزمون فاز ۰` : `فاز ${phase} - روز ${Math.min(currentRealDay, phaseConfig[mod][phase].days)}`; }
                 sesh.maxErr = 100;
             } else if (type === 'shortcut') { qCount = 10; revTimer = true; sesh.maxErr = 1; title = `آزمون میان‌بر فاز ${phase}`; } 
             else if (type === 'exam') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون پایان فاز ${phase}`; } 
-            else if (type === 'comprehensive' || type === 'grand') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = type === 'grand' ? `ابرآزمون جامع` : `آزمون جامع`; }
+            else if (type === 'comprehensive' || type === 'grand') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = type === 'grand' ? `آزمون جامع` : `آزمون جامع`; }
 
             for(let i=0; i<qCount; i++) sesh.qs.push(generateQ(mod, phase, type));
             document.getElementById('trainingTitle').textContent = title;
-            document.getElementById('heartsContainer').textContent = (sesh.maxErr < 10) ? '❤️'.repeat(sesh.maxErr + 1) : '';
+            document.getElementById('heartsContainer').textContent = (sesh.maxErr < 10) ? `جان: ${sesh.maxErr + 1}` : '';
             
             if (type === 'shortcut') showPopup("قوانین میان‌بر", "شما ۱۰ سوال با تایمر معکوس دارید.<br><b>حداکثر ۱ خطا</b> مجاز است.", initArena);
             else if (type === 'exam') showPopup("آزمون پایانی", "تایمر معکوس فعال است.<br><b>حداکثر ۲ خطا</b> برای قبولی مجاز است.", initArena);
@@ -512,7 +521,7 @@
                         for (let i = sesh.qIndex; i < sesh.qs.length; i++) {
                             let qData = sesh.qs[i];
                             if(qData.a === null) try { qData.a = eval(qData.q.replace('×','*').replace('÷','/').replace('٪ از','/100*')); } catch(e){ qData.a = 0; }
-                            sesh.errLog.push({ q: qData.q, correct: qData.a, user: '⏱ بدون پاسخ' });
+                            sesh.errLog.push({ q: qData.q, correct: qData.a, user: 'بدون پاسخ' });
                             sesh.errs++;
                         }
                         endSession(true, "تایم اوت شدی!");
@@ -553,7 +562,7 @@
             let qData = sesh.qs[sesh.qIndex];
             if(qData.a === null) try { qData.a = eval(qData.q.replace('×','*').replace('÷','/').replace('٪ از','/100*')); } catch(e){ qData.a = 0; }
             sesh.skips++;
-            sesh.errLog.push({ q: qData.q, correct: qData.a, user: '⏭ رد شده' });
+            sesh.errLog.push({ q: qData.q, correct: qData.a, user: 'رد شده' });
             let ab = document.getElementById('answerBox');
             ab.textContent = "رد شد"; ab.style.color = 'var(--gold)'; ab.style.borderBottomColor = 'var(--gold)';
             setTimeout(() => { 
@@ -577,7 +586,7 @@
                 setTimeout(() => { ab.style.color = 'var(--accent)'; ab.style.borderBottomColor = 'var(--accent)'; }, 300);
                 if (sesh.maxErr < 10) { 
                     let hearts = sesh.maxErr + 1 - sesh.errs;
-                    document.getElementById('heartsContainer').textContent = hearts > 0 ? '❤️'.repeat(hearts) : '';
+                    document.getElementById('heartsContainer').textContent = hearts > 0 ? `جان: ${hearts}` : '';
                     if (sesh.errs > sesh.maxErr) { endSession(true, "تعداد خطاهای شما از حد مجاز گذشت."); return; }
                 }
             }
@@ -602,7 +611,7 @@
             
             let fb = "خوب بود. ادامه بده.";
             if (isFailed) fb = failMsg || "متاسفانه رد شدی.";
-            else if (sesh.errs === 0 && sesh.skips === 0) fb = "🔥 بی‌نظیر! بدون هیچ خطایی.";
+            else if (sesh.errs === 0 && sesh.skips === 0) fb = "بی‌نظیر! بدون هیچ خطایی.";
             document.getElementById('aiFeedback').textContent = fb;
             document.getElementById('aiFeedback').style.color = isFailed ? 'var(--error)' : 'var(--accent)';
 
@@ -613,8 +622,8 @@
                 sesh.errLog.forEach(e => {
                     el.innerHTML += `<div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border); direction: rtl; text-align: right;">
                         <span style="font-size:0.85rem; opacity:0.8;">سوال:</span> <b style="direction:ltr; display:inline-block; font-size:1.1rem;">${e.q}</b> <br> 
-                        <span style="font-size:0.85rem; opacity:0.8;">شما:</span> <span style="color:var(--error); direction:ltr; display:inline-block; font-weight:bold;">${e.user}</span> | 
-                        <span style="font-size:0.85rem; opacity:0.8;">صحیح:</span> <span style="color:var(--success); direction:ltr; display:inline-block; font-weight:bold;">${e.correct} ✅</span>
+                        <span style="font-size:0.85rem; opacity:0.8;">شما:</span> <span style="color:var(--error); direction:ltr; display:inline-block; font-weight:bold;">${e.user} (غلط)</span> | 
+                        <span style="font-size:0.85rem; opacity:0.8;">صحیح:</span> <span style="color:var(--success); direction:ltr; display:inline-block; font-weight:bold;">${e.correct} (صحیح)</span>
                     </div>`;
                 });
             } else { elc.style.display = 'none'; }
@@ -623,8 +632,8 @@
             let diff = scorePercent - (targetDB.lastScore || 0);
             let chartTxt = `دقت شما: %${scorePercent}`;
             if (targetDB.lastScore > 0) {
-                if(diff > 0) chartTxt += ` <span style="color:var(--success); direction:ltr;">(+${diff}%) 📈</span>`;
-                else if(diff < 0) chartTxt += ` <span style="color:var(--error); direction:ltr;">(${diff}%) 📉</span>`;
+                if(diff > 0) chartTxt += ` <span style="color:var(--success); direction:ltr;">(+${diff}%) (افزایش)</span>`;
+                else if(diff < 0) chartTxt += ` <span style="color:var(--error); direction:ltr;">(${diff}%) (کاهش)</span>`;
                 else chartTxt += ` <span style="color:var(--gold);">- بدون تغییر نسبت به قبل</span>`;
             }
             document.getElementById('progressChart').innerHTML = chartTxt;
@@ -645,7 +654,7 @@
         function shareToTelegram() {
             let corrects = document.getElementById('sumCorrect').textContent;
             let time = document.getElementById('sumTime').textContent;
-            let txt = `🏆 موفق شدم!\n✅ پاسخ صحیح: ${corrects} از ${sesh.qs.length}\n⏱ زمان: ${time}\n\nتو هم می‌تونی رکورد منو بزنی؟ 👇`;
+            let txt = `موفق شدم!\nپاسخ صحیح: ${corrects} از ${sesh.qs.length}\nزمان: ${time}`;
             window.open('https://t.me/share/url?url=https://t.me/MentalDiscipline_Bot&text=' + encodeURIComponent(txt));
         }
 
@@ -660,7 +669,7 @@
             for(let i=1; i<=30; i++) {
                 let isUnlocked = (i === 1) || (db.lang.eps[i] !== undefined); 
                 let btnHtml = `<div class="ep-btn ${isUnlocked ? 'unlocked' : 'locked'}" onclick="${isUnlocked ? `openEpisode(${i})` : ''}">
-                    <span style="font-size: 1.2rem;">${isUnlocked ? '🎧' : '🔒'}</span>
+                    <span style="font-size: 1rem; font-weight:normal;">${isUnlocked ? 'باز' : 'قفل'}</span>
                     قسمت ${i}
                 </div>`;
                 list.innerHTML += btnHtml;
@@ -716,17 +725,17 @@
 
         function replayDialogAudio() {
             let src = `audio/ep${currentEp}_${currentDialog}.mp3`;
-            if(langAudioObj) langAudioObj.pause();
+            try { if(langAudioObj) langAudioObj.pause(); } catch(e) {}
             langAudioObj = new Audio(src);
             langAudioObj.playbackRate = currentSpeed;
             langAudioObj.play().catch(e => {
-                showPopup("خطا", `فایل صوتی یافت نشد.<br>لطفاً مطمئن شوید فایل <b>${src}</b> در مسیر صحیح قرار دارد.`);
+                showPopup("خطا", `فایل صوتی یافت نشد.<br>لطفاً مطمئن شوید فایل <b>${src}</b> در پوشه audio قرار دارد.`);
             });
         }
 
         function markDialogUnderstood() {
             playClick();
-            if(langAudioObj) langAudioObj.pause();
+            try { if(langAudioObj) langAudioObj.pause(); } catch(e) {}
             let currentUnlocked = db.lang.eps[currentEp] || 1;
             if(currentDialog === currentUnlocked && currentDialog < 5) {
                 db.lang.eps[currentEp] = currentDialog + 1;
@@ -735,7 +744,7 @@
             if(currentDialog < 5) {
                 startListening(currentDialog + 1);
             } else {
-                showPopup("تبریک! 🎉", "شما تمام دیالوگ‌های این قسمت را با موفقیت پشت سر گذاشتید.", () => {
+                showPopup("تبریک!", "شما تمام دیالوگ‌های این قسمت را با موفقیت پشت سر گذاشتید.", () => {
                     renderLangDialogs();
                     nav('screen-episode-detail');
                 });
@@ -743,7 +752,12 @@
         }
 
         function exitListening() {
-            if(langAudioObj) langAudioObj.pause();
+            try {
+                if(langAudioObj) {
+                    langAudioObj.pause();
+                    langAudioObj.currentTime = 0;
+                }
+            } catch(e) {}
             renderLangDialogs();
             nav('screen-episode-detail');
         }
