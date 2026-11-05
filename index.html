@@ -29,7 +29,7 @@
         .screen.active { display: flex; }
         
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); z-index: 10; background: var(--card-bg);}
-        .header button { background: var(--btn-bg); border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-color); border-radius: 50%; width: 45px; height: 35px; display:flex; justify-content:center; align-items:center; font-weight: bold;}
+        .header button { background: var(--btn-bg); border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-color); border-radius: 50%; width: 35px; height: 35px; display:flex; justify-content:center; align-items:center; font-weight: bold;}
         .header-title { font-weight: bold; font-size: 1.1rem; }
 
         .container { padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; padding-bottom: 40px; }
@@ -92,9 +92,9 @@
 
     <div id="screen-main" class="screen active">
         <div class="header">
-            <button id="themeToggleBtn">روز</button>
+            <button id="themeToggleBtn">☀️</button>
             <div class="header-title">Discipline</div>
-            <button onclick="tgClose()">بستن</button>
+            <button onclick="tgClose()">✕</button>
         </div>
         <div class="container" style="justify-content: center; height: 100%;">
             <div class="dept-card" style="border-color: var(--blue);" onclick="nav('screen-lang-menu')">
@@ -113,7 +113,7 @@
         <div class="header">
             <button onclick="nav('screen-main')">➔</button>
             <div class="header-title">دپارتمان ریاضی</div>
-            <div style="width:45px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="container">
             <div class="module-card" style="border-color: var(--accent);" onclick="openModule('addsub')">
@@ -144,7 +144,7 @@
         <div class="header">
             <button onclick="nav('screen-phases')">➔</button>
             <div class="header-title" id="pathTitle">مسیر فاز</div>
-            <div style="width:45px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="container">
             <div class="saga-grid" id="sagaGrid"></div>
@@ -153,9 +153,9 @@
 
     <div id="screen-training" class="screen">
         <div class="header">
-            <button onclick="abortTraining()">بازگشت</button>
+            <button onclick="abortTraining()">➔</button>
             <div class="header-title" id="trainingTitle">--</div>
-            <div style="width:45px"></div>
+            <div style="width:35px"></div>
         </div>
         <div style="display: flex; justify-content: space-between; padding: 10px 20px; font-weight: bold; font-size:1.1rem;">
             <div id="progressText">۱/۱۰</div>
@@ -185,7 +185,7 @@
         <div class="header">
             <button onclick="nav('screen-main')">➔</button>
             <div class="header-title">فهرست قسمت‌ها</div>
-            <div style="width:45px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="container">
             <div class="ep-list" id="episodesList"></div>
@@ -196,7 +196,7 @@
         <div class="header">
             <button onclick="nav('screen-lang-menu')">➔</button>
             <div class="header-title" id="episodeDetailTitle">قسمت --</div>
-            <div style="width:45px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="container">
             <div class="phase-card" style="border-color: var(--blue);">
@@ -216,7 +216,7 @@
         <div class="header">
             <button onclick="exitListening()">➔</button>
             <div class="header-title" id="listeningTitle">دیالوگ --</div>
-            <div style="width:45px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="arena" style="text-align: center;">
             <div style="font-size: 1.8rem; font-weight: bold; color: var(--blue); margin-bottom: 30px;">بخش شنیداری</div>
@@ -238,7 +238,7 @@
         <div class="header">
             <button onclick="returnFromSummary()">➔</button>
             <div class="header-title">کارنامه تحلیلی</div>
-            <div style="width:45px"></div>
+            <div style="width:35px"></div>
         </div>
         <div class="container">
             <div style="background:var(--card-bg); padding:20px; border-radius:16px; width:100%; max-width:400px; border:1px solid var(--border);">
@@ -293,15 +293,15 @@
             }
         };
 
-        function saveDb() { localStorage.setItem('discipline_db_v8', JSON.stringify(db)); }
+        function saveDb() { try { localStorage.setItem('discipline_db_v9', JSON.stringify(db)); } catch(e){} }
         function loadDb() {
-            let local = localStorage.getItem('discipline_db_v8');
-            if (local) { 
-                try { 
+            try {
+                let local = localStorage.getItem('discipline_db_v9');
+                if (local) { 
                     let p = JSON.parse(local); 
                     if(p.addsub) { db = p; if(!db.lang) db.lang = { eps: { 1: 1 } }; }
-                } catch(e){} 
-            }
+                }
+            } catch(e){} 
         }
         window.onload = () => { if (tg) tg.expand(); loadDb(); renderLangEpisodes(); };
 
@@ -320,7 +320,7 @@
         document.getElementById('themeToggleBtn').addEventListener('click', () => {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            document.getElementById('themeToggleBtn').textContent = isDark ? 'روز' : 'شب';
+            document.getElementById('themeToggleBtn').textContent = isDark ? '🌙' : '☀️';
             playClick();
         });
 
@@ -336,7 +336,7 @@
             if (currentMod === 'grand' || currentMod === 'comprehensive') {
                 nav('screen-math-menu');
             } else {
-                renderPhases(); // رفع باگ گیر کردن روزها با رفرش صفحه فاز
+                renderPhases(); // تازه کردن صفحه فازها برای آپدیت شدن روزها
                 nav('screen-phases');
             }
         }
@@ -367,10 +367,10 @@
                 let html = `<div class="phase-card" style="border-color: ${isLocked ? 'var(--border)' : 'var(--accent)'};">`;
                 
                 if (isLocked) {
-                    html += `<div class="locked-content"><div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> (قفل)</div><div class="phase-desc">${dayText}</div></div>
+                    html += `<div class="locked-content"><div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> 🔒</div><div class="phase-desc">${dayText}</div></div>
                     <button class="btn outline-btn" style="margin-top:10px; font-size:0.9rem;" onclick="startSession('${currentMod}', ${phase}, 'shortcut')">میان‌بر (آزمون تعیین سطح)</button>`;
                 } else {
-                    html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> (باز)</div><div class="phase-desc" style="margin-bottom:5px;">${dayText}</div>
+                    html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div><div class="phase-desc" style="margin-bottom:5px;">${dayText}</div>
                         <div style="margin-bottom:15px;">${blurBadge}${timerBadge}</div><div style="display:flex; gap:10px;">`;
                     
                     if (conf[phase].days === 0) {
@@ -441,15 +441,20 @@
             sesh = { type, mod, phase, qs: [], qIndex: 0, errs: 0, errLog: [], startT: Date.now(), tLeft: 0, maxErr: 0, isReview: false, skips: 0 };
             currentMod = mod; currentInput = "";
             let qCount = 5; let revTimer = false; let title = "";
+            
             if (type === 'day') {
                 qCount = phase === 0 ? 10 : phaseConfig[mod][phase].qs;
-                let currentRealDay = db[mod][`p${phase}Day`];
-                if (dayNum !== null && dayNum < currentRealDay) { sesh.isReview = true; title = `مرور روز ${dayNum} (فاز ${phase})`; } 
-                else { title = phase === 0 ? `آزمون فاز ۰` : `فاز ${phase} - روز ${Math.min(currentRealDay, phaseConfig[mod][phase].days)}`; }
+                let currentRealDay = db[mod][`p${phase}Day`] || 1;
+                if (dayNum !== null && dayNum < currentRealDay) { 
+                    sesh.isReview = true; 
+                    title = `مرور روز ${dayNum} (فاز ${phase})`; 
+                } else { 
+                    title = phase === 0 ? `آزمون فاز ۰` : `فاز ${phase} - روز ${Math.min(currentRealDay, phaseConfig[mod][phase].days)}`; 
+                }
                 sesh.maxErr = 100;
             } else if (type === 'shortcut') { qCount = 10; revTimer = true; sesh.maxErr = 1; title = `آزمون میان‌بر فاز ${phase}`; } 
             else if (type === 'exam') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون پایان فاز ${phase}`; } 
-            else if (type === 'comprehensive' || type === 'grand') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = type === 'grand' ? `آزمون جامع` : `آزمون جامع`; }
+            else if (type === 'comprehensive' || type === 'grand') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون جامع`; }
 
             for(let i=0; i<qCount; i++) sesh.qs.push(generateQ(mod, phase, type));
             document.getElementById('trainingTitle').textContent = title;
@@ -461,8 +466,10 @@
         }
 
         function generateQ(mod, phase, type) {
-            if (type === 'grand') { mod = Math.random() > 0.5 ? 'addsub' : 'percent'; phase = Math.floor(Math.random()*3)+1; } 
-            else if (type === 'comprehensive') { phase = Math.floor(Math.random()*3)+1; }
+            if (type === 'grand' || type === 'comprehensive') { 
+                mod = Math.random() > 0.5 ? 'addsub' : 'percent'; 
+                phase = Math.floor(Math.random()*3)+1; 
+            } 
 
             if (mod === 'addsub') {
                 if (phase === 0) { 
@@ -594,7 +601,7 @@
             if (sesh.qIndex < sesh.qs.length) loadQ(); else endSession(false);
         }
 
-        function abortTraining() { clearInterval(sesh.tObj); clearTimeout(blurTimeout); nav(sesh.type === 'grand' ? 'screen-math-menu' : 'screen-phases'); }
+        function abortTraining() { clearInterval(sesh.tObj); clearTimeout(blurTimeout); nav(sesh.type === 'grand' || sesh.type === 'comprehensive' ? 'screen-math-menu' : 'screen-phases'); }
 
         function endSession(isFailed, failMsg = null) {
             clearInterval(sesh.tObj); clearTimeout(blurTimeout);
@@ -622,19 +629,19 @@
                 sesh.errLog.forEach(e => {
                     el.innerHTML += `<div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border); direction: rtl; text-align: right;">
                         <span style="font-size:0.85rem; opacity:0.8;">سوال:</span> <b style="direction:ltr; display:inline-block; font-size:1.1rem;">${e.q}</b> <br> 
-                        <span style="font-size:0.85rem; opacity:0.8;">شما:</span> <span style="color:var(--error); direction:ltr; display:inline-block; font-weight:bold;">${e.user} (غلط)</span> | 
-                        <span style="font-size:0.85rem; opacity:0.8;">صحیح:</span> <span style="color:var(--success); direction:ltr; display:inline-block; font-weight:bold;">${e.correct} (صحیح)</span>
+                        <span style="font-size:0.85rem; opacity:0.8;">شما:</span> <span style="color:var(--error); direction:ltr; display:inline-block; font-weight:bold;">${e.user}</span> | 
+                        <span style="font-size:0.85rem; opacity:0.8;">صحیح:</span> <span style="color:var(--success); direction:ltr; display:inline-block; font-weight:bold;">${e.correct}</span>
                     </div>`;
                 });
             } else { elc.style.display = 'none'; }
 
-            let targetDB = sesh.mod === 'grand' ? db.grand : db[sesh.mod];
+            let targetDB = (sesh.mod === 'grand' || sesh.type === 'comprehensive') ? db.grand : db[sesh.mod];
             let diff = scorePercent - (targetDB.lastScore || 0);
             let chartTxt = `دقت شما: %${scorePercent}`;
             if (targetDB.lastScore > 0) {
-                if(diff > 0) chartTxt += ` <span style="color:var(--success); direction:ltr;">(+${diff}%) (افزایش)</span>`;
-                else if(diff < 0) chartTxt += ` <span style="color:var(--error); direction:ltr;">(${diff}%) (کاهش)</span>`;
-                else chartTxt += ` <span style="color:var(--gold);">- بدون تغییر نسبت به قبل</span>`;
+                if(diff > 0) chartTxt += ` <span style="color:var(--success); direction:ltr;">(+${diff}%) (رشد)</span>`;
+                else if(diff < 0) chartTxt += ` <span style="color:var(--error); direction:ltr;">(${diff}%) (افت)</span>`;
+                else chartTxt += ` <span style="color:var(--gold);">- بدون تغییر</span>`;
             }
             document.getElementById('progressChart').innerHTML = chartTxt;
             targetDB.lastScore = scorePercent;
@@ -642,7 +649,9 @@
             if (!isFailed) {
                 if (sesh.type === 'day' && sesh.phase !== 0 && !sesh.isReview) {
                     let maxDays = phaseConfig[sesh.mod][sesh.phase].days;
-                    if (db[sesh.mod][`p${sesh.phase}Day`] <= maxDays) db[sesh.mod][`p${sesh.phase}Day`]++; 
+                    if (db[sesh.mod][`p${sesh.phase}Day`] <= maxDays) {
+                        db[sesh.mod][`p${sesh.phase}Day`]++; 
+                    }
                 } else if (sesh.type === 'shortcut' || sesh.type === 'exam') {
                     if (!db[sesh.mod].unlocked.includes(sesh.phase + 1)) db[sesh.mod].unlocked.push(sesh.phase + 1);
                 }
@@ -669,7 +678,7 @@
             for(let i=1; i<=30; i++) {
                 let isUnlocked = (i === 1) || (db.lang.eps[i] !== undefined); 
                 let btnHtml = `<div class="ep-btn ${isUnlocked ? 'unlocked' : 'locked'}" onclick="${isUnlocked ? `openEpisode(${i})` : ''}">
-                    <span style="font-size: 1rem; font-weight:normal;">${isUnlocked ? 'باز' : 'قفل'}</span>
+                    <span style="font-size: 1.2rem;">${isUnlocked ? '✅' : '🔒'}</span>
                     قسمت ${i}
                 </div>`;
                 list.innerHTML += btnHtml;
@@ -737,14 +746,17 @@
             playClick();
             try { if(langAudioObj) langAudioObj.pause(); } catch(e) {}
             let currentUnlocked = db.lang.eps[currentEp] || 1;
-            if(currentDialog === currentUnlocked && currentDialog < 5) {
+            if(currentDialog === currentUnlocked) {
                 db.lang.eps[currentEp] = currentDialog + 1;
+                if(currentDialog === 5) {
+                    if(!db.lang.eps[currentEp + 1]) db.lang.eps[currentEp + 1] = 1;
+                }
                 saveDb();
             }
             if(currentDialog < 5) {
                 startListening(currentDialog + 1);
             } else {
-                showPopup("تبریک!", "شما تمام دیالوگ‌های این قسمت را با موفقیت پشت سر گذاشتید.", () => {
+                showPopup("تبریک!", "شما تمام دیالوگ‌های این قسمت را با موفقیت پشت سر گذاشتید و قسمت بعدی باز شد.", () => {
                     renderLangDialogs();
                     nav('screen-episode-detail');
                 });
