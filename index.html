@@ -87,7 +87,6 @@
         .timer-danger { color: var(--error) !important; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; transform:scale(1.1); } 100% { opacity: 1; } }
 
-        /* استایل‌های اختصاصی Action Sheet کشویی */
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .action-sheet { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: flex-end; z-index: 60; backdrop-filter: blur(4px); }
         .sheet-content { background: var(--card-bg); width: 100%; max-width: 450px; padding: 30px 25px 40px 25px; border-radius: 30px 30px 0 0; animation: slideUp 0.3s ease-out; display: flex; flex-direction: column; gap: 15px; text-align: center; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
@@ -156,7 +155,7 @@
         </div>
     </div>
 
-    <!-- محیط آموزش تکنیک‌ها (کارت‌های تعاملی) -->
+    <!-- محیط آموزش تکنیک‌ها -->
     <div id="screen-slides" class="screen">
         <div class="header">
             <button onclick="nav('screen-path')">➔</button>
@@ -184,7 +183,7 @@
             <div style="font-size:0.95rem; opacity:0.8; margin-bottom:15px;">برای موفقیت در چالش، ابتدا تکنیک را یاد بگیرید.</div>
             <button class="btn primary-btn" style="background:var(--blue); padding:15px; font-size:1.1rem;" onclick="openTechnique()">آموزش تکنیک</button>
             <button class="btn outline-btn" id="btnStartDrill" style="padding:15px; font-size:1.1rem;" onclick="startDayDrill()">شروع چالش</button>
-            <button class="btn" style="background:transparent; opacity:0.6; margin-top:5px;" onclick="closeActionSheet()">انصراف</button>
+            <button class="btn" style="background:transparent; opacity:0.8; margin-top:5px; color:inherit;" onclick="closeActionSheet()">انصراف</button>
         </div>
     </div>
 
@@ -315,7 +314,7 @@
             percent: { unlocked: [1], p1Day: 1, p2Day: 1, p3Day: 1, lastScore: 0 },
             grand: { lastScore: 0 },
             lang: { eps: { 1: 1 } },
-            learned: {} // ثبت تکنیک‌های یاد گرفته شده
+            learned: {} 
         };
 
         const phaseConfig = {
@@ -332,7 +331,6 @@
             }
         };
 
-        // محتوای تکنیک‌های فاز ۰
         const phase0Techs = {
             1: [
                 { title: "تکنیک وام دادن به ۱۰", text: "عدد ۱۰ مغناطیس محاسبات ذهنی است.<br><br>وقتی یک طرف جمع عدد ۹ است (قانون منهای یک):<br>۹ فقط ۱ واحد می‌خواهد تا ۱۰ شود. آن ۱ واحد را از عدد بغلی بدزدید و به اولش یک اضافه کنید.", eg: "۷ + ۹ ➔<br>از ۷ یکی کم کنید (میشه ۶)<br>جواب: ۱۶" },
@@ -401,6 +399,22 @@
             }
         }
 
+        // --- تابعی که گم شده بود و باعث از کار افتادن دکمه‌ها می‌شد! ---
+        let popupCb = null;
+        function showPopup(title, msg, callback = null) {
+            playClick();
+            document.getElementById('popupTitle').innerHTML = title;
+            document.getElementById('popupMsg').innerHTML = msg;
+            popupCb = callback;
+            document.getElementById('popupOverlay').style.display = 'flex';
+        }
+        function closePopup() { 
+            playClick(); 
+            document.getElementById('popupOverlay').style.display = 'none'; 
+            if(popupCb) popupCb();
+        }
+        // ----------------------------------------------------------------
+
         let currentMod = 'addsub';
         let currentInput = "";
         let blurTimeout = null;
@@ -460,41 +474,43 @@
             
             for(let i=1; i<=conf.days; i++) {
                 let status = i < currentDay ? 'passed' : (i === currentDay ? 'current' : 'locked');
-                // تغییر مهم: باز کردن اکشن شیت برای فاز ۰
                 let clickAction = (status === 'passed' || status === 'current') ? `openDayAction('${currentMod}', ${phase}, ${i})` : '';
                 grid.innerHTML += `<button class="day-btn ${status}" onclick="${clickAction}">${i}</button>`;
             }
             let exStatus = currentDay > conf.days ? 'current' : 'locked';
             if (db[currentMod].unlocked.includes(phase + 1)) exStatus = 'passed';
-            let clickEx = (exStatus === 'passed' || exStatus === 'current') ? `startSession('${currentMod}', ${phase}, 'exam')` : '';
-            grid.innerHTML += `<button class="day-btn exam-btn ${exStatus}" onclick="${clickEx}">آزمون ورود به فاز بعدی</button>`;
+            
+            // رفع مشکل آزمون فاز صفر (ایجاد دکمه مستقل با رنگ متفاوت)
+            if (phase === 0 && currentMod === 'addsub') {
+                let clickEx = (exStatus === 'passed' || exStatus === 'current') ? `startSession('${currentMod}', ${phase}, 'comp_phase0')` : '';
+                grid.innerHTML += `<button class="day-btn exam-btn ${exStatus}" style="background:var(--purple); border-color:var(--purple); color:white;" onclick="${clickEx}">آزمون جامع فاز ۰</button>`;
+            } else {
+                let clickEx = (exStatus === 'passed' || exStatus === 'current') ? `startSession('${currentMod}', ${phase}, 'exam')` : '';
+                grid.innerHTML += `<button class="day-btn exam-btn ${exStatus}" onclick="${clickEx}">آزمون ورود به فاز بعدی</button>`;
+            }
+            
             nav('screen-path');
         }
 
-        // ==========================================
-        // سیستم آموزش تکنیک و Action Sheet
-        // ==========================================
         let actionMod = '', actionPhase = 0, actionDay = 1;
         let currentSlideIdx = 0, currentTechs = [];
 
         function openDayAction(mod, phase, dayNum) {
             if (mod === 'addsub' && phase === 0) {
-                // فقط فاز ۰ تکنیک مستقلِ روزانه دارد
                 actionMod = mod; actionPhase = phase; actionDay = dayNum;
                 document.getElementById('sheetTitle').textContent = `روز ${dayNum} - فاز ${phase}`;
                 
                 let isLearned = db.learned[`p${phase}d${dayNum}`];
                 let btnStart = document.getElementById('btnStartDrill');
                 if (isLearned) {
-                    btnStart.style.opacity = '1'; btnStart.style.pointerEvents = 'auto';
-                    btnStart.textContent = "شروع چالش"; btnStart.style.color = "var(--accent)";
+                    btnStart.onclick = startDayDrill;
+                    btnStart.textContent = "شروع چالش";
                 } else {
-                    btnStart.style.opacity = '0.4'; btnStart.style.pointerEvents = 'none';
-                    btnStart.textContent = "ابتدا آموزش را ببینید (قفل)"; btnStart.style.color = "inherit";
+                    btnStart.onclick = () => { showPopup("توجه", "لطفاً ابتدا دکمه «آموزش تکنیک» را بزنید و یاد بگیرید."); };
+                    btnStart.textContent = "شروع چالش";
                 }
                 document.getElementById('actionSheetOverlay').style.display = 'flex';
             } else {
-                // بقیه فازها مستقیم وارد تست می‌شوند
                 startSession(mod, phase, 'day', dayNum);
             }
         }
@@ -537,7 +553,6 @@
         function changeSlide(dir) {
             playClick();
             if (dir === 1 && currentSlideIdx === currentTechs.length - 1) {
-                // ثبت یادگیری و ورود به تست
                 db.learned[`p${actionPhase}d${actionDay}`] = true;
                 saveDb();
                 startSession(actionMod, actionPhase, 'day', actionDay);
@@ -591,13 +606,13 @@
                     sesh.isReview = true; 
                     title = `مرور روز ${dayNum} (فاز ${phase})`; 
                 } else { 
-                    // dayNum is passed from the map click now
                     title = `فاز ${phase} - روز ${dayNum}`; 
                 }
                 sesh.maxErr = 100;
             } else if (type === 'shortcut') { qCount = 10; revTimer = true; sesh.maxErr = 1; title = `آزمون میان‌بر فاز ${phase}`; } 
             else if (type === 'exam') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون پایان فاز ${phase}`; } 
             else if (type === 'comprehensive' || type === 'grand') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون جامع`; }
+            else if (type === 'comp_phase0') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون جامع فاز ۰`; }
 
             for(let i=0; i<qCount; i++) sesh.qs.push(generateQ(mod, phase, type, dayNum));
             
@@ -606,20 +621,21 @@
             
             if (type === 'shortcut') showPopup("قوانین میان‌بر", "شما ۱۰ سوال با تایمر معکوس دارید.<br><b>حداکثر ۱ خطا یا پرش</b> مجاز است.", initArena);
             else if (type === 'exam') showPopup("آزمون پایانی", "تایمر معکوس فعال است.<br><b>حداکثر ۲ خطا یا پرش</b> برای قبولی مجاز است.", initArena);
+            else if (type === 'comp_phase0') showPopup("آزمون جامع فاز ۰", "این یک آزمون مستقل از کل تکنیک‌های فاز ۰ است.<br>تایمر معکوس فعال است و <b>حداکثر ۲ خطا</b> مجاز است.", initArena);
             else initArena();
         }
 
         function generateAddSubPhase0(dayNum) {
             let q = "", a = 0, hint = "";
-            if (dayNum === 1) { // قانون منهای یک، دو، سه
-                let x = Math.floor(Math.random() * 5) + 4; // 4..8
+            if (dayNum === 1) { 
+                let x = Math.floor(Math.random() * 5) + 4; 
                 let y = [7, 8, 9][Math.floor(Math.random() * 3)];
                 if (Math.random()>0.5) { q = `${x} + ${y}`; } else { q = `${y} + ${x}`; }
                 a = x + y;
                 let diff = 10 - y;
                 hint = `یادآوری تکنیک: ${y} به ${diff} واحد نیاز داره تا بشه ۱۰. این ${diff} واحد رو از ${x} کم کن میشه ${x-diff} ➔ جواب: ۱${x-diff}`;
-            } else if (dayNum === 2) { // دوقلوها و همسایه‌ها
-                let x = Math.floor(Math.random() * 5) + 5; // 5..9
+            } else if (dayNum === 2) { 
+                let x = Math.floor(Math.random() * 5) + 5; 
                 let diff = [0, 1, -1][Math.floor(Math.random() * 3)];
                 let y = x + diff;
                 q = `${x} + ${y}`;
@@ -627,9 +643,9 @@
                 if (diff === 0) hint = `دوقلوها: دو برابر ${x} میشه ${a}.`;
                 else if (diff === 1) hint = `همسایه‌ها: دو برابر ${x} میشه ${x*2}، حالا یکی اضافه کن ➔ ${a}.`;
                 else hint = `همسایه‌ها: دو برابر ${y} میشه ${y*2}، حالا یکی اضافه کن ➔ ${a}.`;
-            } else if (dayNum >= 3) { // تفریق پله‌ای و مکمل
-                let a_val = Math.floor(Math.random() * 8) + 11; // 11..18
-                let b_val = Math.floor(Math.random() * 5) + 5; // 5..9
+            } else if (dayNum >= 3) { 
+                let a_val = Math.floor(Math.random() * 8) + 11; 
+                let b_val = Math.floor(Math.random() * 5) + 5; 
                 while (a_val - b_val >= 10 || a_val - b_val <= 0) {
                     a_val = Math.floor(Math.random() * 8) + 11;
                     b_val = Math.floor(Math.random() * 5) + 5;
@@ -668,9 +684,7 @@
 
             if (mod === 'addsub') {
                 if (phase === 0) { 
-                    // موتور جدید ساخت سوال برای فاز ۰
-                    if (type === 'exam' || type === 'shortcut' || type === 'comprehensive') {
-                        // 70% Technique Questions, 30% Simple Traps
+                    if (type === 'exam' || type === 'shortcut' || type === 'comprehensive' || type === 'comp_phase0') {
                         if (Math.random() > 0.3) {
                             let randomDay = Math.floor(Math.random() * 3) + 1;
                             return generateAddSubPhase0(randomDay);
@@ -678,7 +692,6 @@
                             return generateSimpleTrap();
                         }
                     } else {
-                        // Daily drill relies strictly on dayNum
                         return generateAddSubPhase0(dayNum || 1);
                     }
                 } else if (phase === 1) { 
@@ -717,7 +730,7 @@
             if (sesh.type === 'day' && phaseConfig[sesh.mod] && phaseConfig[sesh.mod][sesh.phase] && phaseConfig[sesh.mod][sesh.phase].revTimer) isRev = true;
 
             if (isRev) {
-                if (sesh.type === 'comprehensive' || sesh.type === 'grand') sesh.tLeft = 75;
+                if (sesh.type === 'comprehensive' || sesh.type === 'grand' || sesh.type === 'comp_phase0') sesh.tLeft = 75;
                 else {
                     if (sesh.phase === 1) sesh.tLeft = 75;
                     else if (sesh.phase === 2) sesh.tLeft = 80;
@@ -854,7 +867,7 @@
                 });
             } else { elc.style.display = 'none'; }
 
-            let targetDB = (sesh.mod === 'grand' || sesh.type === 'comprehensive') ? db.grand : db[sesh.mod];
+            let targetDB = (sesh.mod === 'grand' || sesh.type === 'comprehensive' || sesh.type === 'comp_phase0') ? db.grand : db[sesh.mod];
             let diff = scorePercent - (targetDB.lastScore || 0);
             let chartTxt = `دقت شما: %${scorePercent}`;
             if (targetDB.lastScore > 0) {
@@ -877,6 +890,7 @@
                 } else if (sesh.type === 'exam') {
                     if (!db[sesh.mod].unlocked.includes(sesh.phase + 1)) db[sesh.mod].unlocked.push(sesh.phase + 1);
                 }
+                // نوع comp_phase0 نیازی به باز کردن مرحله جدید ندارد
                 saveDb();
             }
             nav('screen-summary');
@@ -995,8 +1009,6 @@
             renderLangDialogs();
             nav('screen-episode-detail');
         }
-
-        function closePopup() { playClick(); document.getElementById('popupOverlay').style.display = 'none'; }
     </script>
 </body>
 </html>
