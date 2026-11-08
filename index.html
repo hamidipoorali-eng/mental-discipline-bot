@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+def generate_phase1_code():
+    code = """<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -121,16 +122,12 @@
         </div>
         <div class="container">
             <div class="module-card" style="border-color: var(--accent);" onclick="openModule('addsub')">
-                <div><div class="module-title" style="color: var(--accent);">جمع و تفریق</div><div class="module-sub">فاز ۰ تا ۳ (از تک‌رقمی تا سه‌رقمی دشوار)</div></div>
+                <div><div class="module-title" style="color: var(--accent);">جمع و تفریق</div><div class="module-sub">فاز ۰ تا ۱ (از تک‌رقمی تا حرفه‌ای)</div></div>
                 <div style="font-size:1.5rem; color:var(--accent);">➔</div>
             </div>
             <div class="module-card" style="border-color: var(--gold);" onclick="openModule('percent')">
                 <div><div class="module-title" style="color: var(--gold);">محاسبه درصدها</div><div class="module-sub">فاز ۱ تا ۳ (از آجرهای پایه تا بلوک سرعتی)</div></div>
                 <div style="font-size:1.5rem; color:var(--gold);">➔</div>
-            </div>
-            <div class="module-card" style="border-color: var(--purple);" onclick="startSession('grand', 0, 'grand')">
-                <div><div class="module-title" style="color: var(--purple);">آزمون جامع</div><div class="module-sub">رینگ بی‌نهایت با تایمر (۱۰ سوال ترکیبی)</div></div>
-                <div style="font-size:1.5rem; color:var(--purple);">➔</div>
             </div>
         </div>
     </div>
@@ -310,7 +307,7 @@
         function tgClose() { if(tg) tg.close(); }
 
         let db = {
-            addsub: { unlocked: [0,1], p0Day: 1, p1Day: 1, p2Day: 1, p3Day: 1, lastScore: 0 },
+            addsub: { unlocked: [0], p0Day: 1, p1p1Day: 1, p1p2Day: 1, lastScore: 0 },
             percent: { unlocked: [1], p1Day: 1, p2Day: 1, p3Day: 1, lastScore: 0 },
             grand: { lastScore: 0 },
             lang: { eps: { 1: 1 } },
@@ -319,10 +316,8 @@
 
         const phaseConfig = {
             addsub: {
-                0: { title: "فاز ۰: تکنیک‌های ذهنی", days: 3, qs: 10, blur: false, revTimer: false, locked: false },
-                1: { title: "فاز ۱: دو رقمی در دو رقمی", days: 10, qs: 5, blur: false, revTimer: false, locked: false },
-                2: { title: "فاز ۲: سه رقمی پایه", days: 15, qs: 5, blur: true, revTimer: false, locked: true },
-                3: { title: "فاز ۳: سه رقمی دشوار", days: 20, qs: 5, blur: true, revTimer: true, locked: true }
+                0: { title: "فاز ۰: تکنیک‌های پایه", days: 3, qs: 10, blur: false, revTimer: false, locked: false },
+                1: { title: "فاز ۱: جمع و تفریق پیشرفته", days: 1, qs: 10, blur: false, revTimer: false, locked: true }, // Not actually using 'days' for rendering p1
             },
             percent: {
                 1: { title: "فاز ۱: آجرهای پایه (۱۰٪، ۱٪، ۵٪)", days: 10, qs: 5, blur: false, revTimer: false, locked: false },
@@ -347,16 +342,30 @@
             ]
         };
 
-        function saveDb() { try { localStorage.setItem('discipline_db_v10', JSON.stringify(db)); } catch(e){} }
+        const phase1Techs = {
+            p1: [ // قسمت اول: جمع
+                { title: "جمع: چپ‌به‌راست (بزرگ به کوچک)", text: "ابتدا بزرگ‌ترین مرتبه را به کل عدد اضافه کن، سپس مرتبه بعدی.", eg: "۵۷ + ۳۸ ➔<br>۵۷ + ۳۰ = ۸۷<br>۸۷ + ۸ = ۹۵" },
+                { title: "جمع: رند کردن و کسر تاوان", text: "اگر عددی به ۷، ۸ یا ۹ ختم می‌شود، آن را به مضرب ۱۰ یا ۱۰۰ بعدی گرد کن و اضافه را پس بگیر.", eg: "۸۸ + ۴۷ ➔<br>۸۸ + ۵۰ = ۱۳۸<br>۱۳۸ - ۳ = ۱۳۵" }
+            ],
+            p2: [ // قسمت دوم: تفریق
+                { title: "تفریق: طلبکارم، پس‌می‌گیرم", text: "عدد کسرشونده را به ۱۰ یا ۱۰۰ بعدی گرد کن؛ چون بیش از حد کم کردی، طلبکاری و باید اضافه را پس بگیری.", eg: "۱۷۴ - ۵۸ ➔<br>۱۷۴ - ۶۰ = ۱۱۴<br>۱۱۴ + ۲ = ۱۱۶" },
+                { title: "تفریق: پرش رو به جلو", text: "روی عدد کوچک بایست و قدم‌به‌قدم خودت را به عدد بزرگ برسان.", eg: "۸۳ - ۴۷ ➔<br>۴۷ + ۳ = ۵۰<br>۵۰ + ۳۳ = ۸۳<br>۳ + ۳۳ = ۳۶" },
+                { title: "تفریق: همه از ۹، آخری از ۱۰", text: "برای پایه‌های ۱۰۰۰، ۲۰۰۰ و... : از رقم اول سمت چپ یک واحد کم کن، تمام ارقام دیگر از ۹ کم می‌شوند و فقط آخرین رقم غیرصفر از ۱۰.", eg: "۲۰۰۰ - ۴۳۶ ➔<br>۱ (از ۲ یکی کم شد)<br>۹ - ۴ = ۵<br>۹ - ۳ = ۶<br>۱۰ - ۶ = ۴<br>➔ ۱۵۶۴" }
+            ]
+        };
+
+        function saveDb() { try { localStorage.setItem('discipline_db_v11', JSON.stringify(db)); } catch(e){} }
         function loadDb() {
             try {
-                let local = localStorage.getItem('discipline_db_v10');
+                let local = localStorage.getItem('discipline_db_v11');
                 if (local) { 
                     let p = JSON.parse(local); 
                     if(p.addsub) { 
                         db = p; 
                         if(!db.lang) db.lang = { eps: { 1: 1 } }; 
                         if(!db.learned) db.learned = {};
+                        if(!db.addsub.p1p1Day) db.addsub.p1p1Day = 1;
+                        if(!db.addsub.p1p2Day) db.addsub.p1p2Day = 1;
                     }
                 }
             } catch(e){} 
@@ -391,15 +400,17 @@
         }
         
         function returnFromSummary() {
-            if (currentMod === 'grand' || currentMod === 'comprehensive') {
-                nav('screen-math-menu');
-            } else {
+            if (currentMod === 'addsub' && (actionPhase === 1 || sesh.type.includes('comp'))) {
                 renderPhases();
                 nav('screen-phases');
+            } else if (currentMod === 'percent' || currentMod === 'addsub') {
+                renderPhases();
+                nav('screen-phases');
+            } else {
+                nav('screen-math-menu');
             }
         }
 
-        // --- تابعی که گم شده بود و باعث از کار افتادن دکمه‌ها می‌شد! ---
         let popupCb = null;
         function showPopup(title, msg, callback = null) {
             playClick();
@@ -413,7 +424,6 @@
             document.getElementById('popupOverlay').style.display = 'none'; 
             if(popupCb) popupCb();
         }
-        // ----------------------------------------------------------------
 
         let currentMod = 'addsub';
         let currentInput = "";
@@ -433,74 +443,151 @@
             for (let p in conf) {
                 let phase = parseInt(p);
                 let isLocked = !activeDB.unlocked.includes(phase);
-                let currentDay = activeDB[`p${phase}Day`] || 1;
-                let dayText = conf[phase].days > 0 ? `روز ${Math.min(currentDay, conf[phase].days)} از ${conf[phase].days}` : 'آزمون‌محور (بی‌نهایت)';
-                let blurBadge = conf[phase].blur ? `<span style="font-size:0.75rem; background:rgba(231,76,60,0.2); color:var(--error); padding:2px 6px; border-radius:4px; margin-right:5px;">محو ۲ ثانیه</span>` : '';
-                let timerBadge = conf[phase].revTimer ? `<span style="font-size:0.75rem; background:rgba(241,196,15,0.2); color:var(--gold); padding:2px 6px; border-radius:4px; margin-right:5px;">تایمر معکوس</span>` : '';
-
-                let html = `<div class="phase-card" style="border-color: ${isLocked ? 'var(--border)' : 'var(--accent)'};">`;
                 
-                if (isLocked) {
-                    html += `<div class="locked-content"><div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> 🔒</div><div class="phase-desc">${dayText}</div></div>
-                    <button class="btn outline-btn" style="margin-top:10px; font-size:0.9rem;" onclick="startSession('${currentMod}', ${phase}, 'shortcut')">میان‌بر (آزمون تعیین سطح)</button>`;
-                } else {
-                    html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div><div class="phase-desc" style="margin-bottom:5px;">${dayText}</div>
-                        <div style="margin-bottom:15px;">${blurBadge}${timerBadge}</div><div style="display:flex; gap:10px;">`;
+                if (currentMod === 'addsub' && phase === 1) {
+                    // Render Phase 1 (Complex with sub-parts)
+                    let p1Day = activeDB.p1p1Day || 1;
+                    let p2Day = activeDB.p1p2Day || 1;
                     
-                    if (conf[phase].days === 0) {
-                        html += `<button class="btn primary-btn" onclick="startSession('${currentMod}', ${phase}, 'day')">شروع آزمون</button>`;
+                    let html = `<div class="phase-card" style="border-color: ${isLocked ? 'var(--border)' : 'var(--accent)'};">`;
+                    if (isLocked) {
+                        html += `<div class="locked-content"><div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> 🔒</div><div class="phase-desc">برای باز شدن این فاز، فاز ۰ را تکمیل کنید.</div></div>`;
                     } else {
-                        let isDone = currentDay > conf[phase].days;
-                        html += `<button class="btn primary-btn" style="flex:2;" onclick="startSession('${currentMod}', ${phase}, '${isDone ? 'exam' : 'day'}')">${isDone ? 'آزمون پایان فاز' : 'ادامه مسیر'}</button>
-                                 <button class="btn outline-btn" style="flex:1;" onclick="openPath(${phase})">نقشه راه</button>`;
+                        html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div>`;
+                        
+                        // Part 1: Addition
+                        html += `<div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border);">
+                            <div style="font-weight:bold; margin-bottom:5px;">بخش اول: تکنیک‌های جمع</div>
+                            <div style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">روز ${Math.min(p1Day, 15)} از ۱۵</div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn primary-btn" style="flex:2;" onclick="openDayAction('addsub', 1, 'p1', ${p1Day})">${p1Day > 15 ? 'آزمون مجدد' : 'ادامه مسیر'}</button>
+                                <button class="btn outline-btn" style="flex:1;" onclick="openPath(1, 'p1')">نقشه راه</button>
+                            </div>
+                        </div>`;
+                        
+                        // Part 2: Subtraction
+                        html += `<div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border);">
+                            <div style="font-weight:bold; margin-bottom:5px;">بخش دوم: تکنیک‌های تفریق</div>
+                            <div style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">روز ${Math.min(p2Day, 15)} از ۱۵</div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn primary-btn" style="flex:2;" onclick="openDayAction('addsub', 1, 'p2', ${p2Day})">${p2Day > 15 ? 'آزمون مجدد' : 'ادامه مسیر'}</button>
+                                <button class="btn outline-btn" style="flex:1;" onclick="openPath(1, 'p2')">نقشه راه</button>
+                            </div>
+                        </div>`;
+                        
+                        // Part 3: Free Combination
+                        html += `<div>
+                            <div style="font-weight:bold; margin-bottom:5px; color:var(--purple);">بخش سوم: رینگ ترکیب</div>
+                            <div style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">رندوم - ۱۰ سوال با تایمر معکوس</div>
+                            <button class="btn primary-btn" style="background:var(--purple);" onclick="startSession('addsub', 1, 'comp_p1_part3')">شروع چالش ترکیبی</button>
+                        </div>`;
+                        
+                        html += `</div>`;
                     }
-                    html += `</div></div>`;
+                    html += `</div>`;
+                    c.innerHTML += html;
+                } else {
+                    // Standard Phase Rendering
+                    let currentDay = activeDB[`p${phase}Day`] || 1;
+                    let dayText = conf[phase].days > 0 ? `روز ${Math.min(currentDay, conf[phase].days)} از ${conf[phase].days}` : 'آزمون‌محور (بی‌نهایت)';
+                    let blurBadge = conf[phase].blur ? `<span style="font-size:0.75rem; background:rgba(231,76,60,0.2); color:var(--error); padding:2px 6px; border-radius:4px; margin-right:5px;">محو ۲ ثانیه</span>` : '';
+                    let timerBadge = conf[phase].revTimer ? `<span style="font-size:0.75rem; background:rgba(241,196,15,0.2); color:var(--gold); padding:2px 6px; border-radius:4px; margin-right:5px;">تایمر معکوس</span>` : '';
+
+                    let html = `<div class="phase-card" style="border-color: ${isLocked ? 'var(--border)' : 'var(--accent)'};">`;
+                    
+                    if (isLocked) {
+                        html += `<div class="locked-content"><div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> 🔒</div><div class="phase-desc">${dayText}</div></div>`;
+                        if (currentMod === 'percent') html += `<button class="btn outline-btn" style="margin-top:10px; font-size:0.9rem;" onclick="startSession('${currentMod}', ${phase}, 'shortcut')">میان‌بر (آزمون تعیین سطح)</button>`;
+                    } else {
+                        html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div><div class="phase-desc" style="margin-bottom:5px;">${dayText}</div>
+                            <div style="margin-bottom:15px;">${blurBadge}${timerBadge}</div><div style="display:flex; gap:10px;">`;
+                        
+                        if (conf[phase].days === 0) {
+                            html += `<button class="btn primary-btn" onclick="startSession('${currentMod}', ${phase}, 'day')">شروع آزمون</button>`;
+                        } else {
+                            let isDone = currentDay > conf[phase].days;
+                            html += `<button class="btn primary-btn" style="flex:2;" onclick="startSession('${currentMod}', ${phase}, '${isDone ? 'exam' : 'day'}')">${isDone ? 'آزمون پایان فاز' : 'ادامه مسیر'}</button>
+                                     <button class="btn outline-btn" style="flex:1;" onclick="openPath(${phase})">نقشه راه</button>`;
+                        }
+                        html += `</div></div>`;
+                    }
+                    html += `</div>`;
+                    c.innerHTML += html;
                 }
-                html += `</div>`;
-                c.innerHTML += html;
             }
-            c.innerHTML += `<div class="phase-card" style="border-color: var(--purple); text-align:center;">
-                <div class="phase-title" style="color:var(--purple); margin-bottom:10px;">آزمون جامع ${currentMod === 'addsub' ? 'جمع و تفریق' : 'درصد'}</div>
-                <div class="phase-desc">۱۰ سوال رندوم از تمام فازهای این مسیر با تایمر معکوس.</div>
-                <button class="btn primary-btn" style="background:var(--purple);" onclick="startSession('${currentMod}', 0, 'comprehensive')">ورود به آزمون جامع</button>
-            </div>`;
+            
+            if (currentMod === 'addsub') {
+                c.innerHTML += `<div class="phase-card" style="border-color: var(--purple); text-align:center;">
+                    <div class="phase-title" style="color:var(--purple); margin-bottom:10px;">آزمون جامع (فاز ۰ و ۱)</div>
+                    <div class="phase-desc">۱۵ سوال رندوم از تمام تکنیک‌های پایه و پیشرفته با تایمر معکوس.</div>
+                    <button class="btn primary-btn" style="background:var(--purple);" onclick="startSession('${currentMod}', 0, 'comp_final')">ورود به آزمون جامع</button>
+                </div>`;
+            } else {
+                c.innerHTML += `<div class="phase-card" style="border-color: var(--purple); text-align:center;">
+                    <div class="phase-title" style="color:var(--purple); margin-bottom:10px;">آزمون جامع درصدها</div>
+                    <div class="phase-desc">۱۰ سوال رندوم از تمام فازهای درصد با تایمر معکوس.</div>
+                    <button class="btn primary-btn" style="background:var(--purple);" onclick="startSession('${currentMod}', 0, 'comp_final')">ورود به آزمون جامع</button>
+                </div>`;
+            }
         }
 
-        function openPath(phase) {
+        function openPath(phase, part = null) {
             let conf = phaseConfig[currentMod][phase];
-            document.getElementById('pathTitle').textContent = `مسیر فاز ${phase}`;
             let grid = document.getElementById('sagaGrid'); grid.innerHTML = '';
-            let currentDay = db[currentMod][`p${phase}Day`];
             
-            for(let i=1; i<=conf.days; i++) {
-                let status = i < currentDay ? 'passed' : (i === currentDay ? 'current' : 'locked');
-                let clickAction = (status === 'passed' || status === 'current') ? `openDayAction('${currentMod}', ${phase}, ${i})` : '';
-                grid.innerHTML += `<button class="day-btn ${status}" onclick="${clickAction}">${i}</button>`;
-            }
-            let exStatus = currentDay > conf.days ? 'current' : 'locked';
-            if (db[currentMod].unlocked.includes(phase + 1)) exStatus = 'passed';
-            
-            // رفع مشکل آزمون فاز صفر (ایجاد دکمه مستقل با رنگ متفاوت)
-            if (phase === 0 && currentMod === 'addsub') {
-                let clickEx = (exStatus === 'passed' || exStatus === 'current') ? `startSession('${currentMod}', ${phase}, 'comp_phase0')` : '';
-                grid.innerHTML += `<button class="day-btn exam-btn ${exStatus}" style="background:var(--purple); border-color:var(--purple); color:white;" onclick="${clickEx}">آزمون جامع فاز ۰</button>`;
+            if (currentMod === 'addsub' && phase === 1 && part) {
+                let maxDays = 15;
+                document.getElementById('pathTitle').textContent = part === 'p1' ? 'مسیر فاز ۱ (جمع)' : 'مسیر فاز ۱ (تفریق)';
+                let currentDay = db[currentMod][`p1${part}Day`];
+                
+                for(let i=1; i<=maxDays; i++) {
+                    let status = i < currentDay ? 'passed' : (i === currentDay ? 'current' : 'locked');
+                    let clickAction = (status === 'passed' || status === 'current') ? `openDayAction('${currentMod}', ${phase}, '${part}', ${i})` : '';
+                    grid.innerHTML += `<button class="day-btn ${status}" onclick="${clickAction}">${i}</button>`;
+                }
             } else {
-                let clickEx = (exStatus === 'passed' || exStatus === 'current') ? `startSession('${currentMod}', ${phase}, 'exam')` : '';
-                grid.innerHTML += `<button class="day-btn exam-btn ${exStatus}" onclick="${clickEx}">آزمون ورود به فاز بعدی</button>`;
+                document.getElementById('pathTitle').textContent = `مسیر فاز ${phase}`;
+                let currentDay = db[currentMod][`p${phase}Day`];
+                for(let i=1; i<=conf.days; i++) {
+                    let status = i < currentDay ? 'passed' : (i === currentDay ? 'current' : 'locked');
+                    let clickAction = (status === 'passed' || status === 'current') ? `openDayAction('${currentMod}', ${phase}, null, ${i})` : '';
+                    grid.innerHTML += `<button class="day-btn ${status}" onclick="${clickAction}">${i}</button>`;
+                }
+                let exStatus = currentDay > conf.days ? 'current' : 'locked';
+                if (db[currentMod].unlocked.includes(phase + 1)) exStatus = 'passed';
+                
+                if (phase === 0 && currentMod === 'addsub') {
+                    let clickEx = (exStatus === 'passed' || exStatus === 'current') ? `startSession('${currentMod}', ${phase}, 'comp_phase0')` : '';
+                    grid.innerHTML += `<button class="day-btn exam-btn ${exStatus}" style="background:var(--purple); border-color:var(--purple); color:white;" onclick="${clickEx}">آزمون جامع فاز ۰</button>`;
+                } else {
+                    let clickEx = (exStatus === 'passed' || exStatus === 'current') ? `startSession('${currentMod}', ${phase}, 'exam')` : '';
+                    grid.innerHTML += `<button class="day-btn exam-btn ${exStatus}" onclick="${clickEx}">آزمون ورود به فاز بعدی</button>`;
+                }
             }
-            
             nav('screen-path');
         }
 
-        let actionMod = '', actionPhase = 0, actionDay = 1;
+        let actionMod = '', actionPhase = 0, actionPart = null, actionDay = 1;
         let currentSlideIdx = 0, currentTechs = [];
 
-        function openDayAction(mod, phase, dayNum) {
+        function openDayAction(mod, phase, part, dayNum) {
+            actionMod = mod; actionPhase = phase; actionPart = part; actionDay = dayNum;
+            
             if (mod === 'addsub' && phase === 0) {
-                actionMod = mod; actionPhase = phase; actionDay = dayNum;
                 document.getElementById('sheetTitle').textContent = `روز ${dayNum} - فاز ${phase}`;
-                
-                let isLearned = db.learned[`p${phase}d${dayNum}`];
+                let isLearned = db.learned[`p0d${dayNum}`];
+                let btnStart = document.getElementById('btnStartDrill');
+                if (isLearned) {
+                    btnStart.onclick = startDayDrill;
+                    btnStart.textContent = "شروع چالش";
+                } else {
+                    btnStart.onclick = () => { showPopup("توجه", "لطفاً ابتدا دکمه «آموزش تکنیک» را بزنید و یاد بگیرید."); };
+                    btnStart.textContent = "شروع چالش";
+                }
+                document.getElementById('actionSheetOverlay').style.display = 'flex';
+            } else if (mod === 'addsub' && phase === 1) {
+                document.getElementById('sheetTitle').textContent = `تکنیک‌های ${part === 'p1' ? 'جمع' : 'تفریق'}`;
+                let isLearned = db.learned[`p1${part}`]; // Learn once for the whole part
                 let btnStart = document.getElementById('btnStartDrill');
                 if (isLearned) {
                     btnStart.onclick = startDayDrill;
@@ -519,7 +606,11 @@
 
         function openTechnique() {
             closeActionSheet();
-            currentTechs = phase0Techs[actionDay];
+            if (actionPhase === 0) {
+                currentTechs = phase0Techs[actionDay];
+            } else if (actionPhase === 1) {
+                currentTechs = phase1Techs[actionPart];
+            }
             currentSlideIdx = 0;
             renderSlide();
             nav('screen-slides');
@@ -553,7 +644,8 @@
         function changeSlide(dir) {
             playClick();
             if (dir === 1 && currentSlideIdx === currentTechs.length - 1) {
-                db.learned[`p${actionPhase}d${actionDay}`] = true;
+                if (actionPhase === 0) db.learned[`p0d${actionDay}`] = true;
+                if (actionPhase === 1) db.learned[`p1${actionPart}`] = true;
                 saveDb();
                 startSession(actionMod, actionPhase, 'day', actionDay);
             } else {
@@ -600,19 +692,22 @@
             let qCount = 5; let revTimer = false; let title = "";
             
             if (type === 'day') {
-                qCount = phaseConfig[mod][phase].qs;
-                let currentRealDay = db[mod][`p${phase}Day`] || 1;
-                if (dayNum !== null && dayNum < currentRealDay) { 
-                    sesh.isReview = true; 
-                    title = `مرور روز ${dayNum} (فاز ${phase})`; 
-                } else { 
-                    title = `فاز ${phase} - روز ${dayNum}`; 
+                qCount = 10;
+                if (mod === 'addsub' && phase === 1) {
+                    let currentRealDay = db[mod][`p1${actionPart}Day`] || 1;
+                    if (dayNum !== null && dayNum < currentRealDay) { sesh.isReview = true; title = `مرور روز ${dayNum}`; } 
+                    else { title = `چالش ${actionPart === 'p1' ? 'جمع' : 'تفریق'} - روز ${dayNum}`; }
+                } else {
+                    let currentRealDay = db[mod][`p${phase}Day`] || 1;
+                    if (dayNum !== null && dayNum < currentRealDay) { sesh.isReview = true; title = `مرور روز ${dayNum}`; } 
+                    else { title = `فاز ${phase} - روز ${dayNum}`; }
                 }
                 sesh.maxErr = 100;
             } else if (type === 'shortcut') { qCount = 10; revTimer = true; sesh.maxErr = 1; title = `آزمون میان‌بر فاز ${phase}`; } 
             else if (type === 'exam') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون پایان فاز ${phase}`; } 
-            else if (type === 'comprehensive' || type === 'grand') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون جامع`; }
             else if (type === 'comp_phase0') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون جامع فاز ۰`; }
+            else if (type === 'comp_p1_part3') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `رینگ ترکیب (فاز ۱)`; }
+            else if (type === 'comp_final') { qCount = 15; revTimer = true; sesh.maxErr = 3; title = `آزمون جامع دپارتمان`; }
 
             for(let i=0; i<qCount; i++) sesh.qs.push(generateQ(mod, phase, type, dayNum));
             
@@ -622,8 +717,14 @@
             if (type === 'shortcut') showPopup("قوانین میان‌بر", "شما ۱۰ سوال با تایمر معکوس دارید.<br><b>حداکثر ۱ خطا یا پرش</b> مجاز است.", initArena);
             else if (type === 'exam') showPopup("آزمون پایانی", "تایمر معکوس فعال است.<br><b>حداکثر ۲ خطا یا پرش</b> برای قبولی مجاز است.", initArena);
             else if (type === 'comp_phase0') showPopup("آزمون جامع فاز ۰", "این یک آزمون مستقل از کل تکنیک‌های فاز ۰ است.<br>تایمر معکوس فعال است و <b>حداکثر ۲ خطا</b> مجاز است.", initArena);
+            else if (type === 'comp_p1_part3') showPopup("رینگ ترکیب", "ترکیبی تصادفی از جمع و تفریق‌های فاز ۱.<br>تایمر معکوس فعال است و <b>حداکثر ۲ خطا</b> مجاز است.", initArena);
+            else if (type === 'comp_final') showPopup("آزمون جامع", "۱۵ سوال از تمام تکنیک‌های آموزش داده شده.<br>تایمر معکوس فعال است و <b>حداکثر ۳ خطا</b> مجاز است.", initArena);
             else initArena();
         }
+
+        // ==========================================
+        // Question Generators
+        // ==========================================
 
         function generateAddSubPhase0(dayNum) {
             let q = "", a = 0, hint = "";
@@ -663,6 +764,84 @@
             return {q, a, hint};
         }
 
+        function generateAddSubPhase1_Add() {
+            let isRound = Math.random() > 0.5;
+            let q = "", a = 0, hint = "";
+            
+            if (isRound) {
+                // رند کردن و کسر تاوان
+                let is3Digit = Math.random() > 0.5;
+                let x, y;
+                if (is3Digit) {
+                    x = Math.floor(Math.random() * 800) + 100;
+                    y = (Math.floor(Math.random() * 9) + 1) * 10 + [7, 8, 9][Math.floor(Math.random() * 3)];
+                } else {
+                    x = Math.floor(Math.random() * 80) + 10;
+                    y = (Math.floor(Math.random() * 8) + 1) * 10 + [7, 8, 9][Math.floor(Math.random() * 3)];
+                }
+                q = `${x} + ${y}`; a = x + y;
+                let nextTen = Math.ceil(y / 10) * 10;
+                let diff = nextTen - y;
+                hint = `تکنیک رند کردن: ${y} را ${nextTen} فرض کن.\n${x} + ${nextTen} = ${x+nextTen}\nحالا ${diff} تا پس بگیر ➔ ${a}`;
+            } else {
+                // چپ به راست
+                let is3Digit = Math.random() > 0.5;
+                let x, y;
+                if (is3Digit) {
+                    x = Math.floor(Math.random() * 800) + 100;
+                    y = Math.floor(Math.random() * 800) + 100;
+                    q = `${x} + ${y}`; a = x + y;
+                    let yH = Math.floor(y/100)*100;
+                    let yT = Math.floor((y%100)/10)*10;
+                    let yU = y%10;
+                    hint = `چپ‌به‌راست: اول صدگان\n${x} + ${yH} = ${x+yH}\nبعد دهگان: ${x+yH} + ${yT} = ${x+yH+yT}\nدر نهایت یکان: ${a}`;
+                } else {
+                    x = Math.floor(Math.random() * 80) + 10;
+                    y = Math.floor(Math.random() * 80) + 10;
+                    q = `${x} + ${y}`; a = x + y;
+                    let yT = Math.floor(y/10)*10;
+                    let yU = y%10;
+                    hint = `چپ‌به‌راست: اول دهگان\n${x} + ${yT} = ${x+yT}\nبعد یکان: ${x+yT} + ${yU} = ${a}`;
+                }
+            }
+            return {q, a, hint};
+        }
+
+        function generateAddSubPhase1_Sub() {
+            let r = Math.random();
+            let q = "", a = 0, hint = "";
+            
+            if (r < 0.33) {
+                // طلبکارم
+                let x = Math.floor(Math.random() * 800) + 100;
+                let y = (Math.floor(Math.random() * 8) + 1) * 10 + [7, 8, 9][Math.floor(Math.random() * 3)];
+                q = `${x} - ${y}`; a = x - y;
+                let nextTen = Math.ceil(y / 10) * 10;
+                let diff = nextTen - y;
+                hint = `طلبکارم: ${y} را ${nextTen} فرض کن.\n${x} - ${nextTen} = ${x-nextTen}\nچون ${diff} تا بیشتر کم کردی، طلبکاری! پس بده ➔ ${a}`;
+            } else if (r < 0.66) {
+                // پرش رو به جلو
+                let x = Math.floor(Math.random() * 40) + 50;
+                let y = Math.floor(Math.random() * 30) + 10;
+                q = `${x} - ${y}`; a = x - y;
+                let nextTen = Math.ceil(y / 10) * 10;
+                let p1 = nextTen - y;
+                let p2 = x - nextTen;
+                hint = `پرش به جلو: روی ${y} بایست.\nبا ${p1} قدم به ${nextTen} می‌رسی.\nاز ${nextTen} با ${p2} قدم به ${x} می‌رسی.\nجمع قدم‌ها: ${p1} + ${p2} = ${a}`;
+            } else {
+                // همه از 9 آخری از 10
+                let base = [1000, 2000, 5000][Math.floor(Math.random() * 3)];
+                let y = Math.floor(Math.random() * 800) + 100;
+                if (y % 10 === 0) y += Math.floor(Math.random() * 9) + 1; // ensure non-zero last digit for simplicity
+                q = `${base} - ${y}`; a = base - y;
+                
+                let yStr = String(y).padStart(3, '0');
+                let first = base / 1000;
+                hint = `همه از ۹ آخری از ۱۰:\nهزارگان ${first} یکی کم میشه ➔ ${first-1}\n۹ - ${yStr[0]} = ${9-parseInt(yStr[0])}\n۹ - ${yStr[1]} = ${9-parseInt(yStr[1])}\n۱۰ - ${yStr[2]} = ${10-parseInt(yStr[2])}`;
+            }
+            return {q, a, hint};
+        }
+
         function generateSimpleTrap() {
             let isAdd = Math.random()>0.5;
             let x, y, a, q;
@@ -677,35 +856,25 @@
         }
 
         function generateQ(mod, phase, type, dayNum = null) {
-            if (type === 'grand' || type === 'comprehensive') { 
-                mod = Math.random() > 0.5 ? 'addsub' : 'percent'; 
-                phase = Math.floor(Math.random()*3)+1; 
-            } 
-
             if (mod === 'addsub') {
-                if (phase === 0) { 
-                    if (type === 'exam' || type === 'shortcut' || type === 'comprehensive' || type === 'comp_phase0') {
-                        if (Math.random() > 0.3) {
-                            let randomDay = Math.floor(Math.random() * 3) + 1;
-                            return generateAddSubPhase0(randomDay);
-                        } else {
-                            return generateSimpleTrap();
-                        }
-                    } else {
-                        return generateAddSubPhase0(dayNum || 1);
-                    }
+                if (type === 'comp_final') {
+                    // 15 Questions: Mix of Phase 0 and Phase 1 + Traps
+                    let r = Math.random();
+                    if (r < 0.2) return generateSimpleTrap();
+                    if (r < 0.4) return generateAddSubPhase0(Math.floor(Math.random()*3)+1);
+                    if (r < 0.7) return generateAddSubPhase1_Add();
+                    return generateAddSubPhase1_Sub();
+                } else if (type === 'comp_phase0') {
+                    if (Math.random() > 0.3) return generateAddSubPhase0(Math.floor(Math.random()*3)+1);
+                    return generateSimpleTrap();
+                } else if (type === 'comp_p1_part3') {
+                    if (Math.random() > 0.5) return generateAddSubPhase1_Add();
+                    return generateAddSubPhase1_Sub();
+                } else if (phase === 0) { 
+                    return generateAddSubPhase0(dayNum || 1);
                 } else if (phase === 1) { 
-                    let n1 = Math.floor(Math.random() * 90) + 10; let n2 = Math.floor(Math.random() * 90) + 10;
-                    let isAdd = Math.random() > 0.5; if(!isAdd && n1<n2) [n1,n2] = [n2,n1];
-                    return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2, tech: null};
-                } else if (phase === 2) { 
-                    let n1 = (Math.floor(Math.random() * 9)+1)*100 + (Math.floor(Math.random() * 9)*10); let n2 = (Math.floor(Math.random() * 9)+1)*100 + (Math.floor(Math.random() * 9)*10);
-                    let isAdd = Math.random() > 0.5; if(!isAdd && n1<n2) [n1,n2] = [n2,n1];
-                    return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2, tech: null};
-                } else { 
-                    let n1 = Math.floor(Math.random() * 900) + 100; let n2 = Math.floor(Math.random() * 900) + 100;
-                    let isAdd = Math.random() > 0.5; if(!isAdd && n1<n2) [n1,n2] = [n2,n1];
-                    return {q: `${n1} ${isAdd?'+':'-'} ${n2}`, a: isAdd ? n1+n2 : n1-n2, tech: null};
+                    if (actionPart === 'p1') return generateAddSubPhase1_Add();
+                    if (actionPart === 'p2') return generateAddSubPhase1_Sub();
                 }
             } else if (mod === 'percent') {
                 let base = (Math.floor(Math.random() * 90) + 10) * 10; 
@@ -727,16 +896,12 @@
             tt.classList.remove('timer-danger');
             let isRev = false;
             if (sesh.type !== 'day') isRev = true; 
-            if (sesh.type === 'day' && phaseConfig[sesh.mod] && phaseConfig[sesh.mod][sesh.phase] && phaseConfig[sesh.mod][sesh.phase].revTimer) isRev = true;
-
+            
             if (isRev) {
-                if (sesh.type === 'comprehensive' || sesh.type === 'grand' || sesh.type === 'comp_phase0') sesh.tLeft = 75;
-                else {
-                    if (sesh.phase === 1) sesh.tLeft = 75;
-                    else if (sesh.phase === 2) sesh.tLeft = 80;
-                    else if (sesh.phase === 3) sesh.tLeft = 90;
-                    else sesh.tLeft = sesh.qs.length * 6;
-                }
+                if (sesh.type === 'comp_final') sesh.tLeft = 120; // 15 questions, more time
+                else if (sesh.type.includes('comp')) sesh.tLeft = 75;
+                else sesh.tLeft = sesh.qs.length * 6;
+
                 tt.textContent = formatTime(sesh.tLeft);
                 sesh.tObj = setInterval(() => {
                     sesh.tLeft--;
@@ -770,8 +935,6 @@
             document.getElementById('progressText').textContent = `${sesh.qIndex + 1}/${sesh.qs.length}`;
             let hintBtn = document.getElementById('hintBtn');
             hintBtn.style.display = qData.tech ? 'block' : 'none';
-            let doBlur = (sesh.type === 'grand' || sesh.type === 'comprehensive') || (phaseConfig[sesh.mod] && phaseConfig[sesh.mod][sesh.phase] && phaseConfig[sesh.mod][sesh.phase].blur);
-            if (doBlur) blurTimeout = setTimeout(() => { if(document.getElementById('screen-training').classList.contains('active')) qb.classList.add('blur-text'); }, 2000);
         }
 
         document.querySelectorAll('.numpad button[data-val]').forEach(b => {
@@ -831,7 +994,7 @@
             if (sesh.qIndex < sesh.qs.length) loadQ(); else endSession(false);
         }
 
-        function abortTraining() { clearInterval(sesh.tObj); clearTimeout(blurTimeout); nav(sesh.type === 'grand' || sesh.type === 'comprehensive' ? 'screen-math-menu' : 'screen-phases'); }
+        function abortTraining() { clearInterval(sesh.tObj); clearTimeout(blurTimeout); returnFromSummary(); }
 
         function endSession(isFailed, failMsg = null) {
             clearInterval(sesh.tObj); clearTimeout(blurTimeout);
@@ -867,7 +1030,11 @@
                 });
             } else { elc.style.display = 'none'; }
 
-            let targetDB = (sesh.mod === 'grand' || sesh.type === 'comprehensive' || sesh.type === 'comp_phase0') ? db.grand : db[sesh.mod];
+            let targetDB = db[currentMod];
+            if (sesh.type === 'comp_final' || sesh.type.includes('comp')) {
+                // Optional tracking for final scores
+            }
+            
             let diff = scorePercent - (targetDB.lastScore || 0);
             let chartTxt = `دقت شما: %${scorePercent}`;
             if (targetDB.lastScore > 0) {
@@ -880,17 +1047,15 @@
 
             if (!isFailed) {
                 if (sesh.type === 'day' && !sesh.isReview) {
-                    let maxDays = phaseConfig[sesh.mod][sesh.phase].days;
-                    if (db[sesh.mod][`p${sesh.phase}Day`] <= maxDays) db[sesh.mod][`p${sesh.phase}Day`]++; 
-                } else if (sesh.type === 'shortcut') {
-                    let maxDays = phaseConfig[sesh.mod][sesh.phase].days;
-                    if (!db[sesh.mod].unlocked.includes(sesh.phase)) db[sesh.mod].unlocked.push(sesh.phase);
-                    if (!db[sesh.mod].unlocked.includes(sesh.phase + 1)) db[sesh.mod].unlocked.push(sesh.phase + 1);
-                    db[sesh.mod][`p${sesh.phase}Day`] = maxDays + 1; 
-                } else if (sesh.type === 'exam') {
-                    if (!db[sesh.mod].unlocked.includes(sesh.phase + 1)) db[sesh.mod].unlocked.push(sesh.phase + 1);
+                    if (actionPhase === 0) {
+                        if (db.addsub.p0Day <= 3) db.addsub.p0Day++;
+                    } else if (actionPhase === 1) {
+                        if (actionPart === 'p1' && db.addsub.p1p1Day <= 15) db.addsub.p1p1Day++;
+                        if (actionPart === 'p2' && db.addsub.p1p2Day <= 15) db.addsub.p1p2Day++;
+                    }
+                } else if (sesh.type === 'comp_phase0') {
+                    if (!db.addsub.unlocked.includes(1)) db.addsub.unlocked.push(1);
                 }
-                // نوع comp_phase0 نیازی به باز کردن مرحله جدید ندارد
                 saveDb();
             }
             nav('screen-summary');
@@ -1012,3 +1177,11 @@
     </script>
 </body>
 </html>
+"""
+    
+    with open('index.html', 'w', encoding='utf-8') as f:
+        f.write(code)
+    
+    return "Code written successfully."
+
+print(generate_phase1_code())
