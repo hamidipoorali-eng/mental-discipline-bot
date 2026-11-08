@@ -1,5 +1,4 @@
-def generate_phase1_code():
-    code = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -186,13 +185,13 @@ def generate_phase1_code():
 
     <div id="screen-training" class="screen">
         <div class="header">
-            <button onclick="abortTraining()">بازگشت</button>
+            <button onclick="abortTraining()">➔</button>
             <div class="header-title" id="trainingTitle">--</div>
             <div style="width:45px"></div>
         </div>
         <div style="display: flex; justify-content: space-between; padding: 10px 20px; font-weight: bold; font-size:1.1rem;">
             <div id="progressText">۱/۱۰</div>
-            <div id="heartsContainer" style="color:var(--error); letter-spacing:1px; font-size:1rem;"></div>
+            <div id="heartsContainer" style="color:var(--error); letter-spacing:1px; font-size:1.1rem;"></div>
             <div id="timerText" style="direction:ltr;">00:00</div>
         </div>
         <div class="arena">
@@ -317,7 +316,7 @@ def generate_phase1_code():
         const phaseConfig = {
             addsub: {
                 0: { title: "فاز ۰: تکنیک‌های پایه", days: 3, qs: 10, blur: false, revTimer: false, locked: false },
-                1: { title: "فاز ۱: جمع و تفریق پیشرفته", days: 1, qs: 10, blur: false, revTimer: false, locked: true }, // Not actually using 'days' for rendering p1
+                1: { title: "فاز ۱: جمع و تفریق پیشرفته", days: 1, qs: 10, blur: false, revTimer: false, locked: true }, 
             },
             percent: {
                 1: { title: "فاز ۱: آجرهای پایه (۱۰٪، ۱٪، ۵٪)", days: 10, qs: 5, blur: false, revTimer: false, locked: false },
@@ -343,11 +342,11 @@ def generate_phase1_code():
         };
 
         const phase1Techs = {
-            p1: [ // قسمت اول: جمع
+            p1: [ 
                 { title: "جمع: چپ‌به‌راست (بزرگ به کوچک)", text: "ابتدا بزرگ‌ترین مرتبه را به کل عدد اضافه کن، سپس مرتبه بعدی.", eg: "۵۷ + ۳۸ ➔<br>۵۷ + ۳۰ = ۸۷<br>۸۷ + ۸ = ۹۵" },
                 { title: "جمع: رند کردن و کسر تاوان", text: "اگر عددی به ۷، ۸ یا ۹ ختم می‌شود، آن را به مضرب ۱۰ یا ۱۰۰ بعدی گرد کن و اضافه را پس بگیر.", eg: "۸۸ + ۴۷ ➔<br>۸۸ + ۵۰ = ۱۳۸<br>۱۳۸ - ۳ = ۱۳۵" }
             ],
-            p2: [ // قسمت دوم: تفریق
+            p2: [ 
                 { title: "تفریق: طلبکارم، پس‌می‌گیرم", text: "عدد کسرشونده را به ۱۰ یا ۱۰۰ بعدی گرد کن؛ چون بیش از حد کم کردی، طلبکاری و باید اضافه را پس بگیری.", eg: "۱۷۴ - ۵۸ ➔<br>۱۷۴ - ۶۰ = ۱۱۴<br>۱۱۴ + ۲ = ۱۱۶" },
                 { title: "تفریق: پرش رو به جلو", text: "روی عدد کوچک بایست و قدم‌به‌قدم خودت را به عدد بزرگ برسان.", eg: "۸۳ - ۴۷ ➔<br>۴۷ + ۳ = ۵۰<br>۵۰ + ۳۳ = ۸۳<br>۳ + ۳۳ = ۳۶" },
                 { title: "تفریق: همه از ۹، آخری از ۱۰", text: "برای پایه‌های ۱۰۰۰، ۲۰۰۰ و... : از رقم اول سمت چپ یک واحد کم کن، تمام ارقام دیگر از ۹ کم می‌شوند و فقط آخرین رقم غیرصفر از ۱۰.", eg: "۲۰۰۰ - ۴۳۶ ➔<br>۱ (از ۲ یکی کم شد)<br>۹ - ۴ = ۵<br>۹ - ۳ = ۶<br>۱۰ - ۶ = ۴<br>➔ ۱۵۶۴" }
@@ -445,7 +444,6 @@ def generate_phase1_code():
                 let isLocked = !activeDB.unlocked.includes(phase);
                 
                 if (currentMod === 'addsub' && phase === 1) {
-                    // Render Phase 1 (Complex with sub-parts)
                     let p1Day = activeDB.p1p1Day || 1;
                     let p2Day = activeDB.p1p2Day || 1;
                     
@@ -455,7 +453,6 @@ def generate_phase1_code():
                     } else {
                         html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div>`;
                         
-                        // Part 1: Addition
                         html += `<div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border);">
                             <div style="font-weight:bold; margin-bottom:5px;">بخش اول: تکنیک‌های جمع</div>
                             <div style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">روز ${Math.min(p1Day, 15)} از ۱۵</div>
@@ -465,7 +462,6 @@ def generate_phase1_code():
                             </div>
                         </div>`;
                         
-                        // Part 2: Subtraction
                         html += `<div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border);">
                             <div style="font-weight:bold; margin-bottom:5px;">بخش دوم: تکنیک‌های تفریق</div>
                             <div style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">روز ${Math.min(p2Day, 15)} از ۱۵</div>
@@ -475,7 +471,6 @@ def generate_phase1_code():
                             </div>
                         </div>`;
                         
-                        // Part 3: Free Combination
                         html += `<div>
                             <div style="font-weight:bold; margin-bottom:5px; color:var(--purple);">بخش سوم: رینگ ترکیب</div>
                             <div style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">رندوم - ۱۰ سوال با تایمر معکوس</div>
@@ -487,7 +482,6 @@ def generate_phase1_code():
                     html += `</div>`;
                     c.innerHTML += html;
                 } else {
-                    // Standard Phase Rendering
                     let currentDay = activeDB[`p${phase}Day`] || 1;
                     let dayText = conf[phase].days > 0 ? `روز ${Math.min(currentDay, conf[phase].days)} از ${conf[phase].days}` : 'آزمون‌محور (بی‌نهایت)';
                     let blurBadge = conf[phase].blur ? `<span style="font-size:0.75rem; background:rgba(231,76,60,0.2); color:var(--error); padding:2px 6px; border-radius:4px; margin-right:5px;">محو ۲ ثانیه</span>` : '';
@@ -587,7 +581,7 @@ def generate_phase1_code():
                 document.getElementById('actionSheetOverlay').style.display = 'flex';
             } else if (mod === 'addsub' && phase === 1) {
                 document.getElementById('sheetTitle').textContent = `تکنیک‌های ${part === 'p1' ? 'جمع' : 'تفریق'}`;
-                let isLearned = db.learned[`p1${part}`]; // Learn once for the whole part
+                let isLearned = db.learned[`p1${part}`]; 
                 let btnStart = document.getElementById('btnStartDrill');
                 if (isLearned) {
                     btnStart.onclick = startDayDrill;
@@ -712,7 +706,7 @@ def generate_phase1_code():
             for(let i=0; i<qCount; i++) sesh.qs.push(generateQ(mod, phase, type, dayNum));
             
             document.getElementById('trainingTitle').textContent = title;
-            document.getElementById('heartsContainer').textContent = (sesh.maxErr < 10) ? `جان: ${sesh.maxErr + 1}` : '';
+            document.getElementById('heartsContainer').textContent = (sesh.maxErr < 10) ? '❤️'.repeat(sesh.maxErr + 1) : '';
             
             if (type === 'shortcut') showPopup("قوانین میان‌بر", "شما ۱۰ سوال با تایمر معکوس دارید.<br><b>حداکثر ۱ خطا یا پرش</b> مجاز است.", initArena);
             else if (type === 'exam') showPopup("آزمون پایانی", "تایمر معکوس فعال است.<br><b>حداکثر ۲ خطا یا پرش</b> برای قبولی مجاز است.", initArena);
@@ -721,10 +715,6 @@ def generate_phase1_code():
             else if (type === 'comp_final') showPopup("آزمون جامع", "۱۵ سوال از تمام تکنیک‌های آموزش داده شده.<br>تایمر معکوس فعال است و <b>حداکثر ۳ خطا</b> مجاز است.", initArena);
             else initArena();
         }
-
-        // ==========================================
-        // Question Generators
-        // ==========================================
 
         function generateAddSubPhase0(dayNum) {
             let q = "", a = 0, hint = "";
@@ -769,7 +759,6 @@ def generate_phase1_code():
             let q = "", a = 0, hint = "";
             
             if (isRound) {
-                // رند کردن و کسر تاوان
                 let is3Digit = Math.random() > 0.5;
                 let x, y;
                 if (is3Digit) {
@@ -784,7 +773,6 @@ def generate_phase1_code():
                 let diff = nextTen - y;
                 hint = `تکنیک رند کردن: ${y} را ${nextTen} فرض کن.\n${x} + ${nextTen} = ${x+nextTen}\nحالا ${diff} تا پس بگیر ➔ ${a}`;
             } else {
-                // چپ به راست
                 let is3Digit = Math.random() > 0.5;
                 let x, y;
                 if (is3Digit) {
@@ -812,7 +800,6 @@ def generate_phase1_code():
             let q = "", a = 0, hint = "";
             
             if (r < 0.33) {
-                // طلبکارم
                 let x = Math.floor(Math.random() * 800) + 100;
                 let y = (Math.floor(Math.random() * 8) + 1) * 10 + [7, 8, 9][Math.floor(Math.random() * 3)];
                 q = `${x} - ${y}`; a = x - y;
@@ -820,7 +807,6 @@ def generate_phase1_code():
                 let diff = nextTen - y;
                 hint = `طلبکارم: ${y} را ${nextTen} فرض کن.\n${x} - ${nextTen} = ${x-nextTen}\nچون ${diff} تا بیشتر کم کردی، طلبکاری! پس بده ➔ ${a}`;
             } else if (r < 0.66) {
-                // پرش رو به جلو
                 let x = Math.floor(Math.random() * 40) + 50;
                 let y = Math.floor(Math.random() * 30) + 10;
                 q = `${x} - ${y}`; a = x - y;
@@ -829,10 +815,9 @@ def generate_phase1_code():
                 let p2 = x - nextTen;
                 hint = `پرش به جلو: روی ${y} بایست.\nبا ${p1} قدم به ${nextTen} می‌رسی.\nاز ${nextTen} با ${p2} قدم به ${x} می‌رسی.\nجمع قدم‌ها: ${p1} + ${p2} = ${a}`;
             } else {
-                // همه از 9 آخری از 10
                 let base = [1000, 2000, 5000][Math.floor(Math.random() * 3)];
                 let y = Math.floor(Math.random() * 800) + 100;
-                if (y % 10 === 0) y += Math.floor(Math.random() * 9) + 1; // ensure non-zero last digit for simplicity
+                if (y % 10 === 0) y += Math.floor(Math.random() * 9) + 1;
                 q = `${base} - ${y}`; a = base - y;
                 
                 let yStr = String(y).padStart(3, '0');
@@ -858,7 +843,6 @@ def generate_phase1_code():
         function generateQ(mod, phase, type, dayNum = null) {
             if (mod === 'addsub') {
                 if (type === 'comp_final') {
-                    // 15 Questions: Mix of Phase 0 and Phase 1 + Traps
                     let r = Math.random();
                     if (r < 0.2) return generateSimpleTrap();
                     if (r < 0.4) return generateAddSubPhase0(Math.floor(Math.random()*3)+1);
@@ -898,7 +882,7 @@ def generate_phase1_code():
             if (sesh.type !== 'day') isRev = true; 
             
             if (isRev) {
-                if (sesh.type === 'comp_final') sesh.tLeft = 120; // 15 questions, more time
+                if (sesh.type === 'comp_final') sesh.tLeft = 120; 
                 else if (sesh.type.includes('comp')) sesh.tLeft = 75;
                 else sesh.tLeft = sesh.qs.length * 6;
 
@@ -961,7 +945,7 @@ def generate_phase1_code():
                     if (sesh.maxErr < 10) { 
                         let totalFails = sesh.errs + sesh.skips;
                         let hearts = sesh.maxErr + 1 - totalFails;
-                        document.getElementById('heartsContainer').textContent = hearts > 0 ? `جان: ${hearts}` : '';
+                        document.getElementById('heartsContainer').textContent = hearts > 0 ? '❤️'.repeat(hearts) : '';
                         if (totalFails > sesh.maxErr) { endSession(true, "تعداد خطاهای شما از حد مجاز گذشت."); return; }
                     }
                 }
@@ -986,7 +970,7 @@ def generate_phase1_code():
                 if (sesh.maxErr < 10) { 
                     let totalFails = sesh.errs + sesh.skips;
                     let hearts = sesh.maxErr + 1 - totalFails;
-                    document.getElementById('heartsContainer').textContent = hearts > 0 ? `جان: ${hearts}` : '';
+                    document.getElementById('heartsContainer').textContent = hearts > 0 ? '❤️'.repeat(hearts) : '';
                     if (totalFails > sesh.maxErr) { endSession(true, "تعداد خطاهای شما از حد مجاز گذشت."); return; }
                 }
             }
@@ -1031,9 +1015,6 @@ def generate_phase1_code():
             } else { elc.style.display = 'none'; }
 
             let targetDB = db[currentMod];
-            if (sesh.type === 'comp_final' || sesh.type.includes('comp')) {
-                // Optional tracking for final scores
-            }
             
             let diff = scorePercent - (targetDB.lastScore || 0);
             let chartTxt = `دقت شما: %${scorePercent}`;
@@ -1064,7 +1045,9 @@ def generate_phase1_code():
         function shareToTelegram() {
             let corrects = document.getElementById('sumCorrect').textContent;
             let time = document.getElementById('sumTime').textContent;
-            let txt = `موفق شدم!\nپاسخ صحیح: ${corrects} از ${sesh.qs.length}\nزمان: ${time}`;
+            let txt = `موفق شدم!
+پاسخ صحیح: ${corrects} از ${sesh.qs.length}
+زمان: ${time}`;
             window.open('https://t.me/share/url?url=https://t.me/MentalDiscipline_Bot&text=' + encodeURIComponent(txt));
         }
 
@@ -1177,11 +1160,3 @@ def generate_phase1_code():
     </script>
 </body>
 </html>
-"""
-    
-    with open('index.html', 'w', encoding='utf-8') as f:
-        f.write(code)
-    
-    return "Code written successfully."
-
-print(generate_phase1_code())
