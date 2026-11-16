@@ -220,6 +220,7 @@
             <div style="width:45px"></div>
         </div>
         <div class="container">
+            <button id="btnFlashback" class="btn primary-btn" style="background:var(--gold); color:var(--bg-color); margin-bottom:10px; display:none; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(241,196,15,0.3);" onclick="startFlashback()">✨ فلش‌بک صوتی (مرور بدون اصطکاک)</button>
             <div class="ep-list" id="episodesList"></div>
         </div>
     </div>
@@ -250,9 +251,13 @@
             <div class="header-title" id="listeningTitle">دیالوگ --</div>
             <div style="width:45px"></div>
         </div>
-        <div class="arena" style="text-align: center;">
-            <div style="font-size: 1.8rem; font-weight: bold; color: var(--blue); margin-bottom: 30px;">بخش شنیداری</div>
-            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 40px; background: var(--card-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border);">
+        <div class="arena" style="text-align: center; max-width:400px; margin: 0 auto; width:100%;">
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--blue); margin-bottom: 20px;">بخش شنیداری</div>
+            
+            <button class="btn outline-btn" id="btnToggleText" style="margin-bottom:15px; font-size:1rem; border-color:var(--blue); color:var(--blue);" onclick="toggleTranscript()">نمایش متن دیالوگ</button>
+            <div id="transcriptBox" style="display:none; background:var(--bg-color); padding:15px; border-radius:12px; margin-bottom:20px; font-size:1.2rem; direction:ltr; font-weight:bold; border-left:4px solid var(--blue); text-align:left;"></div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 30px; background: var(--card-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border);">
                 <button class="btn outline-btn" id="spd07" style="padding: 5px 10px; font-size: 1rem;" onclick="setAudioSpeed(0.7)">کند</button>
                 <button class="btn primary-btn" id="spd10" style="padding: 5px 10px; font-size: 1rem; background: var(--blue);" onclick="setAudioSpeed(1.0)">عادی</button>
                 <button class="btn outline-btn" id="spd12" style="padding: 5px 10px; font-size: 1rem;" onclick="setAudioSpeed(1.2)">سریع</button>
@@ -263,6 +268,28 @@
             <button class="btn primary-btn" style="background: var(--success); height: 60px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="markDialogUnderstood()">
                 فهمیدم
             </button>
+        </div>
+    </div>
+    
+    <!-- محیط مرور (فلش‌بک صوتی) -->
+    <div id="screen-flashback" class="screen">
+        <div class="header">
+            <button onclick="nav('screen-lang-menu')">➔</button>
+            <div class="header-title">فلش‌بک صوتی</div>
+            <div style="width:45px"></div>
+        </div>
+        <div class="arena" style="text-align: center; max-width:400px; margin: 0 auto; width:100%;">
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--gold); margin-bottom: 15px;">سینمای ذهنی</div>
+            <div style="font-size: 0.95rem; opacity: 0.8; margin-bottom: 30px;">آیا تصویر و معنی این دیالوگ را به یاد می‌آوری؟</div>
+            
+            <div id="fbHintText" style="display:none; background:rgba(241,196,15,0.1); color:var(--gold); padding:15px; border-radius:12px; font-weight:bold; margin-bottom:20px; font-size:1.1rem;"></div>
+            
+            <button class="btn outline-btn" style="height: 60px; font-size: 1.2rem; margin-bottom: 25px; border-color:var(--gold); color:var(--gold);" onclick="playFlashbackAudio()">تکرار مجدد صوت</button>
+            
+            <div style="display: flex; gap: 15px; width: 100%;">
+                <button class="btn" style="flex:1; background:var(--error); color:white; height: 60px; font-size: 1.1rem;" onclick="fbForgot()">یادم رفت ❌</button>
+                <button class="btn" style="flex:1; background:var(--success); color:white; height: 60px; font-size: 1.1rem;" onclick="fbRemembered()">تصویرش یادم آمد ✅</button>
+            </div>
         </div>
     </div>
 
@@ -312,6 +339,8 @@
             lang: { eps: { 1: 1 } },
             learned: {} 
         };
+        
+        let transcripts = {};
 
         const phaseConfig = {
             addsub: {
@@ -351,6 +380,16 @@
         };
 
         function saveDb() { try { localStorage.setItem('discipline_db_v13', JSON.stringify(db)); } catch(e){} }
+        
+        async function loadTranscripts() {
+            try {
+                let res = await fetch('transcripts.json');
+                transcripts = await res.json();
+            } catch(e) {
+                console.warn('transcripts.json not found or invalid');
+            }
+        }
+        
         function loadDb() {
             try {
                 let local = localStorage.getItem('discipline_db_v13');
@@ -370,7 +409,13 @@
                 }
             } catch(e){} 
         }
-        window.onload = () => { if (tg) tg.expand(); loadDb(); renderLangEpisodes(); };
+        
+        window.onload = () => { 
+            if (tg) tg.expand(); 
+            loadDb(); 
+            loadTranscripts();
+            renderLangEpisodes(); 
+        };
 
         let audioCtx;
         function playClick() {
@@ -555,7 +600,6 @@
             let btnStart = document.getElementById('btnStartDrill');
             let btnOpenTech = document.getElementById('btnOpenTech');
             
-            // در آپدیت جدید هر دو دکمه همیشه باز و فعال هستند.
             btnStart.onclick = startDayDrill;
             btnStart.textContent = "شروع چالش";
             btnStart.style.opacity = '1'; btnStart.style.pointerEvents = 'auto';
@@ -1116,6 +1160,10 @@ ${x} - ${nextTen} = ${x-nextTen}
                 </div>`;
                 list.innerHTML += btnHtml;
             }
+            
+            // نمایش دکمه فلش‌بک صوتی اگر حداقل قسمت ۶ باز شده باشد (یعنی ۵ قسمت تمام شده)
+            let maxEp = Math.max(...Object.keys(db.lang.eps).map(Number));
+            document.getElementById('btnFlashback').style.display = (maxEp > 5) ? 'block' : 'none';
         }
 
         function openEpisode(epNum) {
@@ -1143,8 +1191,37 @@ ${x} - ${nextTen} = ${x-nextTen}
             currentDialog = dialogNum;
             document.getElementById('listeningTitle').textContent = `دیالوگ ${dialogNum} (قسمت ${currentEp})`;
             setAudioSpeed(1.0); 
+            
+            let tBox = document.getElementById('transcriptBox');
+            let tBtn = document.getElementById('btnToggleText');
+            if (tBox) tBox.style.display = 'none';
+            if (tBtn) {
+                tBtn.textContent = "نمایش متن دیالوگ";
+                tBtn.classList.remove('primary-btn');
+                tBtn.classList.add('outline-btn');
+            }
+            
             nav('screen-listening');
             replayDialogAudio();
+        }
+
+        function toggleTranscript() {
+            playClick();
+            let box = document.getElementById('transcriptBox');
+            let btn = document.getElementById('btnToggleText');
+            if(box.style.display === 'none') {
+                let key = `ep${currentEp}_${currentDialog}`;
+                box.innerHTML = transcripts[key] || "متن این دیالوگ یافت نشد.";
+                box.style.display = 'block';
+                btn.textContent = "مخفی کردن متن";
+                btn.classList.remove('outline-btn');
+                btn.classList.add('primary-btn');
+            } else {
+                box.style.display = 'none';
+                btn.textContent = "نمایش متن دیالوگ";
+                btn.classList.remove('primary-btn');
+                btn.classList.add('outline-btn');
+            }
         }
 
         function setAudioSpeed(speed) {
@@ -1189,9 +1266,9 @@ ${x} - ${nextTen} = ${x-nextTen}
             if(currentDialog < 5) {
                 startListening(currentDialog + 1);
             } else {
-                showPopup("تبریک!", "شما تمام دیالوگ‌های این قسمت را با موفقیت پشت سر گذاشتید و قسمت بعدی باز شد.", () => {
-                    renderLangDialogs();
-                    nav('screen-episode-detail');
+                showPopup("تبریک!", "شما تمام دیالوگ‌های این قسمت را با موفقیت پشت سر گذاشتید.", () => {
+                    renderLangEpisodes(); // آپدیت لیست برای باز شدن قسمت جدید
+                    nav('screen-lang-menu'); // بازگشت خودکار به منوی قسمت‌ها (رفع باگ)
                 });
             }
         }
@@ -1205,6 +1282,41 @@ ${x} - ${nextTen} = ${x-nextTen}
             } catch(e) {}
             renderLangDialogs();
             nav('screen-episode-detail');
+        }
+        
+        let fbEp = 1, fbDialog = 1;
+        function startFlashback() {
+            let maxEp = Math.max(...Object.keys(db.lang.eps).map(Number));
+            let availableEps = maxEp - 1; // if max is 6, available are 1 to 5
+            fbEp = Math.floor(Math.random() * availableEps) + 1;
+            fbDialog = Math.floor(Math.random() * 5) + 1;
+            
+            document.getElementById('fbHintText').style.display = 'none';
+            nav('screen-flashback');
+            playFlashbackAudio();
+        }
+        
+        function playFlashbackAudio() {
+            let src = `audio/ep${fbEp}_${fbDialog}.mp3`;
+            try { if(langAudioObj) langAudioObj.pause(); } catch(e) {}
+            langAudioObj = new Audio(src);
+            langAudioObj.play().catch(e => {
+                showPopup("خطا", `فایل صوتی <b>${src}</b> برای مرور یافت نشد.`);
+            });
+        }
+        
+        function fbRemembered() {
+            playClick();
+            try { if(langAudioObj) langAudioObj.pause(); } catch(e) {}
+            startFlashback(); // برو به دیالوگ بعدی
+        }
+        
+        function fbForgot() {
+            playClick();
+            let hintBox = document.getElementById('fbHintText');
+            hintBox.innerHTML = `💡 این صدا در <b>قسمت ${fbEp}</b> بود.`;
+            hintBox.style.display = 'block';
+            playFlashbackAudio(); // پخش مجدد صوت برای یادآوری
         }
     </script>
 </body>
