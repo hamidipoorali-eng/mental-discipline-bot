@@ -125,7 +125,7 @@
                 <div style="font-size:1.5rem; color:var(--accent);">➔</div>
             </div>
             <div class="module-card" style="border-color: var(--gold);" onclick="openModule('percent')">
-                <div><div class="module-title" style="color: var(--gold);">محاسبه درصدها</div><div class="module-sub">فاز ۱ تا ۳ (از آجرهای پایه تا بلوک سرعتی)</div></div>
+                <div><div class="module-title" style="color: var(--gold);">محاسبه درصدها</div><div class="module-sub">ایستگاه ۱ تا ۷ (پایه تا تعادل مالی)</div></div>
                 <div style="font-size:1.5rem; color:var(--gold);">➔</div>
             </div>
         </div>
@@ -172,12 +172,12 @@
         </div>
     </div>
 
-    <!-- پاپ‌آپ کشویی روزانه -->
+    <!-- پاپ‌آپ کشویی روزانه/ایستگاهی -->
     <div id="actionSheetOverlay" class="action-sheet" onclick="if(event.target === this) closeActionSheet()">
         <div class="sheet-content">
-            <h3 id="sheetTitle" style="font-size:1.4rem; color:var(--accent);">روز --</h3>
-            <div style="font-size:0.95rem; opacity:0.8; margin-bottom:15px;">برای موفقیت در چالش، ابتدا تکنیک را یاد بگیرید.</div>
-            <button class="btn primary-btn" style="background:var(--blue); padding:15px; font-size:1.1rem;" onclick="openTechnique()">آموزش تکنیک</button>
+            <h3 id="sheetTitle" style="font-size:1.4rem; color:var(--accent);">--</h3>
+            <div style="font-size:0.95rem; opacity:0.8; margin-bottom:15px;">برای موفقیت در چالش، ابتدا آموزش را ببینید.</div>
+            <button class="btn primary-btn" style="background:var(--blue); padding:15px; font-size:1.1rem;" id="btnOpenTech" onclick="openTechnique()">آموزش</button>
             <button class="btn outline-btn" id="btnStartDrill" style="padding:15px; font-size:1.1rem;" onclick="startDayDrill()">شروع چالش</button>
             <button class="btn" style="background:transparent; opacity:0.8; margin-top:5px; color:inherit;" onclick="closeActionSheet()">انصراف</button>
         </div>
@@ -196,7 +196,7 @@
         </div>
         <div class="arena">
             <button id="hintBtn" onclick="showCurrentHint()" style="display:none; margin-bottom: 15px; font-size: 1rem; font-weight: bold; background: var(--card-bg); color: var(--gold); border: 1px solid var(--gold); border-radius: 8px; padding: 5px 15px; cursor: pointer; box-shadow: 0 0 10px rgba(241,196,15,0.3);">راهنما</button>
-            <div class="question-box" id="questionBox">--</div>
+            <div class="question-box" id="questionBox" style="font-size: 2.3rem;">--</div>
             <div class="answer-box" id="answerBox"></div>
         </div>
         <div class="numpad-container">
@@ -306,8 +306,8 @@
         function tgClose() { if(tg) tg.close(); }
 
         let db = {
-            addsub: { unlocked: [0], p0Day: 1, p1p1Day: 1, p1p2Day: 1, lastScore: 0 },
-            percent: { unlocked: [1], p1Day: 1, p2Day: 1, p3Day: 1, lastScore: 0 },
+            addsub: { unlocked: [0, 1], p0Day: 1, p1p1Day: 1, p1p2Day: 1, lastScore: 0 },
+            percent: { unlocked: [1,2,3,4,5,6,7], lastScore: 0 },
             grand: { lastScore: 0 },
             lang: { eps: { 1: 1 } },
             learned: {} 
@@ -315,48 +315,45 @@
 
         const phaseConfig = {
             addsub: {
-                0: { title: "فاز ۰: تکنیک‌های پایه", days: 3, qs: 10, blur: false, revTimer: false, locked: false },
-                1: { title: "فاز ۱: جمع و تفریق پیشرفته", days: 1, qs: 10, blur: false, revTimer: false, locked: true }, 
+                0: { title: "فاز ۰: تکنیک‌های پایه", days: 3, qs: 10 },
+                1: { title: "فاز ۱: جمع و تفریق پیشرفته", days: 1, qs: 10 }, 
             },
             percent: {
-                1: { title: "فاز ۱: آجرهای پایه (۱۰٪، ۱٪، ۵٪)", days: 10, qs: 5, blur: false, revTimer: false, locked: false },
-                2: { title: "فاز ۲: مونتاژ لگویی (۱۵٪، ۲۰٪)", days: 10, qs: 5, blur: true, revTimer: false, locked: true },
-                3: { title: "فاز ۳: سرعتی (۲.۵٪، ۳۰٪)", days: 10, qs: 5, blur: true, revTimer: true, locked: true }
+                1: { title: "ایستگاه ۱: آجرهای مادر", days: 0 },
+                2: { title: "ایستگاه ۲: زنجیره نصف کردن", days: 0 },
+                3: { title: "ایستگاه ۳: لگوهای ترکیبی", days: 0 },
+                4: { title: "ایستگاه ۴: قیمت نهایی (تخفیف)", days: 0 },
+                5: { title: "ایستگاه ۵: تخفیف معکوس", days: 0 },
+                6: { title: "ایستگاه ۶: درصدهای خاص", days: 0 },
+                7: { title: "ایستگاه ۷: تعادل سود و زیان", days: 0 }
             }
         };
 
+        const percentTechs = {
+            1: [ { title: "ایستگاه ۱: آجرهای مادر", text: "همه درصدهای دنیا از دو واحد پایه ساخته می‌شوند:<br><br><b>آجر ۱۰٪:</b> یک پله ممیز به چپ.<br><b>آجر ۱٪:</b> دو پله ممیز به چپ.", eg: "۱۰٪ عدد ۲۴۰ ➔ ۲۴<br>۱٪ عدد ۲۴۰ ➔ ۲.۴" } ],
+            2: [ { title: "ایستگاه ۲: زنجیره نصف کردن", text: "با نصف کردن آجر ۱۰٪، درصدهای دقیق‌تر را بسازید:<br><br><b>۵٪:</b> نصفِ ۱۰٪<br><b>۲.۵٪:</b> دو بار پیاپی نصف کردنِ ۱۰٪ (یا نصفِ ۵٪)", eg: "۵٪ عدد ۲۴۰ ➔ نصف ۲۴ میشه ۱۲" } ],
+            3: [ { title: "ایستگاه ۳: لگوهای ترکیبی", text: "آجرهای قبلی را به هم بچسبانید تا درصدهای پرکاربرد را بسازید:<br><br><b>۲۰٪:</b> دو برابرِ ۱۰٪<br><b>۳۰٪:</b> سه برابرِ ۱۰٪<br><b>۱۵٪:</b> جمعِ ۱۰٪ با ۵٪", eg: "۱۵٪ عدد ۲۰۰ ➔<br>۱۰٪ میشه ۲۰<br>۵٪ میشه ۱۰<br>جمع ➔ ۳۰" } ],
+            4: [ { title: "ایستگاه ۴: قیمت نهایی (تخفیف)", text: "به جای محاسبه جداگانه تخفیف، آن را در ذهن قفل کرده و با تفریق چپ‌به‌راست از قیمت کل کم کنید تا مبلغ پرداختی به دست آید.", eg: "کالای ۲۰۰ دلاری با ۱۵٪ تخفیف:<br>تخفیف میشه ۳۰ دلار<br>۲۰۰ - ۳۰ ➔ ۱۷۰ دلار پرداختی" } ],
+            5: [ { title: "ایستگاه ۵: تخفیف معکوس", text: "وقتی قیمت بعد از تخفیف را دارید و می‌خواهید قیمت اصلی را کشف کنید، پول را به تکه‌های باقیمانده تقسیم کنید:<br>تخفیف ۵۰٪: ضرب در ۲<br>تخفیف ۲۵٪: تقسیم بر ۳ و اضافه کردن یک تکه<br>تخفیف ۲۰٪: تقسیم بر ۴ و اضافه کردن یک تکه<br>تخفیف ۱۰٪: تقسیم بر ۹ و اضافه کردن یک تکه", eg: "قیمت بعد از ۲۰٪ تخفیف شده ۱۶۰:<br>۱۶۰ تقسیم بر ۴ میشه ۴۰.<br>۴۰ رو به ۱۶۰ اضافه کن ➔ ۲۰۰" } ],
+            6: [ { title: "ایستگاه ۶: درصدهای خاص و مالیات", text: "<b>مالیات ۹٪:</b> همان ۱۰٪ منهای ۱٪ است.<br><b>۴٪ و ۶٪:</b> از آجر ۵٪ کمک بگیرید (منهای ۱٪ یا بعلاوه ۱٪).<br><b>آجر ۱۲.۵٪ (یک‌هشتم طلایی):</b> برای محاسبه آن، عدد را ۳ بار متوالی نصف کنید.", eg: "۹٪ عدد ۲۰۰ ➔ ۲۰ منهای ۲ میشه ۱۸<br><br>۱۲.۵٪ عدد ۴۰۰ ➔ ۲۰۰ ➔ ۱۰۰ ➔ ۵۰" } ],
+            7: [ { title: "ایستگاه ۷: تعادل سود و زیان", text: "قانون نامتقارن بازگشت:<br>اگر ارزش سرمایه ۲۰٪ افت کند، برای برگشت به ارزش اولیه به ۲۵٪ رشد نیاز دارد.<br>اگر ۵۰٪ کاهش یابد، باید ۱۰۰٪ رشد کند تا سر‌به‌سر شود.", eg: "سهمی ۲۰٪ افت کرده ➔ باید ۲۵٪ رشد کند تا به نقطه صفر برگردد." } ]
+        };
+
         const phase0Techs = {
-            1: [
-                { title: "تکنیک وام دادن به ۱۰", text: "عدد ۱۰ مغناطیس محاسبات ذهنی است.<br><br>وقتی یک طرف جمع عدد ۹ است (قانون منهای یک):<br>۹ فقط ۱ واحد می‌خواهد تا ۱۰ شود. آن ۱ واحد را از عدد بغلی بدزدید و به اولش یک اضافه کنید.", eg: "۷ + ۹ ➔<br>از ۷ یکی کم کنید (میشه ۶)<br>جواب: ۱۶" },
-                { title: "قانون منهای دو (عدد ۸)", text: "۸ دقیقاً ۲ واحد می‌خواهد تا ۱۰ شود. پس همیشه ۲ واحد از عدد دیگر بردارید:", eg: "۸ + ۵ ➔<br>از ۵ دوتا بردارید (میشه ۳)<br>جواب: ۱۳" },
-                { title: "قانون منهای سه (عدد ۷)", text: "۷ به ۳ واحد نیاز دارد. پس همیشه ۳ واحد از عدد دیگر بردارید:", eg: "۷ + ۶ ➔<br>از ۶ سه‌تا بردارید (میشه ۳)<br>جواب: ۱۳" }
-            ],
-            2: [
-                { title: "دوقلوها و همسایه‌ها", text: "اگر دو عدد به هم نزدیک هستند، نیازی به شمارش نیست! از دو برابر کردن استفاده کنید.", eg: "۷ + ۸ ➔<br>دو برابر ۷ میشه ۱۴؛ یکی اضافه کن ➔ ۱۵<br><br>۵ + ۶ ➔<br>دو برابر ۵ میشه ۱۰؛ یکی اضافه کن ➔ ۱۱" }
-            ],
-            3: [
-                { title: "تفریق: روش پله‌ای", text: "در تفریق‌های سرعتی (مثل ۱۳ منهای ۸) هرگز به عقب حرکت نکنید؛ از «پرش از پله ۱۰» استفاده کنید.<br><br>اول از ۱۳ سه تا کم کنید تا به ۱۰ برسید. از ۸ سه تا رفته، ۵ تا مانده است. پس از ۱۰ پنج تا کم کنید.", eg: "۱۵ - ۷ ➔<br>اول ۵ تا بردار تا به ۱۰ برسی.<br>از ۷ دو تا مانده.<br>۱۰ - ۲ = ۸" },
-                { title: "تفریق: قانون مکمل ۱۰", text: "یک روش جادویی دیگر برای تفریق از اعداد ۱۱ تا ۱۸:<br><br><b>حاصل = یکان عدد اول (خرده) + مکمل عدد دوم تا ۱۰</b>", eg: "۱۵ - ۸ ➔<br>خرده ۱۵: ۵<br>مکمل ۸ تا ده: ۲<br>۵ + ۲ = ۷" },
-                { title: "جعبه ابزار مکمل‌ها", text: "تنها چیزی که ذهن نیاز دارد این است که مکمل‌ها مثل تصویر در حافظه باشند:<br><br>مکمل ۹ ➔ ۱<br>مکمل ۸ ➔ ۲<br>مکمل ۷ ➔ ۳<br>مکمل ۶ ➔ ۴<br>مکمل ۵ ➔ ۵", eg: "" }
-            ]
+            1: [ { title: "تکنیک وام دادن به ۱۰", text: "وقتی یک طرف جمع عدد ۹ است: ۱ واحد از عدد بغلی بدزدید و به اولش یک اضافه کنید.", eg: "۷ + ۹ ➔ ۱۶" }, { title: "قانون منهای دو (عدد ۸)", text: "همیشه ۲ واحد از عدد دیگر بردارید:", eg: "۸ + ۵ ➔ ۱۳" }, { title: "قانون منهای سه (عدد ۷)", text: "همیشه ۳ واحد از عدد دیگر بردارید:", eg: "۷ + ۶ ➔ ۱۳" } ],
+            2: [ { title: "دوقلوها و همسایه‌ها", text: "از دو برابر کردن استفاده کنید.", eg: "۷ + ۸ ➔ دو برابر ۷ میشه ۱۴؛ یکی اضافه کن ➔ ۱۵" } ],
+            3: [ { title: "تفریق: روش پله‌ای", text: "از پرش از پله ۱۰ استفاده کنید.", eg: "۱۵ - ۷ ➔ اول ۵ تا بردار تا به ۱۰ برسی. از ۷ دو تا مانده. ۱۰ - ۲ = ۸" }, { title: "تفریق: قانون مکمل ۱۰", text: "حاصل = یکان عدد اول (خرده) + مکمل عدد دوم تا ۱۰", eg: "۱۵ - ۸ ➔ خرده ۵ + مکمل ۲ = ۷" }, { title: "جعبه ابزار مکمل‌ها", text: "مکمل ۹➔۱، مکمل ۸➔۲، مکمل ۷➔۳، مکمل ۶➔۴، مکمل ۵➔۵", eg: "" } ]
         };
 
         const phase1Techs = {
-            p1: [ 
-                { title: "جمع: چپ‌به‌راست (بزرگ به کوچک)", text: "ابتدا بزرگ‌ترین مرتبه را به کل عدد اضافه کن، سپس مرتبه بعدی.", eg: "۵۷ + ۳۸ ➔<br>۵۷ + ۳۰ = ۸۷<br>۸۷ + ۸ = ۹۵" },
-                { title: "جمع: رند کردن و کسر تاوان", text: "اگر عددی به ۷، ۸ یا ۹ ختم می‌شود، آن را به مضرب ۱۰ یا ۱۰۰ بعدی گرد کن و اضافه را پس بگیر.", eg: "۸۸ + ۴۷ ➔<br>۸۸ + ۵۰ = ۱۳۸<br>۱۳۸ - ۳ = ۱۳۵" }
-            ],
-            p2: [ 
-                { title: "تفریق: طلبکارم، پس‌می‌گیرم", text: "عدد کسرشونده را به ۱۰ یا ۱۰۰ بعدی گرد کن؛ چون بیش از حد کم کردی، طلبکاری و باید اضافه را پس بگیری.", eg: "۱۷۴ - ۵۸ ➔<br>۱۷۴ - ۶۰ = ۱۱۴<br>۱۱۴ + ۲ = ۱۱۶" },
-                { title: "تفریق: پرش رو به جلو", text: "روی عدد کوچک بایست و قدم‌به‌قدم خودت را به عدد بزرگ برسان.", eg: "۸۳ - ۴۷ ➔<br>۴۷ + ۳ = ۵۰<br>۵۰ + ۳۳ = ۸۳<br>۳ + ۳۳ = ۳۶" },
-                { title: "تفریق: همه از ۹، آخری از ۱۰", text: "برای پایه‌های ۱۰۰۰، ۲۰۰۰ و... : از رقم اول سمت چپ یک واحد کم کن، تمام ارقام دیگر از ۹ کم می‌شوند و فقط آخرین رقم غیرصفر از ۱۰.", eg: "۲۰۰۰ - ۴۳۶ ➔<br>۱ (از ۲ یکی کم شد)<br>۹ - ۴ = ۵<br>۹ - ۳ = ۶<br>۱۰ - ۶ = ۴<br>➔ ۱۵۶۴" }
-            ]
+            p1: [ { title: "جمع: چپ‌به‌راست (بزرگ به کوچک)", text: "ابتدا بزرگ‌ترین مرتبه را به کل عدد اضافه کن، سپس مرتبه بعدی.", eg: "۵۷ + ۳۸ ➔ ۵۷ + ۳۰ = ۸۷ ➔ ۸۷ + ۸ = ۹۵" }, { title: "جمع: رند کردن و کسر تاوان", text: "اگر عددی به ۷، ۸ یا ۹ ختم می‌شود، آن را به مضرب ۱۰ یا ۱۰۰ بعدی گرد کن و اضافه را پس بگیر.", eg: "۸۸ + ۴۷ ➔ ۸۸ + ۵۰ = ۱۳۸ ➔ ۱۳۸ - ۳ = ۱۳۵" } ],
+            p2: [ { title: "تفریق: طلبکارم، پس‌می‌گیرم", text: "عدد کسرشونده را به ۱۰ یا ۱۰۰ بعدی گرد کن؛ چون بیش از حد کم کردی، طلبکاری و باید اضافه را پس بگیری.", eg: "۱۷۴ - ۵۸ ➔ ۱۷۴ - ۶۰ = ۱۱۴ ➔ ۱۱۴ + ۲ = ۱۱۶" }, { title: "تفریق: پرش رو به جلو", text: "روی عدد کوچک بایست و قدم‌به‌قدم خودت را به عدد بزرگ برسان.", eg: "۸۳ - ۴۷ ➔ ۴۷ + ۳ = ۵۰ ➔ ۵۰ + ۳۳ = ۸۳ ➔ ۳ + ۳۳ = ۳۶" }, { title: "تفریق: همه از ۹، آخری از ۱۰", text: "برای پایه‌های ۱۰۰۰، ۲۰۰۰ و... : از رقم اول سمت چپ یک واحد کم کن، تمام ارقام دیگر از ۹ کم می‌شوند و فقط آخرین رقم غیرصفر از ۱۰.", eg: "۲۰۰۰ - ۴۳۶ ➔ ۱ (از ۲ یکی کم شد) | ۹-۴=۵ | ۹-۳=۶ | ۱۰-۶=۴ ➔ ۱۵۶۴" } ]
         };
 
-        function saveDb() { try { localStorage.setItem('discipline_db_v11', JSON.stringify(db)); } catch(e){} }
+        function saveDb() { try { localStorage.setItem('discipline_db_v13', JSON.stringify(db)); } catch(e){} }
         function loadDb() {
             try {
-                let local = localStorage.getItem('discipline_db_v11');
+                let local = localStorage.getItem('discipline_db_v13');
                 if (local) { 
                     let p = JSON.parse(local); 
                     if(p.addsub) { 
@@ -365,6 +362,10 @@
                         if(!db.learned) db.learned = {};
                         if(!db.addsub.p1p1Day) db.addsub.p1p1Day = 1;
                         if(!db.addsub.p1p2Day) db.addsub.p1p2Day = 1;
+                        if(!db.addsub.unlocked.includes(0)) db.addsub.unlocked.push(0);
+                        if(!db.addsub.unlocked.includes(1)) db.addsub.unlocked.push(1);
+                        if(!db.percent) db.percent = { unlocked: [1,2,3,4,5,6,7], lastScore: 0 };
+                        if(db.percent.unlocked.length < 7) db.percent.unlocked = [1,2,3,4,5,6,7];
                     }
                 }
             } catch(e){} 
@@ -400,11 +401,9 @@
         
         function returnFromSummary() {
             if (currentMod === 'addsub' && (actionPhase === 1 || sesh.type.includes('comp'))) {
-                renderPhases();
-                nav('screen-phases');
+                renderPhases(); nav('screen-phases');
             } else if (currentMod === 'percent' || currentMod === 'addsub') {
-                renderPhases();
-                nav('screen-phases');
+                renderPhases(); nav('screen-phases');
             } else {
                 nav('screen-math-menu');
             }
@@ -439,18 +438,15 @@
             let activeDB = db[currentMod];
             let conf = phaseConfig[currentMod];
 
-            for (let p in conf) {
-                let phase = parseInt(p);
-                let isLocked = !activeDB.unlocked.includes(phase);
-                
-                if (currentMod === 'addsub' && phase === 1) {
-                    let p1Day = activeDB.p1p1Day || 1;
-                    let p2Day = activeDB.p1p2Day || 1;
+            if (currentMod === 'addsub') {
+                for (let p in conf) {
+                    let phase = parseInt(p);
                     
-                    let html = `<div class="phase-card" style="border-color: ${isLocked ? 'var(--border)' : 'var(--accent)'};">`;
-                    if (isLocked) {
-                        html += `<div class="locked-content"><div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> 🔒</div><div class="phase-desc">برای باز شدن این فاز، فاز ۰ را تکمیل کنید.</div></div>`;
-                    } else {
+                    if (phase === 1) {
+                        let p1Day = activeDB.p1p1Day || 1;
+                        let p2Day = activeDB.p1p2Day || 1;
+                        
+                        let html = `<div class="phase-card" style="border-color: var(--accent);">`;
                         html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div>`;
                         
                         html += `<div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border);">
@@ -475,52 +471,42 @@
                             <div style="font-weight:bold; margin-bottom:5px; color:var(--purple);">بخش سوم: رینگ ترکیب</div>
                             <div style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">رندوم - ۱۰ سوال با تایمر معکوس</div>
                             <button class="btn primary-btn" style="background:var(--purple);" onclick="startSession('addsub', 1, 'comp_p1_part3')">شروع چالش ترکیبی</button>
-                        </div>`;
+                        </div></div>`;
                         
                         html += `</div>`;
-                    }
-                    html += `</div>`;
-                    c.innerHTML += html;
-                } else {
-                    let currentDay = activeDB[`p${phase}Day`] || 1;
-                    let dayText = conf[phase].days > 0 ? `روز ${Math.min(currentDay, conf[phase].days)} از ${conf[phase].days}` : 'آزمون‌محور (بی‌نهایت)';
-                    let blurBadge = conf[phase].blur ? `<span style="font-size:0.75rem; background:rgba(231,76,60,0.2); color:var(--error); padding:2px 6px; border-radius:4px; margin-right:5px;">محو ۲ ثانیه</span>` : '';
-                    let timerBadge = conf[phase].revTimer ? `<span style="font-size:0.75rem; background:rgba(241,196,15,0.2); color:var(--gold); padding:2px 6px; border-radius:4px; margin-right:5px;">تایمر معکوس</span>` : '';
-
-                    let html = `<div class="phase-card" style="border-color: ${isLocked ? 'var(--border)' : 'var(--accent)'};">`;
-                    
-                    if (isLocked) {
-                        html += `<div class="locked-content"><div class="phase-header"><span class="phase-title" style="color:inherit;">${conf[phase].title}</span> 🔒</div><div class="phase-desc">${dayText}</div></div>`;
-                        if (currentMod === 'percent') html += `<button class="btn outline-btn" style="margin-top:10px; font-size:0.9rem;" onclick="startSession('${currentMod}', ${phase}, 'shortcut')">میان‌بر (آزمون تعیین سطح)</button>`;
+                        c.innerHTML += html;
                     } else {
-                        html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div><div class="phase-desc" style="margin-bottom:5px;">${dayText}</div>
-                            <div style="margin-bottom:15px;">${blurBadge}${timerBadge}</div><div style="display:flex; gap:10px;">`;
-                        
-                        if (conf[phase].days === 0) {
-                            html += `<button class="btn primary-btn" onclick="startSession('${currentMod}', ${phase}, 'day')">شروع آزمون</button>`;
-                        } else {
-                            let isDone = currentDay > conf[phase].days;
-                            html += `<button class="btn primary-btn" style="flex:2;" onclick="startSession('${currentMod}', ${phase}, '${isDone ? 'exam' : 'day'}')">${isDone ? 'آزمون پایان فاز' : 'ادامه مسیر'}</button>
-                                     <button class="btn outline-btn" style="flex:1;" onclick="openPath(${phase})">نقشه راه</button>`;
-                        }
-                        html += `</div></div>`;
+                        let currentDay = activeDB[`p${phase}Day`] || 1;
+                        let html = `<div class="phase-card" style="border-color: var(--accent);">`;
+                        html += `<div><div class="phase-header"><span class="phase-title">${conf[phase].title}</span> ✅</div><div class="phase-desc" style="margin-bottom:5px;">روز ${Math.min(currentDay, conf[phase].days)} از ${conf[phase].days}</div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn primary-btn" style="flex:2;" onclick="openDayAction('addsub', ${phase}, null, ${currentDay > conf[phase].days ? currentDay-1 : currentDay})">${currentDay > conf[phase].days ? 'آزمون پایان فاز' : 'ادامه مسیر'}</button>
+                                <button class="btn outline-btn" style="flex:1;" onclick="openPath(${phase})">نقشه راه</button>
+                            </div></div>`;
+                        html += `</div>`;
+                        c.innerHTML += html;
                     }
-                    html += `</div>`;
-                    c.innerHTML += html;
                 }
-            }
-            
-            if (currentMod === 'addsub') {
                 c.innerHTML += `<div class="phase-card" style="border-color: var(--purple); text-align:center;">
                     <div class="phase-title" style="color:var(--purple); margin-bottom:10px;">آزمون جامع (فاز ۰ و ۱)</div>
                     <div class="phase-desc">۱۵ سوال رندوم از تمام تکنیک‌های پایه و پیشرفته با تایمر معکوس.</div>
                     <button class="btn primary-btn" style="background:var(--purple);" onclick="startSession('${currentMod}', 0, 'comp_final')">ورود به آزمون جامع</button>
                 </div>`;
-            } else {
+            } else if (currentMod === 'percent') {
+                for (let phase = 1; phase <= 7; phase++) {
+                    let conf = phaseConfig.percent[phase];
+                    let html = `<div class="phase-card" style="border-color: var(--accent);">`;
+                    html += `<div><div class="phase-header"><span class="phase-title">${conf.title}</span> ✅</div><div class="phase-desc" style="margin-bottom:15px;">آموزش تعاملی و چالش ۱۰ سواله</div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn primary-btn" onclick="openDayAction('percent', ${phase}, null, 1)">ورود به ایستگاه</button>
+                        </div></div>`;
+                    html += `</div>`;
+                    c.innerHTML += html;
+                }
                 c.innerHTML += `<div class="phase-card" style="border-color: var(--purple); text-align:center;">
                     <div class="phase-title" style="color:var(--purple); margin-bottom:10px;">آزمون جامع درصدها</div>
-                    <div class="phase-desc">۱۰ سوال رندوم از تمام فازهای درصد با تایمر معکوس.</div>
-                    <button class="btn primary-btn" style="background:var(--purple);" onclick="startSession('${currentMod}', 0, 'comp_final')">ورود به آزمون جامع</button>
+                    <div class="phase-desc">۱۰ سوال رندوم از تمام ۷ ایستگاه با تایمر معکوس.</div>
+                    <button class="btn primary-btn" style="background:var(--purple);" onclick="startSession('${currentMod}', 0, 'comp_final')">شروع آزمون جامع</button>
                 </div>`;
             }
         }
@@ -548,7 +534,6 @@
                     grid.innerHTML += `<button class="day-btn ${status}" onclick="${clickAction}">${i}</button>`;
                 }
                 let exStatus = currentDay > conf.days ? 'current' : 'locked';
-                if (db[currentMod].unlocked.includes(phase + 1)) exStatus = 'passed';
                 
                 if (phase === 0 && currentMod === 'addsub') {
                     let clickEx = (exStatus === 'passed' || exStatus === 'current') ? `startSession('${currentMod}', ${phase}, 'comp_phase0')` : '';
@@ -567,29 +552,25 @@
         function openDayAction(mod, phase, part, dayNum) {
             actionMod = mod; actionPhase = phase; actionPart = part; actionDay = dayNum;
             
+            let btnStart = document.getElementById('btnStartDrill');
+            let btnOpenTech = document.getElementById('btnOpenTech');
+            
+            // در آپدیت جدید هر دو دکمه همیشه باز و فعال هستند.
+            btnStart.onclick = startDayDrill;
+            btnStart.textContent = "شروع چالش";
+            btnStart.style.opacity = '1'; btnStart.style.pointerEvents = 'auto';
+
             if (mod === 'addsub' && phase === 0) {
                 document.getElementById('sheetTitle').textContent = `روز ${dayNum} - فاز ${phase}`;
-                let isLearned = db.learned[`p0d${dayNum}`];
-                let btnStart = document.getElementById('btnStartDrill');
-                if (isLearned) {
-                    btnStart.onclick = startDayDrill;
-                    btnStart.textContent = "شروع چالش";
-                } else {
-                    btnStart.onclick = () => { showPopup("توجه", "لطفاً ابتدا دکمه «آموزش تکنیک» را بزنید و یاد بگیرید."); };
-                    btnStart.textContent = "شروع چالش";
-                }
+                btnOpenTech.textContent = "آموزش";
                 document.getElementById('actionSheetOverlay').style.display = 'flex';
             } else if (mod === 'addsub' && phase === 1) {
-                document.getElementById('sheetTitle').textContent = `تکنیک‌های ${part === 'p1' ? 'جمع' : 'تفریق'}`;
-                let isLearned = db.learned[`p1${part}`]; 
-                let btnStart = document.getElementById('btnStartDrill');
-                if (isLearned) {
-                    btnStart.onclick = startDayDrill;
-                    btnStart.textContent = "شروع چالش";
-                } else {
-                    btnStart.onclick = () => { showPopup("توجه", "لطفاً ابتدا دکمه «آموزش تکنیک» را بزنید و یاد بگیرید."); };
-                    btnStart.textContent = "شروع چالش";
-                }
+                document.getElementById('sheetTitle').textContent = `تکنیک‌های ${part === 'p1' ? 'جمع' : 'تفریق'} - روز ${dayNum}`;
+                btnOpenTech.textContent = "آموزش";
+                document.getElementById('actionSheetOverlay').style.display = 'flex';
+            } else if (mod === 'percent') {
+                document.getElementById('sheetTitle').textContent = phaseConfig.percent[phase].title;
+                btnOpenTech.textContent = "آموزش ایستگاه";
                 document.getElementById('actionSheetOverlay').style.display = 'flex';
             } else {
                 startSession(mod, phase, 'day', dayNum);
@@ -600,7 +581,9 @@
 
         function openTechnique() {
             closeActionSheet();
-            if (actionPhase === 0) {
+            if (actionMod === 'percent') {
+                currentTechs = percentTechs[actionPhase];
+            } else if (actionPhase === 0) {
                 currentTechs = phase0Techs[actionDay];
             } else if (actionPhase === 1) {
                 currentTechs = phase1Techs[actionPart];
@@ -638,8 +621,9 @@
         function changeSlide(dir) {
             playClick();
             if (dir === 1 && currentSlideIdx === currentTechs.length - 1) {
-                if (actionPhase === 0) db.learned[`p0d${actionDay}`] = true;
-                if (actionPhase === 1) db.learned[`p1${actionPart}`] = true;
+                if (actionMod === 'addsub' && actionPhase === 0) db.learned[`p0d${actionDay}`] = true;
+                if (actionMod === 'addsub' && actionPhase === 1) db.learned[`p1${actionPart}`] = true;
+                if (actionMod === 'percent') db.learned[`perc_s${actionPhase}`] = true;
                 saveDb();
                 startSession(actionMod, actionPhase, 'day', actionDay);
             } else {
@@ -653,29 +637,11 @@
             startSession(actionMod, actionPhase, 'day', actionDay);
         }
 
-        async function showTechniques() {
-            try {
-                let response = await fetch('techniques.json');
-                let data = await response.json();
-                let msg = data[currentMod] || "تکنیکی برای این بخش نوشته نشده است.";
-                showPopup("تکنیک‌های این مسیر", msg);
-            } catch (error) { showPopup("خطا", "امکان دریافت فایل تکنیک‌ها وجود ندارد."); }
-        }
-        
-        async function showCurrentHint() {
+        function showCurrentHint() {
             playClick();
             let qData = sesh.qs[sesh.qIndex];
-            if (!qData || !qData.tech) return;
-            try {
-                let response = await fetch('techniques.json');
-                let data = await response.json();
-                let techData = data[qData.tech]; 
-                if (techData) {
-                    let htmlContent = `<div style="width:100%; border-radius:12px; overflow:hidden; border:1px solid var(--border); background:#fff; display:flex; justify-content:center; align-items:center;">
-                            <img src="${techData.image}" alt="تکنیک" style="width:100%; height:auto; display:block; object-fit:contain;"></div>`;
-                    showPopup(techData.title, htmlContent);
-                }
-            } catch (error) {}
+            if (!qData || !qData.hint) return;
+            showPopup("راهنمای گام‌به‌گام", qData.hint);
         }
 
         let sesh = { type: '', mod: '', phase: 0, qs: [], qIndex: 0, errs: 0, errLog: [], startT: 0, tObj: null, tLeft: 0, maxErr: 0, isReview: false, skips: 0 };
@@ -687,7 +653,9 @@
             
             if (type === 'day') {
                 qCount = 10;
-                if (mod === 'addsub' && phase === 1) {
+                if (mod === 'percent') {
+                    title = phaseConfig.percent[phase].title;
+                } else if (mod === 'addsub' && phase === 1) {
                     let currentRealDay = db[mod][`p1${actionPart}Day`] || 1;
                     if (dayNum !== null && dayNum < currentRealDay) { sesh.isReview = true; title = `مرور روز ${dayNum}`; } 
                     else { title = `چالش ${actionPart === 'p1' ? 'جمع' : 'تفریق'} - روز ${dayNum}`; }
@@ -697,23 +665,86 @@
                     else { title = `فاز ${phase} - روز ${dayNum}`; }
                 }
                 sesh.maxErr = 100;
-            } else if (type === 'shortcut') { qCount = 10; revTimer = true; sesh.maxErr = 1; title = `آزمون میان‌بر فاز ${phase}`; } 
-            else if (type === 'exam') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون پایان فاز ${phase}`; } 
+            } else if (type === 'exam') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون پایان فاز ${phase}`; } 
             else if (type === 'comp_phase0') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `آزمون جامع فاز ۰`; }
             else if (type === 'comp_p1_part3') { qCount = 10; revTimer = true; sesh.maxErr = 2; title = `رینگ ترکیب (فاز ۱)`; }
-            else if (type === 'comp_final') { qCount = 15; revTimer = true; sesh.maxErr = 3; title = `آزمون جامع دپارتمان`; }
+            else if (type === 'comp_final') { qCount = (mod === 'addsub') ? 15 : 10; revTimer = true; sesh.maxErr = (mod === 'addsub') ? 3 : 2; title = `آزمون جامع دپارتمان`; }
 
             for(let i=0; i<qCount; i++) sesh.qs.push(generateQ(mod, phase, type, dayNum));
             
             document.getElementById('trainingTitle').textContent = title;
             document.getElementById('heartsContainer').textContent = (sesh.maxErr < 10) ? '❤️'.repeat(sesh.maxErr + 1) : '';
             
-            if (type === 'shortcut') showPopup("قوانین میان‌بر", "شما ۱۰ سوال با تایمر معکوس دارید.<br><b>حداکثر ۱ خطا یا پرش</b> مجاز است.", initArena);
-            else if (type === 'exam') showPopup("آزمون پایانی", "تایمر معکوس فعال است.<br><b>حداکثر ۲ خطا یا پرش</b> برای قبولی مجاز است.", initArena);
+            if (type === 'exam') showPopup("آزمون پایانی", "تایمر معکوس فعال است.<br><b>حداکثر ۲ خطا یا پرش</b> برای قبولی مجاز است.", initArena);
             else if (type === 'comp_phase0') showPopup("آزمون جامع فاز ۰", "این یک آزمون مستقل از کل تکنیک‌های فاز ۰ است.<br>تایمر معکوس فعال است و <b>حداکثر ۲ خطا</b> مجاز است.", initArena);
             else if (type === 'comp_p1_part3') showPopup("رینگ ترکیب", "ترکیبی تصادفی از جمع و تفریق‌های فاز ۱.<br>تایمر معکوس فعال است و <b>حداکثر ۲ خطا</b> مجاز است.", initArena);
-            else if (type === 'comp_final') showPopup("آزمون جامع", "۱۵ سوال از تمام تکنیک‌های آموزش داده شده.<br>تایمر معکوس فعال است و <b>حداکثر ۳ خطا</b> مجاز است.", initArena);
+            else if (type === 'comp_final' && mod === 'addsub') showPopup("آزمون جامع", "۱۵ سوال از تمام تکنیک‌های آموزش داده شده.<br>تایمر معکوس فعال است و <b>حداکثر ۳ خطا</b> مجاز است.", initArena);
+            else if (type === 'comp_final' && mod === 'percent') showPopup("آزمون جامع", "۱۰ سوال ترکیبی از ۷ ایستگاه درصد.<br>تایمر معکوس فعال است و <b>حداکثر ۲ خطا</b> مجاز است.", initArena);
             else initArena();
+        }
+
+        function generatePercentStation(station) {
+            let q = "", a = 0, hint = "";
+            if (station === 1) { 
+                let base = (Math.floor(Math.random() * 90) + 10) * 10; 
+                let p = Math.random() > 0.5 ? 10 : 1;
+                q = `${p}٪ از ${base}`;
+                a = (p * base) / 100;
+                hint = p === 10 ? `آجر ۱۰٪: یک پله ممیز به چپ ➔ ${a}` : `آجر ۱٪: دو پله ممیز به چپ ➔ ${a}`;
+            } else if (station === 2) { 
+                let base = (Math.floor(Math.random() * 40) + 10) * 20; 
+                let p = Math.random() > 0.5 ? 5 : 2.5;
+                q = `${p}٪ از ${base}`;
+                a = (p * base) / 100;
+                if (p === 5) hint = `۵٪: اول ۱۰٪ رو پیدا کن (${base/10})، بعد نصفش کن ➔ ${a}`;
+                else hint = `۲.۵٪: اول ۱۰٪ رو پیدا کن (${base/10})، بعد دو بار متوالی نصف کن ➔ ${a}`;
+            } else if (station === 3) { 
+                let base = (Math.floor(Math.random() * 90) + 10) * 10;
+                let p = [15, 20, 30][Math.floor(Math.random() * 3)];
+                q = `${p}٪ از ${base}`;
+                a = (p * base) / 100;
+                let tenP = base/10;
+                if (p === 20) hint = `۲۰٪: دو برابرِ ۱۰٪ (${tenP}) ➔ ${a}`;
+                else if (p === 30) hint = `۳۰٪: سه برابرِ ۱۰٪ (${tenP}) ➔ ${a}`;
+                else hint = `۱۵٪: آجر ۱۰٪ (${tenP}) رو با آجر ۵٪ (${tenP/2}) جمع کن ➔ ${a}`;
+            } else if (station === 4) { 
+                let base = (Math.floor(Math.random() * 40) + 10) * 10;
+                let p = [10, 15, 20, 25, 30][Math.floor(Math.random() * 5)];
+                q = `قیمت نهایی: ${base} با ${p}٪ تخفیف`;
+                let disc = (p * base) / 100;
+                a = base - disc;
+                hint = `تخفیف: ${disc}. حالا از قیمت کل کم کن: ${base} - ${disc} = ${a}`;
+            } else if (station === 5) { 
+                let p = [50, 25, 20, 10][Math.floor(Math.random() * 4)];
+                let original = (Math.floor(Math.random() * 15) + 5) * 20; 
+                let finalPrice = original - (p * original) / 100;
+                q = `بعد از ${p}٪ تخفیف شده ${finalPrice}. قیمت اصلی؟`;
+                a = original;
+                if (p === 50) hint = `تخفیف ۵۰٪: ۱ تکه از ۲ تکه مانده. پس ${finalPrice} رو ضربدر ۲ کن ➔ ${a}`;
+                else if (p === 25) hint = `تخفیف ۲۵٪: ۳ تکه از ۴ تکه مانده. ${finalPrice} رو تقسیم بر ۳ کن (${finalPrice/3}) و به خودش اضافه کن ➔ ${a}`;
+                else if (p === 20) hint = `تخفیف ۲۰٪: ۴ تکه از ۵ تکه مانده. ${finalPrice} رو تقسیم بر ۴ کن (${finalPrice/4}) و به خودش اضافه کن ➔ ${a}`;
+                else if (p === 10) hint = `تخفیف ۱۰٪: ۹ تکه از ۱۰ تکه مانده. ${finalPrice} رو تقسیم بر ۹ کن (${finalPrice/9}) و به خودش اضافه کن ➔ ${a}`;
+            } else if (station === 6) { 
+                let p = [9, 4, 6, 12.5][Math.floor(Math.random() * 4)];
+                let base = 0;
+                if (p === 12.5) base = (Math.floor(Math.random() * 10) + 1) * 80;
+                else base = (Math.floor(Math.random() * 90) + 10) * 10;
+                
+                q = `${p}٪ از ${base}`;
+                a = (p * base) / 100;
+                let ten = base/10, one = base/100, five = ten/2;
+                if (p === 9) hint = `۹٪: آجر ۱۰٪ (${ten}) منهای آجر ۱٪ (${one}) ➔ ${a}`;
+                else if (p === 4) hint = `۴٪: آجر ۵٪ (${five}) منهای آجر ۱٪ (${one}) ➔ ${a}`;
+                else if (p === 6) hint = `۶٪: آجر ۵٪ (${five}) به علاوه آجر ۱٪ (${one}) ➔ ${a}`;
+                else if (p === 12.5) hint = `۱۲.۵٪ (یک‌هشتم): سه بار متوالی نصف کن! نصف اول ${base/2}، نصف دوم ${base/4}، نصف سوم ➔ ${a}`;
+            } else if (station === 7) { 
+                let pair = [{d: 20, r: 25}, {d: 50, r: 100}][Math.floor(Math.random() * 2)];
+                q = `دارایی ${pair.d}٪ افت کرده. برای برگشت چند درصد رشد نیاز است؟`;
+                a = pair.r;
+                if (pair.d === 20) hint = `افت ۲۰٪ یعنی رسیدن به ۸۰. برای برگشتن از ۸۰ به ۱۰۰، به ۲۰ واحد نیاز داری که میشه ۲۵٪ از ۸۰ ➔ ۲۵`;
+                if (pair.d === 50) hint = `افت ۵۰٪ یعنی ارزش نصف شده. برای برگشت باید ۱۰۰٪ رشد کنه تا دو برابر بشه ➔ ۱۰۰`;
+            }
+            return {q, a, hint};
         }
 
         function generateAddSubPhase0(dayNum) {
@@ -745,7 +776,8 @@
                 a = a_val - b_val;
                 if (Math.random() > 0.5) {
                     let khor = a_val - 10; let mok = 10 - b_val;
-                    hint = `تکنیک مکمل: خرده ${a_val} میشه ${khor} / مکمل ${b_val} میشه ${mok}\n${khor} + ${mok} = ${a}`;
+                    hint = `تکنیک مکمل: خرده ${a_val} میشه ${khor} / مکمل ${b_val} میشه ${mok}
+${khor} + ${mok} = ${a}`;
                 } else {
                     let khor = a_val - 10; let rem = b_val - khor;
                     hint = `تکنیک پله‌ای: اول ${khor} تا کم کن برس به ۱۰. از ${b_val} مقدار ${rem} تا مونده. ۱۰ منهای ${rem} میشه ${a}`;
@@ -771,7 +803,9 @@
                 q = `${x} + ${y}`; a = x + y;
                 let nextTen = Math.ceil(y / 10) * 10;
                 let diff = nextTen - y;
-                hint = `تکنیک رند کردن: ${y} را ${nextTen} فرض کن.\n${x} + ${nextTen} = ${x+nextTen}\nحالا ${diff} تا پس بگیر ➔ ${a}`;
+                hint = `تکنیک رند کردن: ${y} را ${nextTen} فرض کن.
+${x} + ${nextTen} = ${x+nextTen}
+حالا ${diff} تا پس بگیر ➔ ${a}`;
             } else {
                 let is3Digit = Math.random() > 0.5;
                 let x, y;
@@ -782,14 +816,19 @@
                     let yH = Math.floor(y/100)*100;
                     let yT = Math.floor((y%100)/10)*10;
                     let yU = y%10;
-                    hint = `چپ‌به‌راست: اول صدگان\n${x} + ${yH} = ${x+yH}\nبعد دهگان: ${x+yH} + ${yT} = ${x+yH+yT}\nدر نهایت یکان: ${a}`;
+                    hint = `چپ‌به‌راست: اول صدگان
+${x} + ${yH} = ${x+yH}
+بعد دهگان: ${x+yH} + ${yT} = ${x+yH+yT}
+در نهایت یکان: ${a}`;
                 } else {
                     x = Math.floor(Math.random() * 80) + 10;
                     y = Math.floor(Math.random() * 80) + 10;
                     q = `${x} + ${y}`; a = x + y;
                     let yT = Math.floor(y/10)*10;
                     let yU = y%10;
-                    hint = `چپ‌به‌راست: اول دهگان\n${x} + ${yT} = ${x+yT}\nبعد یکان: ${x+yT} + ${yU} = ${a}`;
+                    hint = `چپ‌به‌راست: اول دهگان
+${x} + ${yT} = ${x+yT}
+بعد یکان: ${x+yT} + ${yU} = ${a}`;
                 }
             }
             return {q, a, hint};
@@ -805,7 +844,9 @@
                 q = `${x} - ${y}`; a = x - y;
                 let nextTen = Math.ceil(y / 10) * 10;
                 let diff = nextTen - y;
-                hint = `طلبکارم: ${y} را ${nextTen} فرض کن.\n${x} - ${nextTen} = ${x-nextTen}\nچون ${diff} تا بیشتر کم کردی، طلبکاری! پس بده ➔ ${a}`;
+                hint = `طلبکارم: ${y} را ${nextTen} فرض کن.
+${x} - ${nextTen} = ${x-nextTen}
+چون ${diff} تا بیشتر کم کردی، طلبکاری! پس بده ➔ ${a}`;
             } else if (r < 0.66) {
                 let x = Math.floor(Math.random() * 40) + 50;
                 let y = Math.floor(Math.random() * 30) + 10;
@@ -813,7 +854,10 @@
                 let nextTen = Math.ceil(y / 10) * 10;
                 let p1 = nextTen - y;
                 let p2 = x - nextTen;
-                hint = `پرش به جلو: روی ${y} بایست.\nبا ${p1} قدم به ${nextTen} می‌رسی.\nاز ${nextTen} با ${p2} قدم به ${x} می‌رسی.\nجمع قدم‌ها: ${p1} + ${p2} = ${a}`;
+                hint = `پرش به جلو: روی ${y} بایست.
+با ${p1} قدم به ${nextTen} می‌رسی.
+از ${nextTen} با ${p2} قدم به ${x} می‌رسی.
+جمع قدم‌ها: ${p1} + ${p2} = ${a}`;
             } else {
                 let base = [1000, 2000, 5000][Math.floor(Math.random() * 3)];
                 let y = Math.floor(Math.random() * 800) + 100;
@@ -822,7 +866,11 @@
                 
                 let yStr = String(y).padStart(3, '0');
                 let first = base / 1000;
-                hint = `همه از ۹ آخری از ۱۰:\nهزارگان ${first} یکی کم میشه ➔ ${first-1}\n۹ - ${yStr[0]} = ${9-parseInt(yStr[0])}\n۹ - ${yStr[1]} = ${9-parseInt(yStr[1])}\n۱۰ - ${yStr[2]} = ${10-parseInt(yStr[2])}`;
+                hint = `همه از ۹ آخری از ۱۰:
+هزارگان ${first} یکی کم میشه ➔ ${first-1}
+۹ - ${yStr[0]} = ${9-parseInt(yStr[0])}
+۹ - ${yStr[1]} = ${9-parseInt(yStr[1])}
+۱۰ - ${yStr[2]} = ${10-parseInt(yStr[2])}`;
             }
             return {q, a, hint};
         }
@@ -861,13 +909,14 @@
                     if (actionPart === 'p2') return generateAddSubPhase1_Sub();
                 }
             } else if (mod === 'percent') {
-                let base = (Math.floor(Math.random() * 90) + 10) * 10; 
-                let p = phase === 1 ? [10, 1, 5][Math.floor(Math.random()*3)] : phase === 2 ? [15, 20][Math.floor(Math.random()*2)] : [2.5, 30][Math.floor(Math.random()*2)];
-                let qData = {q: `${p}٪ از ${base}`, a: (p * base) / 100, tech: null};
-                if (p === 5 && Math.floor((base/10)) % 2 !== 0) qData.tech = 'percent_5_odd';
-                return qData;
+                if (type === 'comp_final') {
+                    let randomStation = Math.floor(Math.random() * 7) + 1;
+                    return generatePercentStation(randomStation);
+                } else {
+                    return generatePercentStation(phase);
+                }
             }
-            return {q: `15 - 8`, a: 7, tech: null};
+            return {q: `15 - 8`, a: 7, hint: null};
         }
 
         function formatTime(secs) { return `${String(Math.floor(secs/60)).padStart(2,'0')}:${String(secs%60).padStart(2,'0')}`; }
@@ -882,7 +931,7 @@
             if (sesh.type !== 'day') isRev = true; 
             
             if (isRev) {
-                if (sesh.type === 'comp_final') sesh.tLeft = 120; 
+                if (sesh.type === 'comp_final') sesh.tLeft = (sesh.mod === 'addsub') ? 120 : 90; 
                 else if (sesh.type.includes('comp')) sesh.tLeft = 75;
                 else sesh.tLeft = sesh.qs.length * 6;
 
@@ -918,7 +967,7 @@
             qb.textContent = qData.q;
             document.getElementById('progressText').textContent = `${sesh.qIndex + 1}/${sesh.qs.length}`;
             let hintBtn = document.getElementById('hintBtn');
-            hintBtn.style.display = qData.tech ? 'block' : 'none';
+            hintBtn.style.display = qData.hint ? 'block' : 'none';
         }
 
         document.querySelectorAll('.numpad button[data-val]').forEach(b => {
@@ -1028,15 +1077,15 @@
 
             if (!isFailed) {
                 if (sesh.type === 'day' && !sesh.isReview) {
-                    if (actionPhase === 0) {
-                        if (db.addsub.p0Day <= 3) db.addsub.p0Day++;
-                    } else if (actionPhase === 1) {
-                        if (actionPart === 'p1' && db.addsub.p1p1Day <= 15) db.addsub.p1p1Day++;
-                        if (actionPart === 'p2' && db.addsub.p1p2Day <= 15) db.addsub.p1p2Day++;
-                    }
-                } else if (sesh.type === 'comp_phase0') {
-                    if (!db.addsub.unlocked.includes(1)) db.addsub.unlocked.push(1);
-                }
+                    if (actionMod === 'addsub') {
+                        if (actionPhase === 0) {
+                            if (db.addsub.p0Day <= 3) db.addsub.p0Day++;
+                        } else if (actionPhase === 1) {
+                            if (actionPart === 'p1' && db.addsub.p1p1Day <= 15) db.addsub.p1p1Day++;
+                            if (actionPart === 'p2' && db.addsub.p1p2Day <= 15) db.addsub.p1p2Day++;
+                        }
+                    } 
+                } 
                 saveDb();
             }
             nav('screen-summary');
