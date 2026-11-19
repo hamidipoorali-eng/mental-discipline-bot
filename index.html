@@ -90,6 +90,38 @@
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .action-sheet { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: flex-end; z-index: 60; backdrop-filter: blur(4px); }
         .sheet-content { background: var(--card-bg); width: 100%; max-width: 450px; padding: 30px 25px 40px 25px; border-radius: 30px 30px 0 0; animation: slideUp 0.3s ease-out; display: flex; flex-direction: column; gap: 15px; text-align: center; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
+
+        /* --- مرور شبکه‌ای (Network Review) --- */
+        .net-filter-bar { display: flex; gap: 8px; overflow-x: auto; width: 100%; max-width: 400px; padding-bottom: 6px; scrollbar-width: none; }
+        .net-filter-bar::-webkit-scrollbar { display: none; }
+        .net-chip { flex: 0 0 auto; padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-color); font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .net-chip.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+        .net-node-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); cursor: pointer; transition: transform 0.15s; }
+        .net-node-card:active { transform: scale(0.98); }
+        .net-node-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+        .net-node-title { font-size: 1.1rem; font-weight: bold; color: var(--text-color); }
+        .net-tag { font-size: 0.75rem; padding: 3px 9px; border-radius: 8px; background: rgba(52,152,219,0.15); color: var(--blue); font-weight: bold; white-space: nowrap; }
+        .net-patterns { display: flex; flex-wrap: wrap; gap: 6px; direction: ltr; justify-content: flex-end; margin-bottom: 10px; }
+        .net-pattern-pill { font-size: 0.82rem; padding: 3px 10px; border-radius: 8px; background: var(--bg-color); color: var(--accent); font-weight: bold; border: 1px solid var(--border); }
+        .net-node-meta { font-size: 0.8rem; opacity: 0.65; display: flex; justify-content: space-between; align-items: center; }
+
+        .net-parenting-box { background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.35); width: 100%; max-width: 400px; padding: 14px 16px; border-radius: 14px; }
+        .net-parenting-label { font-size: 0.85rem; font-weight: bold; color: var(--success); margin-bottom: 6px; }
+        .net-parenting-text { font-size: 0.95rem; direction: ltr; text-align: left; line-height: 1.6; font-weight: bold; }
+
+        .net-occ-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 15px; border-radius: 16px; border: 1.5px solid var(--border); transition: all 0.25s; }
+        .net-occ-card.playing { border-color: var(--blue); box-shadow: 0 0 16px rgba(52,152,219,0.35); background: rgba(52,152,219,0.06); }
+        .net-occ-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+        .net-occ-meta { font-size: 0.8rem; opacity: 0.75; font-weight: bold; }
+        .net-play-btn { background: var(--blue); color: white; border: none; border-radius: 10px; padding: 6px 14px; font-size: 0.9rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .net-play-btn:active { transform: scale(0.95); }
+        .net-occ-text { font-size: 1.08rem; font-weight: bold; direction: ltr; text-align: left; line-height: 1.55; margin-bottom: 10px; color: var(--text-color); }
+        .net-details-toggle { background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 0.82rem; font-weight: bold; cursor: pointer; width: 100%; text-align: center; opacity: 0.85; }
+        .net-details-box { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 0.88rem; line-height: 1.75; }
+        .net-details-box.open { display: block; }
+        .net-detail-row { margin-bottom: 6px; }
+        .net-detail-label { font-weight: bold; color: var(--gold); }
     </style>
 </head>
 <body data-theme="dark">
@@ -221,6 +253,13 @@
         </div>
         <div class="container">
             <button id="btnFlashback" class="btn primary-btn" style="background:var(--gold); color:var(--bg-color); margin-bottom:10px; display:none; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(241,196,15,0.3);" onclick="startFlashback()">✨ فلش‌بک صوتی (مرور بدون اصطکاک)</button>
+            <div class="module-card" style="border-color: var(--purple); width: 100%; max-width: 400px;" onclick="openNetworkReview()">
+                <div>
+                    <div class="module-title" style="color: var(--purple);">مرور شبکه‌ای (۵ قسمت اول)</div>
+                    <div class="module-sub">۱۳ گره موضوعی • ۵۹ کلیپ سایه‌خوانی و پخش زنجیره‌ای</div>
+                </div>
+                <div style="font-size:1.4rem; color:var(--purple);">➔</div>
+            </div>
             <div class="ep-list" id="episodesList"></div>
         </div>
     </div>
@@ -290,6 +329,39 @@
                 <button class="btn" style="flex:1; background:var(--error); color:white; height: 60px; font-size: 1.1rem;" onclick="fbForgot()">یادم رفت ❌</button>
                 <button class="btn" style="flex:1; background:var(--success); color:white; height: 60px; font-size: 1.1rem;" onclick="fbRemembered()">تصویرش یادم آمد ✅</button>
             </div>
+        </div>
+    </div>
+
+    <!-- مرور شبکه‌ای: لیست گره‌ها -->
+    <div id="screen-net-nodes" class="screen">
+        <div class="header">
+            <button onclick="nav('screen-lang-menu')">➔</button>
+            <div class="header-title">مرور شبکه‌ای</div>
+            <div style="width:45px"></div>
+        </div>
+        <div class="container">
+            <div class="net-filter-bar" id="netFilterBar"></div>
+            <div id="netNodesList" style="width:100%; display:flex; flex-direction:column; gap:12px; align-items:center;"></div>
+        </div>
+    </div>
+
+    <!-- مرور شبکه‌ای: جزئیات هر گره -->
+    <div id="screen-net-detail" class="screen">
+        <div class="header">
+            <button onclick="exitNetworkDetail()">➔</button>
+            <div class="header-title" id="netDetailTitle">--</div>
+            <div style="width:45px"></div>
+        </div>
+        <div class="container">
+            <div style="width:100%; max-width:400px; display:flex; gap:10px;">
+                <button id="btnNetChain" class="btn primary-btn" style="background:var(--purple); flex:2;" onclick="toggleNetworkChain()">▶ پخش زنجیره‌ای (سایه‌خوانی)</button>
+            </div>
+            <div id="netChainStatus" style="display:none; width:100%; max-width:400px; text-align:center; font-size:0.85rem; color:var(--gold); font-weight:bold;"></div>
+            <div class="net-parenting-box" id="netParentingBox">
+                <div class="net-parenting-label">کاربرد در خانه</div>
+                <div class="net-parenting-text" id="netParentingText"></div>
+            </div>
+            <div id="netOccurrencesList" style="width:100%; display:flex; flex-direction:column; gap:12px; align-items:center;"></div>
         </div>
     </div>
 
@@ -438,6 +510,7 @@
 
         function nav(id) {
             if(langAudioObj) { try { langAudioObj.pause(); } catch(e) {} }
+            if(typeof stopNetworkAudio === 'function') stopNetworkAudio();
             let mainAudio = document.getElementById('mainEpAudio');
             if(mainAudio) { try { mainAudio.pause(); } catch(e) {} }
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -820,8 +893,7 @@
                 a = a_val - b_val;
                 if (Math.random() > 0.5) {
                     let khor = a_val - 10; let mok = 10 - b_val;
-                    hint = `تکنیک مکمل: خرده ${a_val} میشه ${khor} / مکمل ${b_val} میشه ${mok}
-${khor} + ${mok} = ${a}`;
+                    hint = `تکنیک مکمل: خرده ${a_val} میشه ${khor} / مکمل ${b_val} میشه ${mok}\n${khor} + ${mok} = ${a}`;
                 } else {
                     let khor = a_val - 10; let rem = b_val - khor;
                     hint = `تکنیک پله‌ای: اول ${khor} تا کم کن برس به ۱۰. از ${b_val} مقدار ${rem} تا مونده. ۱۰ منهای ${rem} میشه ${a}`;
@@ -847,9 +919,7 @@ ${khor} + ${mok} = ${a}`;
                 q = `${x} + ${y}`; a = x + y;
                 let nextTen = Math.ceil(y / 10) * 10;
                 let diff = nextTen - y;
-                hint = `تکنیک رند کردن: ${y} را ${nextTen} فرض کن.
-${x} + ${nextTen} = ${x+nextTen}
-حالا ${diff} تا پس بگیر ➔ ${a}`;
+                hint = `تکنیک رند کردن: ${y} را ${nextTen} فرض کن.\n${x} + ${nextTen} = ${x+nextTen}\nحالا ${diff} تا پس بگیر ➔ ${a}`;
             } else {
                 let is3Digit = Math.random() > 0.5;
                 let x, y;
@@ -860,19 +930,14 @@ ${x} + ${nextTen} = ${x+nextTen}
                     let yH = Math.floor(y/100)*100;
                     let yT = Math.floor((y%100)/10)*10;
                     let yU = y%10;
-                    hint = `چپ‌به‌راست: اول صدگان
-${x} + ${yH} = ${x+yH}
-بعد دهگان: ${x+yH} + ${yT} = ${x+yH+yT}
-در نهایت یکان: ${a}`;
+                    hint = `چپ‌به‌راست: اول صدگان\n${x} + ${yH} = ${x+yH}\nبعد دهگان: ${x+yH} + ${yT} = ${x+yH+yT}\nدر نهایت یکان: ${a}`;
                 } else {
                     x = Math.floor(Math.random() * 80) + 10;
                     y = Math.floor(Math.random() * 80) + 10;
                     q = `${x} + ${y}`; a = x + y;
                     let yT = Math.floor(y/10)*10;
                     let yU = y%10;
-                    hint = `چپ‌به‌راست: اول دهگان
-${x} + ${yT} = ${x+yT}
-بعد یکان: ${x+yT} + ${yU} = ${a}`;
+                    hint = `چپ‌به‌راست: اول دهگان\n${x} + ${yT} = ${x+yT}\nبعد یکان: ${x+yT} + ${yU} = ${a}`;
                 }
             }
             return {q, a, hint};
@@ -888,9 +953,7 @@ ${x} + ${yT} = ${x+yT}
                 q = `${x} - ${y}`; a = x - y;
                 let nextTen = Math.ceil(y / 10) * 10;
                 let diff = nextTen - y;
-                hint = `طلبکارم: ${y} را ${nextTen} فرض کن.
-${x} - ${nextTen} = ${x-nextTen}
-چون ${diff} تا بیشتر کم کردی، طلبکاری! پس بده ➔ ${a}`;
+                hint = `طلبکارم: ${y} را ${nextTen} فرض کن.\n${x} - ${nextTen} = ${x-nextTen}\nچون ${diff} تا بیشتر کم کردی، طلبکاری! پس بده ➔ ${a}`;
             } else if (r < 0.66) {
                 let x = Math.floor(Math.random() * 40) + 50;
                 let y = Math.floor(Math.random() * 30) + 10;
@@ -898,10 +961,7 @@ ${x} - ${nextTen} = ${x-nextTen}
                 let nextTen = Math.ceil(y / 10) * 10;
                 let p1 = nextTen - y;
                 let p2 = x - nextTen;
-                hint = `پرش به جلو: روی ${y} بایست.
-با ${p1} قدم به ${nextTen} می‌رسی.
-از ${nextTen} با ${p2} قدم به ${x} می‌رسی.
-جمع قدم‌ها: ${p1} + ${p2} = ${a}`;
+                hint = `پرش به جلو: روی ${y} بایست.\nبا ${p1} قدم به ${nextTen} می‌رسی.\nاز ${nextTen} با ${p2} قدم به ${x} می‌رسی.\nجمع قدم‌ها: ${p1} + ${p2} = ${a}`;
             } else {
                 let base = [1000, 2000, 5000][Math.floor(Math.random() * 3)];
                 let y = Math.floor(Math.random() * 800) + 100;
@@ -910,11 +970,7 @@ ${x} - ${nextTen} = ${x-nextTen}
                 
                 let yStr = String(y).padStart(3, '0');
                 let first = base / 1000;
-                hint = `همه از ۹ آخری از ۱۰:
-هزارگان ${first} یکی کم میشه ➔ ${first-1}
-۹ - ${yStr[0]} = ${9-parseInt(yStr[0])}
-۹ - ${yStr[1]} = ${9-parseInt(yStr[1])}
-۱۰ - ${yStr[2]} = ${10-parseInt(yStr[2])}`;
+                hint = `همه از ۹ آخری از ۱۰:\nهزارگان ${first} یکی کم میشه ➔ ${first-1}\n۹ - ${yStr[0]} = ${9-parseInt(yStr[0])}\n۹ - ${yStr[1]} = ${9-parseInt(yStr[1])}\n۱۰ - ${yStr[2]} = ${10-parseInt(yStr[2])}`;
             }
             return {q, a, hint};
         }
@@ -1138,9 +1194,7 @@ ${x} - ${nextTen} = ${x-nextTen}
         function shareToTelegram() {
             let corrects = document.getElementById('sumCorrect').textContent;
             let time = document.getElementById('sumTime').textContent;
-            let txt = `موفق شدم!
-پاسخ صحیح: ${corrects} از ${sesh.qs.length}
-زمان: ${time}`;
+            let txt = `موفق شدم!\nپاسخ صحیح: ${corrects} از ${sesh.qs.length}\nزمان: ${time}`;
             window.open('https://t.me/share/url?url=https://t.me/MentalDiscipline_Bot&text=' + encodeURIComponent(txt));
         }
 
@@ -1317,6 +1371,251 @@ ${x} - ${nextTen} = ${x-nextTen}
             hintBox.innerHTML = `💡 این صدا در <b>قسمت ${fbEp}</b> بود.`;
             hintBox.style.display = 'block';
             playFlashbackAudio(); // پخش مجدد صوت برای یادآوری
+        }
+
+        // ==========================================
+        // مرور شبکه‌ای (Network Review - Ep 1-5)
+        // ==========================================
+        let netDb = null;
+        let netSelectedTag = 'همه';
+        let netCurrentNode = null;
+        let netAudioObj = null;
+        let netChainActive = false;
+        let netChainTimer = null;
+        let netChainIndex = 0;
+
+        async function openNetworkReview() {
+            playClick();
+            nav('screen-net-nodes');
+            if (!netDb) {
+                document.getElementById('netNodesList').innerHTML = '<div style="opacity:0.7; padding:30px;">در حال بارگذاری دیتابیس شبکه‌ای...</div>';
+                try {
+                    let res = await fetch('peppa_network_db_ep1_5.json');
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    netDb = await res.json();
+                } catch (e) {
+                    document.getElementById('netNodesList').innerHTML = '<div style="color:var(--error); text-align:center; padding:20px;">فایل <b>peppa_network_db_ep1_5.json</b> یافت نشد. لطفاً آن را کنار index.html در گیت‌هاب آپلود کنید.</div>';
+                    return;
+                }
+            }
+            renderNetworkFilters();
+            renderNetworkNodes();
+        }
+
+        function renderNetworkFilters() {
+            const bar = document.getElementById('netFilterBar');
+            bar.innerHTML = '';
+            const tags = ['همه', ...new Set(netDb.nodes.map(n => n.context_tag))];
+            tags.forEach(tag => {
+                const btn = document.createElement('button');
+                btn.className = 'net-chip' + (netSelectedTag === tag ? ' active' : '');
+                btn.textContent = tag;
+                btn.onclick = () => {
+                    playClick();
+                    netSelectedTag = tag;
+                    renderNetworkFilters();
+                    renderNetworkNodes();
+                };
+                bar.appendChild(btn);
+            });
+        }
+
+        function renderNetworkNodes() {
+            const list = document.getElementById('netNodesList');
+            list.innerHTML = '';
+            const filtered = netSelectedTag === 'همه'
+                ? netDb.nodes
+                : netDb.nodes.filter(n => n.context_tag === netSelectedTag);
+
+            filtered.forEach(node => {
+                const card = document.createElement('div');
+                card.className = 'net-node-card';
+                card.onclick = () => openNetworkNode(node.id);
+
+                const patternsHtml = node.patterns.map(p => `<span class="net-pattern-pill">${p}</span>`).join('');
+                card.innerHTML = `
+                    <div class="net-node-top">
+                        <div class="net-node-title">${node.title}</div>
+                        <span class="net-tag">${node.context_tag}</span>
+                    </div>
+                    <div class="net-patterns">${patternsHtml}</div>
+                    <div class="net-node-meta">
+                        <span>${node.occurrences.length} تکرار در قسمت‌های ۱ تا ۵</span>
+                        <span style="color:var(--blue); font-weight:bold;">مشاهده ➔</span>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function getEpisodeFaTitle(epNum) {
+            if (!netDb || !netDb.episodes) return `قسمت ${epNum}`;
+            const ep = netDb.episodes.find(e => e.id === epNum);
+            return ep ? `قسمت ${epNum} (${ep.fa_title})` : `قسمت ${epNum}`;
+        }
+
+        function openNetworkNode(nodeId) {
+            playClick();
+            stopNetworkAudio();
+            netCurrentNode = netDb.nodes.find(n => n.id === nodeId);
+            if (!netCurrentNode) return;
+
+            document.getElementById('netDetailTitle').textContent = netCurrentNode.title;
+            document.getElementById('netParentingText').textContent = netCurrentNode.parenting_example || '';
+            document.getElementById('netParentingBox').style.display = netCurrentNode.parenting_example ? 'block' : 'none';
+
+            const occList = document.getElementById('netOccurrencesList');
+            occList.innerHTML = '';
+
+            netCurrentNode.occurrences.forEach((occ, idx) => {
+                const card = document.createElement('div');
+                card.className = 'net-occ-card';
+                card.id = `net-occ-${idx}`;
+
+                card.innerHTML = `
+                    <div class="net-occ-header">
+                        <div class="net-occ-meta">${getEpisodeFaTitle(occ.episode)} • ${occ.speaker}</div>
+                        <button class="net-play-btn" onclick="playSingleNetworkClip(${idx})">▶ پخش</button>
+                    </div>
+                    <div class="net-occ-text">${occ.text}</div>
+                    <button class="net-details-toggle" id="net-toggle-${idx}" onclick="toggleNetDetails(${idx})">تلفظ پیوسته و نکات ▾</button>
+                    <div class="net-details-box" id="net-details-${idx}">
+                        <div class="net-detail-row"><span class="net-detail-label">تلفظ پیوسته:</span> ${occ.shadowing}</div>
+                        <div class="net-detail-row"><span class="net-detail-label">نکته آوایی:</span> ${occ.phonetic_note}</div>
+                        <div class="net-detail-row" style="margin-bottom:0;"><span class="net-detail-label">سینمای ذهنی:</span> ${occ.visual_anchor}</div>
+                    </div>
+                `;
+                occList.appendChild(card);
+            });
+
+            updateChainButtonUI();
+            nav('screen-net-detail');
+        }
+
+        function toggleNetDetails(idx) {
+            playClick();
+            const box = document.getElementById(`net-details-${idx}`);
+            const btn = document.getElementById(`net-toggle-${idx}`);
+            if (!box) return;
+            const isOpen = box.classList.toggle('open');
+            btn.textContent = isOpen ? 'بستن نکات ▴' : 'تلفظ پیوسته و نکات ▾';
+        }
+
+        function clearNetworkHighlights() {
+            document.querySelectorAll('.net-occ-card.playing').forEach(el => el.classList.remove('playing'));
+        }
+
+        function stopNetworkAudio() {
+            netChainActive = false;
+            if (netChainTimer) { clearTimeout(netChainTimer); netChainTimer = null; }
+            if (netAudioObj) {
+                try {
+                    netAudioObj.onended = null;
+                    netAudioObj.onerror = null;
+                    netAudioObj.pause();
+                    netAudioObj.currentTime = 0;
+                } catch (e) {}
+                netAudioObj = null;
+            }
+            clearNetworkHighlights();
+            updateChainButtonUI();
+            const statusEl = document.getElementById('netChainStatus');
+            if (statusEl) statusEl.style.display = 'none';
+        }
+
+        function updateChainButtonUI() {
+            const btn = document.getElementById('btnNetChain');
+            if (!btn) return;
+            if (netChainActive) {
+                btn.textContent = '⏹ توقف پخش زنجیره‌ای';
+                btn.style.background = 'var(--error)';
+            } else {
+                btn.textContent = '▶ پخش زنجیره‌ای (سایه‌خوانی)';
+                btn.style.background = 'var(--purple)';
+            }
+        }
+
+        function playSingleNetworkClip(idx) {
+            if (!netCurrentNode || !netCurrentNode.occurrences[idx]) return;
+            stopNetworkAudio();
+            const occ = netCurrentNode.occurrences[idx];
+            const card = document.getElementById(`net-occ-${idx}`);
+            if (card) card.classList.add('playing');
+
+            const src = `audio/${occ.audio}`;
+            netAudioObj = new Audio(src);
+            netAudioObj.onended = () => {
+                if (card) card.classList.remove('playing');
+            };
+            netAudioObj.onerror = () => {
+                if (card) card.classList.remove('playing');
+                showPopup("خطا", `فایل صوتی <b>${src}</b> یافت نشد.`);
+            };
+            netAudioObj.play().catch(() => {
+                if (card) card.classList.remove('playing');
+            });
+        }
+
+        function toggleNetworkChain() {
+            playClick();
+            if (netChainActive) {
+                stopNetworkAudio();
+                return;
+            }
+            if (!netCurrentNode || !netCurrentNode.occurrences.length) return;
+            stopNetworkAudio();
+            netChainActive = true;
+            netChainIndex = 0;
+            updateChainButtonUI();
+            playNextInNetworkChain();
+        }
+
+        function playNextInNetworkChain() {
+            if (!netChainActive || !netCurrentNode) return;
+            if (netChainIndex >= netCurrentNode.occurrences.length) {
+                stopNetworkAudio();
+                return;
+            }
+
+            clearNetworkHighlights();
+            const idx = netChainIndex;
+            const occ = netCurrentNode.occurrences[idx];
+            const card = document.getElementById(`net-occ-${idx}`);
+            const statusEl = document.getElementById('netChainStatus');
+
+            if (card) {
+                card.classList.add('playing');
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                statusEl.textContent = `در حال پخش کلیپ ${idx + 1} از ${netCurrentNode.occurrences.length}...`;
+            }
+
+            const src = `audio/${occ.audio}`;
+            netAudioObj = new Audio(src);
+            netAudioObj.onended = () => {
+                if (!netChainActive) return;
+                if (statusEl) statusEl.textContent = `مکث برای تکرار و سایه‌خوانی...`;
+                netChainTimer = setTimeout(() => {
+                    if (!netChainActive) return;
+                    netChainIndex++;
+                    playNextInNetworkChain();
+                }, 1800);
+            };
+            netAudioObj.onerror = () => {
+                if (!netChainActive) return;
+                netChainIndex++;
+                playNextInNetworkChain();
+            };
+            netAudioObj.play().catch(() => {
+                stopNetworkAudio();
+            });
+        }
+
+        function exitNetworkDetail() {
+            stopNetworkAudio();
+            nav('screen-net-nodes');
         }
     </script>
 </body>
