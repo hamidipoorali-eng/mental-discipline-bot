@@ -90,7 +90,7 @@
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .action-sheet { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: flex-end; z-index: 60; backdrop-filter: blur(4px); }
         .sheet-content { background: var(--card-bg); width: 100%; max-width: 450px; padding: 30px 25px 40px 25px; border-radius: 30px 30px 0 0; animation: slideUp 0.3s ease-out; display: flex; flex-direction: column; gap: 15px; text-align: center; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
-
+    
         /* --- مرور شبکه‌ای (Network Review) --- */
         .net-filter-bar { display: flex; gap: 8px; overflow-x: auto; width: 100%; max-width: 400px; padding-bottom: 6px; scrollbar-width: none; }
         .net-filter-bar::-webkit-scrollbar { display: none; }
@@ -122,6 +122,23 @@
         .net-details-box.open { display: block; }
         .net-detail-row { margin-bottom: 6px; }
         .net-detail-label { font-weight: bold; color: var(--gold); }
+
+        /* --- جملات کلیدی هر قسمت (Episode Highlights) --- */
+        .hl-ep-bar { display: flex; gap: 8px; overflow-x: auto; width: 100%; max-width: 400px; padding-bottom: 6px; scrollbar-width: none; }
+        .hl-ep-bar::-webkit-scrollbar { display: none; }
+        .hl-ep-chip { flex: 0 0 auto; padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-color); font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .hl-ep-chip.active { background: var(--purple); color: white; border-color: var(--purple); }
+
+        .hl-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 16px; border-radius: 16px; border: 1.5px solid var(--border); box-shadow: var(--shadow); transition: all 0.25s; }
+        .hl-card.playing { border-color: var(--purple); box-shadow: 0 0 16px rgba(155,89,182,0.35); background: rgba(155,89,182,0.06); }
+        .hl-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .hl-meta { font-size: 0.8rem; opacity: 0.75; font-weight: bold; }
+        .hl-pattern { font-size: 0.78rem; padding: 3px 9px; border-radius: 8px; background: rgba(155,89,182,0.15); color: var(--purple); font-weight: bold; direction: ltr; }
+        .hl-en { font-size: 1.1rem; font-weight: bold; direction: ltr; text-align: left; line-height: 1.55; margin-bottom: 6px; }
+        .hl-fa { font-size: 0.95rem; font-weight: bold; color: var(--success); margin-bottom: 10px; line-height: 1.6; }
+        .hl-sub-box { background: var(--bg-color); border-radius: 10px; padding: 10px 12px; font-size: 0.86rem; line-height: 1.75; margin-bottom: 8px; }
+        .hl-parenting { background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 10px; padding: 10px 12px; font-size: 0.86rem; line-height: 1.65; }
+        .hl-parenting-en { direction: ltr; text-align: left; font-weight: bold; margin-top: 4px; }
     </style>
 </head>
 <body data-theme="dark">
@@ -255,10 +272,17 @@
             <button id="btnFlashback" class="btn primary-btn" style="background:var(--gold); color:var(--bg-color); margin-bottom:10px; display:none; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(241,196,15,0.3);" onclick="startFlashback()">✨ فلش‌بک صوتی (مرور بدون اصطکاک)</button>
             <div class="module-card" style="border-color: var(--purple); width: 100%; max-width: 400px;" onclick="openNetworkReview()">
                 <div>
-                    <div class="module-title" style="color: var(--purple);">مرور شبکه‌ای (۵ قسمت اول)</div>
+                    <div class="module-title" style="color: var(--purple);">مرور شبکه‌ای (تا قسمت ۶)</div>
                     <div class="module-sub">۱۳ گره موضوعی • ۵۹ کلیپ سایه‌خوانی و پخش زنجیره‌ای</div>
                 </div>
                 <div style="font-size:1.4rem; color:var(--purple);">➔</div>
+            </div>
+            <div class="module-card" style="border-color: var(--gold); width: 100%; max-width: 400px;" onclick="openEpisodeHighlights()">
+                <div>
+                    <div class="module-title" style="color: var(--gold);">جملات کلیدی هر قسمت</div>
+                    <div class="module-sub">مرور جملات طلایی، تلفظ پیوسته و کاربرد در خانه</div>
+                </div>
+                <div style="font-size:1.4rem; color:var(--gold);">➔</div>
             </div>
             <div class="ep-list" id="episodesList"></div>
         </div>
@@ -362,6 +386,19 @@
                 <div class="net-parenting-text" id="netParentingText"></div>
             </div>
             <div id="netOccurrencesList" style="width:100%; display:flex; flex-direction:column; gap:12px; align-items:center;"></div>
+        </div>
+    </div>
+
+    <!-- جملات کلیدی هر قسمت (Episode Highlights) -->
+    <div id="screen-episode-highlights" class="screen">
+        <div class="header">
+            <button onclick="exitEpisodeHighlights()">➔</button>
+            <div class="header-title">جملات کلیدی قسمت‌ها</div>
+            <div style="width:45px"></div>
+        </div>
+        <div class="container">
+            <div class="hl-ep-bar" id="hlEpisodeBar"></div>
+            <div id="hlCardsList" style="width:100%; display:flex; flex-direction:column; gap:12px; align-items:center;"></div>
         </div>
     </div>
 
@@ -893,7 +930,8 @@
                 a = a_val - b_val;
                 if (Math.random() > 0.5) {
                     let khor = a_val - 10; let mok = 10 - b_val;
-                    hint = `تکنیک مکمل: خرده ${a_val} میشه ${khor} / مکمل ${b_val} میشه ${mok}\n${khor} + ${mok} = ${a}`;
+                    hint = `تکنیک مکمل: خرده ${a_val} میشه ${khor} / مکمل ${b_val} میشه ${mok}
+${khor} + ${mok} = ${a}`;
                 } else {
                     let khor = a_val - 10; let rem = b_val - khor;
                     hint = `تکنیک پله‌ای: اول ${khor} تا کم کن برس به ۱۰. از ${b_val} مقدار ${rem} تا مونده. ۱۰ منهای ${rem} میشه ${a}`;
@@ -919,7 +957,9 @@
                 q = `${x} + ${y}`; a = x + y;
                 let nextTen = Math.ceil(y / 10) * 10;
                 let diff = nextTen - y;
-                hint = `تکنیک رند کردن: ${y} را ${nextTen} فرض کن.\n${x} + ${nextTen} = ${x+nextTen}\nحالا ${diff} تا پس بگیر ➔ ${a}`;
+                hint = `تکنیک رند کردن: ${y} را ${nextTen} فرض کن.
+${x} + ${nextTen} = ${x+nextTen}
+حالا ${diff} تا پس بگیر ➔ ${a}`;
             } else {
                 let is3Digit = Math.random() > 0.5;
                 let x, y;
@@ -930,14 +970,19 @@
                     let yH = Math.floor(y/100)*100;
                     let yT = Math.floor((y%100)/10)*10;
                     let yU = y%10;
-                    hint = `چپ‌به‌راست: اول صدگان\n${x} + ${yH} = ${x+yH}\nبعد دهگان: ${x+yH} + ${yT} = ${x+yH+yT}\nدر نهایت یکان: ${a}`;
+                    hint = `چپ‌به‌راست: اول صدگان
+${x} + ${yH} = ${x+yH}
+بعد دهگان: ${x+yH} + ${yT} = ${x+yH+yT}
+در نهایت یکان: ${a}`;
                 } else {
                     x = Math.floor(Math.random() * 80) + 10;
                     y = Math.floor(Math.random() * 80) + 10;
                     q = `${x} + ${y}`; a = x + y;
                     let yT = Math.floor(y/10)*10;
                     let yU = y%10;
-                    hint = `چپ‌به‌راست: اول دهگان\n${x} + ${yT} = ${x+yT}\nبعد یکان: ${x+yT} + ${yU} = ${a}`;
+                    hint = `چپ‌به‌راست: اول دهگان
+${x} + ${yT} = ${x+yT}
+بعد یکان: ${x+yT} + ${yU} = ${a}`;
                 }
             }
             return {q, a, hint};
@@ -953,7 +998,9 @@
                 q = `${x} - ${y}`; a = x - y;
                 let nextTen = Math.ceil(y / 10) * 10;
                 let diff = nextTen - y;
-                hint = `طلبکارم: ${y} را ${nextTen} فرض کن.\n${x} - ${nextTen} = ${x-nextTen}\nچون ${diff} تا بیشتر کم کردی، طلبکاری! پس بده ➔ ${a}`;
+                hint = `طلبکارم: ${y} را ${nextTen} فرض کن.
+${x} - ${nextTen} = ${x-nextTen}
+چون ${diff} تا بیشتر کم کردی، طلبکاری! پس بده ➔ ${a}`;
             } else if (r < 0.66) {
                 let x = Math.floor(Math.random() * 40) + 50;
                 let y = Math.floor(Math.random() * 30) + 10;
@@ -961,7 +1008,10 @@
                 let nextTen = Math.ceil(y / 10) * 10;
                 let p1 = nextTen - y;
                 let p2 = x - nextTen;
-                hint = `پرش به جلو: روی ${y} بایست.\nبا ${p1} قدم به ${nextTen} می‌رسی.\nاز ${nextTen} با ${p2} قدم به ${x} می‌رسی.\nجمع قدم‌ها: ${p1} + ${p2} = ${a}`;
+                hint = `پرش به جلو: روی ${y} بایست.
+با ${p1} قدم به ${nextTen} می‌رسی.
+از ${nextTen} با ${p2} قدم به ${x} می‌رسی.
+جمع قدم‌ها: ${p1} + ${p2} = ${a}`;
             } else {
                 let base = [1000, 2000, 5000][Math.floor(Math.random() * 3)];
                 let y = Math.floor(Math.random() * 800) + 100;
@@ -970,7 +1020,11 @@
                 
                 let yStr = String(y).padStart(3, '0');
                 let first = base / 1000;
-                hint = `همه از ۹ آخری از ۱۰:\nهزارگان ${first} یکی کم میشه ➔ ${first-1}\n۹ - ${yStr[0]} = ${9-parseInt(yStr[0])}\n۹ - ${yStr[1]} = ${9-parseInt(yStr[1])}\n۱۰ - ${yStr[2]} = ${10-parseInt(yStr[2])}`;
+                hint = `همه از ۹ آخری از ۱۰:
+هزارگان ${first} یکی کم میشه ➔ ${first-1}
+۹ - ${yStr[0]} = ${9-parseInt(yStr[0])}
+۹ - ${yStr[1]} = ${9-parseInt(yStr[1])}
+۱۰ - ${yStr[2]} = ${10-parseInt(yStr[2])}`;
             }
             return {q, a, hint};
         }
@@ -1194,7 +1248,9 @@
         function shareToTelegram() {
             let corrects = document.getElementById('sumCorrect').textContent;
             let time = document.getElementById('sumTime').textContent;
-            let txt = `موفق شدم!\nپاسخ صحیح: ${corrects} از ${sesh.qs.length}\nزمان: ${time}`;
+            let txt = `موفق شدم!
+پاسخ صحیح: ${corrects} از ${sesh.qs.length}
+زمان: ${time}`;
             window.open('https://t.me/share/url?url=https://t.me/MentalDiscipline_Bot&text=' + encodeURIComponent(txt));
         }
 
@@ -1374,7 +1430,7 @@
         }
 
         // ==========================================
-        // مرور شبکه‌ای (Network Review - Ep 1-5)
+        // مرور شبکه‌ای (Network Review - Ep 1-6)
         // ==========================================
         let netDb = null;
         let netSelectedTag = 'همه';
@@ -1390,11 +1446,11 @@
             if (!netDb) {
                 document.getElementById('netNodesList').innerHTML = '<div style="opacity:0.7; padding:30px;">در حال بارگذاری دیتابیس شبکه‌ای...</div>';
                 try {
-                    let res = await fetch('peppa_network_db_ep1_5.json');
+                    let res = await fetch('peppa_network_db_ep1_6.json');
                     if (!res.ok) throw new Error('HTTP ' + res.status);
                     netDb = await res.json();
                 } catch (e) {
-                    document.getElementById('netNodesList').innerHTML = '<div style="color:var(--error); text-align:center; padding:20px;">فایل <b>peppa_network_db_ep1_5.json</b> یافت نشد. لطفاً آن را کنار index.html در گیت‌هاب آپلود کنید.</div>';
+                    document.getElementById('netNodesList').innerHTML = '<div style="color:var(--error); text-align:center; padding:20px;">فایل <b>peppa_network_db_ep1_6.json</b> یافت نشد. لطفاً آن را کنار index.html در گیت‌هاب آپلود کنید.</div>';
                     return;
                 }
             }
@@ -1440,7 +1496,7 @@
                     </div>
                     <div class="net-patterns">${patternsHtml}</div>
                     <div class="net-node-meta">
-                        <span>${node.occurrences.length} تکرار در قسمت‌های ۱ تا ۵</span>
+                        <span>${node.occurrences.length} تکرار در قسمت‌های ۱ تا ۶</span>
                         <span style="color:var(--blue); font-weight:bold;">مشاهده ➔</span>
                     </div>
                 `;
@@ -1616,6 +1672,142 @@
         function exitNetworkDetail() {
             stopNetworkAudio();
             nav('screen-net-nodes');
+        }
+
+        // ==========================================
+        // جملات کلیدی هر قسمت (Episode Highlights)
+        // ==========================================
+        let hlSelectedEp = null;
+
+        async function ensureNetDbLoaded() {
+            if (netDb) return true;
+            try {
+                let res = await fetch('peppa_network_db_ep1_6.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                netDb = await res.json();
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function openEpisodeHighlights() {
+            playClick();
+            nav('screen-episode-highlights');
+            const list = document.getElementById('hlEpisodeBar');
+            const cards = document.getElementById('hlCardsList');
+            if (!netDb) {
+                cards.innerHTML = '<div style="opacity:0.7; padding:30px;">در حال بارگذاری جملات کلیدی...</div>';
+                const ok = await ensureNetDbLoaded();
+                if (!ok) {
+                    list.innerHTML = '';
+                    cards.innerHTML = '<div style="color:var(--error); text-align:center; padding:20px;">فایل <b>peppa_network_db_ep1_6.json</b> یافت نشد.</div>';
+                    return;
+                }
+            }
+            const rawHighlights = Array.isArray(netDb.episode_highlights) ? netDb.episode_highlights : [];
+            const highlights = rawHighlights.flatMap(h => Array.isArray(h.sentences) ? h.sentences.map(s => ({ ...s, episode: s.episode || h.episode })) : [h]);
+            if (!highlights.length) {
+                list.innerHTML = '';
+                cards.innerHTML = '<div style="opacity:0.75; text-align:center; padding:25px;">هنوز جملات کلیدی در دیتابیس ثبت نشده است.</div>';
+                return;
+            }
+
+            const epNums = [...new Set(highlights.map(h => h.episode))].sort((a, b) => a - b);
+            if (!epNums.includes(hlSelectedEp)) {
+                hlSelectedEp = epNums[epNums.length - 1];
+            }
+            renderHighlightEpisodeBar(epNums);
+            renderHighlightCards();
+        }
+
+        function renderHighlightEpisodeBar(epNums) {
+            const bar = document.getElementById('hlEpisodeBar');
+            bar.innerHTML = '';
+            epNums.forEach(epNum => {
+                const epObj = netDb.episodes ? netDb.episodes.find(e => e.id === epNum) : null;
+                const label = epObj ? `قسمت ${epNum}: ${epObj.title}` : `قسمت ${epNum}`;
+                const btn = document.createElement('button');
+                btn.className = 'hl-ep-chip' + (hlSelectedEp === epNum ? ' active' : '');
+                btn.textContent = label;
+                btn.onclick = () => {
+                    playClick();
+                    stopNetworkAudio();
+                    hlSelectedEp = epNum;
+                    renderHighlightEpisodeBar(epNums);
+                    renderHighlightCards();
+                };
+                bar.appendChild(btn);
+            });
+        }
+
+        function renderHighlightCards() {
+            const cardsEl = document.getElementById('hlCardsList');
+            cardsEl.innerHTML = '';
+            const epBlocks = (netDb.episode_highlights || []).filter(h => h.episode === hlSelectedEp);
+            const items = [];
+            epBlocks.forEach(block => {
+                if (Array.isArray(block.sentences)) {
+                    block.sentences.forEach(s => items.push(s));
+                } else if (block.text) {
+                    items.push(block);
+                }
+            });
+
+            items.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = 'hl-card';
+                card.id = `hl-card-${idx}`;
+
+                const speakerText = item.speaker ? `${item.speaker} • ` : '';
+                const patternHtml = item.pattern ? `<span class="hl-pattern">${item.pattern}</span>` : '';
+                const meaningHtml = item.fa_meaning ? `<div class="hl-fa">${item.fa_meaning}</div>` : '';
+                const shadowingHtml = item.shadowing ? `<div><span class="net-detail-label">تلفظ پیوسته:</span> ${item.shadowing}</div>` : '';
+                const phoneticHtml = item.phonetic_note ? `<div style="margin-top:4px;"><span class="net-detail-label">نکته آوایی:</span> ${item.phonetic_note}</div>` : '';
+                const subBoxHtml = (shadowingHtml || phoneticHtml) ? `<div class="hl-sub-box">${shadowingHtml}${phoneticHtml}</div>` : '';
+                const parentingHtml = item.parenting_example
+                    ? `<div class="hl-parenting"><div class="net-parenting-label">کاربرد در خانه</div><div class="hl-parenting-en">${item.parenting_example}</div></div>`
+                    : '';
+
+                card.innerHTML = `
+                    <div class="hl-top">
+                        <div class="hl-meta">${speakerText}جمله ${idx + 1}</div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            ${patternHtml}
+                            <button class="net-play-btn" onclick="playHighlightClip(${idx}, '${item.audio || ''}')">▶ پخش</button>
+                        </div>
+                    </div>
+                    <div class="hl-en">${item.text || ''}</div>
+                    ${meaningHtml}
+                    ${subBoxHtml}
+                    ${parentingHtml}
+                `;
+                cardsEl.appendChild(card);
+            });
+        }
+
+        function playHighlightClip(idx, audioFile) {
+            stopNetworkAudio();
+            if (!audioFile) return;
+            const card = document.getElementById(`hl-card-${idx}`);
+            if (card) card.classList.add('playing');
+            const src = audioFile.startsWith('audio/') ? audioFile : `audio/${audioFile}`;
+            netAudioObj = new Audio(src);
+            netAudioObj.onended = () => {
+                if (card) card.classList.remove('playing');
+            };
+            netAudioObj.onerror = () => {
+                if (card) card.classList.remove('playing');
+                showPopup("خطا", `فایل صوتی <b>${src}</b> یافت نشد.`);
+            };
+            netAudioObj.play().catch(() => {
+                if (card) card.classList.remove('playing');
+            });
+        }
+
+        function exitEpisodeHighlights() {
+            stopNetworkAudio();
+            nav('screen-lang-menu');
         }
     </script>
 </body>
