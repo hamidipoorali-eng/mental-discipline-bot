@@ -4,13 +4,13 @@
 "accent": "British English (UK)",
 "audio_spec": "MP3, 64kbps, Mono"
 },
-"episodes": \[
+"episodes": [
 {
 "id": 1,
 "title": "Muddy Puddles",
 "fa_title": "چاله‌های گل",
 "full_audio": "ep1_full.mp3",
-"clips": \[
+"clips": [
 {
 "audio": "ep1_01.mp3",
 "start": "00:00:35.880",
@@ -207,14 +207,14 @@
 "phonetic_note": "اتصال come and به «کامِن» + too در انتهای جمله.",
 "parenting_example": "Have you been drawing? / Come on, let's clean up quickly!"
 }
-\]
+]
 },
 {
 "id": 2,
 "title": "Mr. Dinosaur Is Lost",
 "fa_title": "آقای دایناسور گم شده",
 "full_audio": "ep2_full.mp3",
-"clips": \[
+"clips": [
 {
 "audio": "ep2_01.mp3",
 "start": "00:00:44.780",
@@ -355,14 +355,14 @@
 "phonetic_note": "بیدار شدن R در wonder if (Linking R: واندِـریف).",
 "parenting_example": "Can you guess what I have? / I wonder where it can be!"
 }
-\]
+]
 },
 {
 "id": 3,
 "title": "Best Friend",
 "fa_title": "بهترین دوست",
 "full_audio": "ep3_full.mp3",
-"clips": \[
+"clips": [
 {
 "audio": "ep3_01.mp3",
 "start": "00:00:53.140",
@@ -573,14 +573,14 @@
 "phonetic_note": "کوتاه شدن you're به «یُـ» در لهجه بریتانیایی.",
 "parenting_example": "Let me think... / Have you thought of looking under the bed?"
 }
-\]
+]
 },
 {
 "id": 4,
 "title": "Polly Parrot",
 "fa_title": "طوطی پالی",
 "full_audio": "ep4_full.mp3",
-"clips": \[
+"clips": [
 {
 "audio": "ep4_01.mp3",
 "start": "00:00:48.300",
@@ -693,14 +693,14 @@
 "phonetic_note": "حذف کامل R در word (وِه‌د)؛ بسیار رایج در بریتانیا.",
 "parenting_example": "Oh, my word! Look what you made! / Oh dear, what happened?"
 }
-\]
+]
 },
 {
 "id": 5,
 "title": "Hide and Seek",
 "fa_title": "قایم‌موشک",
 "full_audio": "ep5_full.mp3",
-"clips": \[
+"clips": [
 {
 "audio": "ep5_01.mp3",
 "start": "00:00:35.360",
@@ -869,14 +869,14 @@
 "phonetic_note": "حذف R در dear و wonder و where؛ خنثی شدن can به «کِن».",
 "parenting_example": "Oh, my word! Look what you made! / Oh dear, what happened?"
 }
-\]
+]
 },
 {
 "id": 6,
 "title": "The Playgroup",
 "fa_title": "مهدکودک / گروه بازی",
 "full_audio": "ep6_full.mp3",
-"clips": \[
+"clips": [
 {
 "audio": "ep6_01.mp3",
 "start": "",
@@ -1087,7 +1087,7 @@
 "phonetic_note": "اتصال show و us با یک «و» نرم (شُـوِس)؛ عالی برای اعتمادبه‌نفس دادن به کودک.",
 "parenting_example": "Can you show us all how to draw a cat?"
 }
-\]
+]
 }
-\]
+]
 }
